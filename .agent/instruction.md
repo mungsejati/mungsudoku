@@ -1,0 +1,1 @@
+Before writing any code, always read the project blueprint in `./project/PRD.md` and check the current development stage in `./project/SCOPE.md`.
