@@ -53,6 +53,7 @@ class SudokuBoardWidget extends ConsumerWidget {
                   selectedCol: state.selectedCol,
                   highlightedValue: highlightedValue,
                   conflictPositions: state.conflictPositions,
+                  superHighlightPositions: state.superHighlightPositions,
                   isFastModeActive: state.isFastModeActive,
                   activeValue: state.activeValue,
                   symbolType: state.symbolType,
@@ -149,6 +150,7 @@ class _BoardHighlightData {
     required this.selectedCol,
     required this.highlightedValue,
     required this.conflictPositions,
+    required this.superHighlightPositions,
     required this.isFastModeActive,
     required this.activeValue,
     required this.symbolType,
@@ -158,6 +160,7 @@ class _BoardHighlightData {
   final int? selectedCol;
   final int? highlightedValue;
   final Set<(int, int)> conflictPositions;
+  final Set<(int, int)> superHighlightPositions;
   final bool isFastModeActive;
   final int? activeValue;
   final SymbolType symbolType;
@@ -214,6 +217,10 @@ class _SubGridCard extends StatelessWidget {
               final isSelected =
                   state.selectedRow == row && state.selectedCol == col;
               final isConflict = state.conflictPositions.contains((row, col));
+              final isSuperHighlight = state.superHighlightPositions.contains((
+                row,
+                col,
+              ));
 
               bool isCrosshair = false;
               if (state.selectedRow != null &&
@@ -242,6 +249,7 @@ class _SubGridCard extends StatelessWidget {
                 cell: cell,
                 isSelected: isSelected,
                 isConflict: isConflict,
+                isSuperHighlight: isSuperHighlight,
                 isCrosshair: isCrosshair,
                 isIdentical: isIdentical,
                 isHighlightedNote: isHighlightedNote,
@@ -281,6 +289,7 @@ class _CellTile extends StatelessWidget {
     required this.cell,
     required this.isSelected,
     required this.isConflict,
+    required this.isSuperHighlight,
     required this.isCrosshair,
     required this.isIdentical,
     required this.isHighlightedNote,
@@ -295,6 +304,7 @@ class _CellTile extends StatelessWidget {
   final SudokuCell cell;
   final bool isSelected;
   final bool isConflict;
+  final bool isSuperHighlight;
   final bool isCrosshair;
   final bool isIdentical;
   final bool isHighlightedNote;
@@ -313,7 +323,10 @@ class _CellTile extends StatelessWidget {
 
     final bool showRedBackground = isConflict && cell.isOriginal;
 
-    if (isSelected) {
+    if (isSuperHighlight) {
+      bg = Colors.amberAccent;
+      borderRadius = BorderRadius.circular(6);
+    } else if (isSelected) {
       bg = gameTheme.selectedCellColor;
       borderRadius = BorderRadius.circular(6);
     } else if (showRedBackground) {
@@ -372,7 +385,9 @@ class _CellTile extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
         margin: bg != Colors.transparent
             ? const EdgeInsets.all(3.5)
             : const EdgeInsets.all(1.0),
@@ -381,7 +396,12 @@ class _CellTile extends StatelessWidget {
           border: border,
           borderRadius: borderRadius,
         ),
-        child: content,
+        child: AnimatedScale(
+          scale: isIdentical ? 1.05 : 1.0,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+          child: content,
+        ),
       ),
     );
   }
@@ -439,20 +459,17 @@ class _NotesGrid extends StatelessWidget {
         return Center(
           child: isHot
               ? Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 2.0, vertical: 1.0),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 2.0,
+                    vertical: 1.0,
+                  ),
                   decoration: BoxDecoration(
                     color: gameTheme.identicalValueCellColor,
                     borderRadius: BorderRadius.circular(3),
                   ),
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: text,
-                  ),
+                  child: FittedBox(fit: BoxFit.scaleDown, child: text),
                 )
-              : FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: text,
-                ),
+              : FittedBox(fit: BoxFit.scaleDown, child: text),
         );
       },
     );

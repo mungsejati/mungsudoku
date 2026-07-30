@@ -45,9 +45,15 @@ class GameNotifier extends Notifier<GameState> {
 
   Timer? _timer;
 
+  bool _mounted = true;
+
   @override
   GameState build() {
-    ref.onDispose(_cancelTimer);
+    _mounted = true;
+    ref.onDispose(() {
+      _mounted = false;
+      _cancelTimer();
+    });
     return GameState.initial();
   }
 
@@ -86,6 +92,7 @@ class GameNotifier extends Notifier<GameState> {
       undoStack: const [],
       redoStack: const [],
       conflictPositions: const <(int, int)>{},
+      superHighlightPositions: const <(int, int)>{},
     );
 
     _startTimer();
@@ -163,6 +170,7 @@ class GameNotifier extends Notifier<GameState> {
 
     final SudokuBoard updatedBoard;
     int newMistakeCount = state.cumulativeMistakeCount;
+    final Set<(int, int)> superHighlights = {};
 
     if (state.isNoteMode) {
       updatedBoard = state.board.updateCell(row, col, cell.toggleNote(value));
@@ -184,9 +192,40 @@ class GameNotifier extends Notifier<GameState> {
         newMistakeCount++;
         _log.warning('Mistake at ($row,$col): entered $newValue, expected ${cell.solutionValue}.');
       }
+
+      // Check for sweep animation
+      if (newValue != null && newValue == cell.solutionValue) {
+        final int gridSize = state.board.gridSize;
+        final int sgSize = state.board.subGridSize;
+        final int sgIndex = (row ~/ sgSize) * sgSize + (col ~/ sgSize);
+        
+        if (updatedBoard.rowNumbers[row]!.length == gridSize) {
+          for (int c = 0; c < gridSize; c++) {
+            superHighlights.add((row, c));
+          }
+        }
+        if (updatedBoard.colNumbers[col]!.length == gridSize) {
+          for (int r = 0; r < gridSize; r++) {
+            superHighlights.add((r, col));
+          }
+        }
+        if (updatedBoard.subGridNumbers[sgIndex]!.length == gridSize) {
+          final int startRow = (sgIndex ~/ sgSize) * sgSize;
+          final int startCol = (sgIndex % sgSize) * sgSize;
+          for (int r = startRow; r < startRow + sgSize; r++) {
+            for (int c = startCol; c < startCol + sgSize; c++) {
+              superHighlights.add((r, c));
+            }
+          }
+        }
+      }
     }
 
-    _applyBoardUpdate(updatedBoard, cumulativeMistakeCount: newMistakeCount);
+    _applyBoardUpdate(
+      updatedBoard,
+      cumulativeMistakeCount: newMistakeCount,
+      newSuperHighlights: superHighlights,
+    );
   }
 
   /// Clears the value (and notes) from the cell at ([row], [col]).
@@ -315,6 +354,36 @@ class GameNotifier extends Notifier<GameState> {
   }
 
   // ---------------------------------------------------------------------------
+  // Auto-Complete
+  // ---------------------------------------------------------------------------
+
+  /// Fills the remaining empty cells one by one with a staggered delay.
+  Future<void> triggerAutoComplete() async {
+    if (_isBlocked || !state.canAutoComplete) return;
+
+    final board = state.board;
+    final gridSize = board.gridSize;
+
+    final emptyCells = <(int, int)>[];
+    for (int r = 0; r < gridSize; r++) {
+      for (int c = 0; c < gridSize; c++) {
+        if (!board.cellAt(r, c).isFilled) {
+          emptyCells.add((r, c));
+        }
+      }
+    }
+
+    for (final pos in emptyCells) {
+      if (!_mounted) return;
+      final cell = state.board.cellAt(pos.$1, pos.$2);
+      if (!cell.isFilled) {
+        inputNumber(pos.$1, pos.$2, cell.solutionValue);
+        await Future.delayed(const Duration(milliseconds: 150));
+      }
+    }
+  }
+
+  // ---------------------------------------------------------------------------
   // Undo / Redo
   // ---------------------------------------------------------------------------
 
@@ -397,6 +466,7 @@ class GameNotifier extends Notifier<GameState> {
   void _applyBoardUpdate(
     SudokuBoard updatedBoard, {
     int? cumulativeMistakeCount,
+    Set<(int, int)>? newSuperHighlights,
   }) {
     final conflicts = SudokuValidator.findConflicts(updatedBoard);
     final isVictory = updatedBoard.isCompleted;
@@ -409,11 +479,20 @@ class GameNotifier extends Notifier<GameState> {
       undoStack: [...state.undoStack, state.board],
       redoStack: const [],
       conflictPositions: conflicts,
+      superHighlightPositions: newSuperHighlights ?? const <(int, int)>{},
       cumulativeMistakeCount: newMistakeCount,
       isVictory: isVictory,
       isGameOver: isGameOver,
       isPaused: isGameOver ? false : state.isPaused,
     );
+
+    if (newSuperHighlights != null && newSuperHighlights.isNotEmpty) {
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (_mounted) {
+          state = state.copyWith(superHighlightPositions: const <(int, int)>{});
+        }
+      });
+    }
 
     if (isVictory || isGameOver) _cancelTimer();
     _autoSave();

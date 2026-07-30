@@ -42,6 +42,7 @@ class GameState {
     required this.undoStack,
     required this.redoStack,
     required this.conflictPositions,
+    required this.superHighlightPositions,
     this.cumulativeMistakeCount = 0,
     this.selectedRow,
     this.selectedCol,
@@ -133,6 +134,10 @@ class GameState {
   /// The UI uses this set to render the red conflict-highlight overlay.
   final Set<(int, int)> conflictPositions;
 
+  /// Temporary set of positions for the "Sweep" success animation.
+  /// Used when a row, col, or subgrid is fully resolved.
+  final Set<(int, int)> superHighlightPositions;
+
   // --- End-of-game flags ---
 
   /// `true` after a game-over condition is triggered (e.g. mistake limit).
@@ -155,6 +160,14 @@ class GameState {
   /// `true` when there is at least one action to redo.
   bool get canRedo => redoStack.isNotEmpty;
 
+  /// `true` when there are 10 or fewer empty cells and no conflicts.
+  bool get canAutoComplete =>
+      !isVictory &&
+      !isGameOver &&
+      conflictPositions.isEmpty &&
+      board.filledCellCount < board.totalCells &&
+      (board.totalCells - board.filledCellCount <= 10);
+
   // --- Factory ---
 
   /// Creates the default state before any game has been loaded.
@@ -173,6 +186,7 @@ class GameState {
         undoStack: const [],
         redoStack: const [],
         conflictPositions: const <(int, int)>{},
+        superHighlightPositions: const <(int, int)>{},
       );
 
   // --- Immutable copy ---
@@ -201,6 +215,7 @@ class GameState {
     List<SudokuBoard>? undoStack,
     List<SudokuBoard>? redoStack,
     Set<(int, int)>? conflictPositions,
+    Set<(int, int)>? superHighlightPositions,
     bool? isGameOver,
     bool? isVictory,
   }) =>
@@ -225,6 +240,7 @@ class GameState {
         undoStack: undoStack ?? this.undoStack,
         redoStack: redoStack ?? this.redoStack,
         conflictPositions: conflictPositions ?? this.conflictPositions,
+        superHighlightPositions: superHighlightPositions ?? this.superHighlightPositions,
         isGameOver: isGameOver ?? this.isGameOver,
         isVictory: isVictory ?? this.isVictory,
       );
@@ -249,6 +265,7 @@ class GameState {
         'undoStack': undoStack.map((b) => b.toJson()).toList(),
         'redoStack': redoStack.map((b) => b.toJson()).toList(),
         'conflictPositions': conflictPositions.map((p) => {'row': p.$1, 'col': p.$2}).toList(),
+        // Note: superHighlightPositions is strictly ephemeral, no need to persist it.
         'isGameOver': isGameOver,
         'isVictory': isVictory,
       };
@@ -278,6 +295,7 @@ class GameState {
       conflictPositions: (json['conflictPositions'] as List<dynamic>)
           .map((e) => (e['row'] as int, e['col'] as int))
           .toSet(),
+      superHighlightPositions: const <(int, int)>{}, // Ephemeral
       isGameOver: json['isGameOver'] as bool,
       isVictory: json['isVictory'] as bool,
     );

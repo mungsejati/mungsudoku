@@ -148,6 +148,7 @@ class _GamePageState extends ConsumerState<GamePage> {
     });
 
     final gameTheme = ref.watch(gameThemeProvider);
+    final canAutoComplete = ref.watch(gameNotifierProvider.select((s) => s.canAutoComplete));
 
     return Scaffold(
       body: Stack(
@@ -235,6 +236,36 @@ class _GamePageState extends ConsumerState<GamePage> {
                           ),
                           // Control toolbar overlaps the top of the numpad
                           const GameControlPad(),
+                          
+                          // Auto Complete Button
+                          if (canAutoComplete)
+                            Positioned(
+                              top: -46,
+                              child: TweenAnimationBuilder<double>(
+                                tween: Tween(begin: 0.0, end: 1.0),
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeOutBack,
+                                builder: (context, val, child) {
+                                  return Transform.scale(
+                                    scale: val,
+                                    child: child,
+                                  );
+                                },
+                                child: FilledButton.icon(
+                                  onPressed: () => ref.read(gameNotifierProvider.notifier).triggerAutoComplete(),
+                                  icon: const Icon(Icons.auto_awesome_rounded),
+                                  label: const Text(
+                                    'Auto Complete',
+                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                  style: FilledButton.styleFrom(
+                                    backgroundColor: Colors.amberAccent,
+                                    foregroundColor: Colors.black87,
+                                    elevation: 6,
+                                  ),
+                                ),
+                              ),
+                            ),
                         ],
                       ),
                     ),
