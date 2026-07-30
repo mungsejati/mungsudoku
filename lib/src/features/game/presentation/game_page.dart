@@ -223,6 +223,13 @@ class _GamePageState extends ConsumerState<GamePage> {
                       ),
                     ),
 
+                    // ---- Auto Complete Button ----
+                    if (canAutoComplete)
+                      const Padding(
+                        padding: EdgeInsets.only(bottom: 12.0),
+                        child: _PulseAutoCompleteButton(),
+                      ),
+
                     // ---- Toolbar overlapping numpad (Stack overlap) ----
                     SizedBox(
                       child: Stack(
@@ -236,36 +243,6 @@ class _GamePageState extends ConsumerState<GamePage> {
                           ),
                           // Control toolbar overlaps the top of the numpad
                           const GameControlPad(),
-                          
-                          // Auto Complete Button
-                          if (canAutoComplete)
-                            Positioned(
-                              top: -46,
-                              child: TweenAnimationBuilder<double>(
-                                tween: Tween(begin: 0.0, end: 1.0),
-                                duration: const Duration(milliseconds: 300),
-                                curve: Curves.easeOutBack,
-                                builder: (context, val, child) {
-                                  return Transform.scale(
-                                    scale: val,
-                                    child: child,
-                                  );
-                                },
-                                child: FilledButton.icon(
-                                  onPressed: () => ref.read(gameNotifierProvider.notifier).triggerAutoComplete(),
-                                  icon: const Icon(Icons.auto_awesome_rounded),
-                                  label: const Text(
-                                    'Auto Complete',
-                                    style: TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                  style: FilledButton.styleFrom(
-                                    backgroundColor: Colors.amberAccent,
-                                    foregroundColor: Colors.black87,
-                                    elevation: 6,
-                                  ),
-                                ),
-                              ),
-                            ),
                         ],
                       ),
                     ),
@@ -278,6 +255,80 @@ class _GamePageState extends ConsumerState<GamePage> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _PulseAutoCompleteButton extends ConsumerStatefulWidget {
+  const _PulseAutoCompleteButton();
+
+  @override
+  ConsumerState<_PulseAutoCompleteButton> createState() => _PulseAutoCompleteButtonState();
+}
+
+class _PulseAutoCompleteButtonState extends ConsumerState<_PulseAutoCompleteButton> with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _scaleAnimation;
+  late final Animation<double> _shadowAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    )..repeat(reverse: true);
+
+    _scaleAnimation = Tween<double>(begin: 0.97, end: 1.03).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+    
+    _shadowAnimation = Tween<double>(begin: 4.0, end: 12.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Transform.scale(
+          scale: _scaleAnimation.value,
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF10B981).withValues(alpha: 0.4),
+                  blurRadius: _shadowAnimation.value,
+                  spreadRadius: _shadowAnimation.value / 4,
+                ),
+              ],
+            ),
+            child: FilledButton.icon(
+              onPressed: () => ref.read(gameNotifierProvider.notifier).triggerAutoComplete(),
+              icon: const Icon(Icons.auto_awesome_rounded, size: 20),
+              label: const Text(
+                'Auto Complete ✨',
+                style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
+              ),
+              style: FilledButton.styleFrom(
+                backgroundColor: const Color(0xFF10B981), // Emerald Green
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

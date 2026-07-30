@@ -47,6 +47,7 @@ class GameState {
     this.selectedRow,
     this.selectedCol,
     this.activeValue,
+    this.isAutoCompleteRunning = false,
     this.isGameOver = false,
     this.isVictory = false,
   });
@@ -138,6 +139,9 @@ class GameState {
   /// Used when a row, col, or subgrid is fully resolved.
   final Set<(int, int)> superHighlightPositions;
 
+  /// `true` when auto-complete sequence is currently playing.
+  final bool isAutoCompleteRunning;
+
   // --- End-of-game flags ---
 
   /// `true` after a game-over condition is triggered (e.g. mistake limit).
@@ -187,6 +191,7 @@ class GameState {
         redoStack: const [],
         conflictPositions: const <(int, int)>{},
         superHighlightPositions: const <(int, int)>{},
+        isAutoCompleteRunning: false,
       );
 
   // --- Immutable copy ---
@@ -216,6 +221,7 @@ class GameState {
     List<SudokuBoard>? redoStack,
     Set<(int, int)>? conflictPositions,
     Set<(int, int)>? superHighlightPositions,
+    bool? isAutoCompleteRunning,
     bool? isGameOver,
     bool? isVictory,
   }) =>
@@ -241,6 +247,7 @@ class GameState {
         redoStack: redoStack ?? this.redoStack,
         conflictPositions: conflictPositions ?? this.conflictPositions,
         superHighlightPositions: superHighlightPositions ?? this.superHighlightPositions,
+        isAutoCompleteRunning: isAutoCompleteRunning ?? this.isAutoCompleteRunning,
         isGameOver: isGameOver ?? this.isGameOver,
         isVictory: isVictory ?? this.isVictory,
       );
@@ -265,7 +272,7 @@ class GameState {
         'undoStack': undoStack.map((b) => b.toJson()).toList(),
         'redoStack': redoStack.map((b) => b.toJson()).toList(),
         'conflictPositions': conflictPositions.map((p) => {'row': p.$1, 'col': p.$2}).toList(),
-        // Note: superHighlightPositions is strictly ephemeral, no need to persist it.
+        // Note: superHighlightPositions & isAutoCompleteRunning are ephemeral, no need to persist.
         'isGameOver': isGameOver,
         'isVictory': isVictory,
       };
@@ -296,6 +303,7 @@ class GameState {
           .map((e) => (e['row'] as int, e['col'] as int))
           .toSet(),
       superHighlightPositions: const <(int, int)>{}, // Ephemeral
+      isAutoCompleteRunning: false, // Ephemeral
       isGameOver: json['isGameOver'] as bool,
       isVictory: json['isVictory'] as bool,
     );

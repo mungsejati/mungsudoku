@@ -162,8 +162,8 @@ class GameNotifier extends Notifier<GameState> {
   ///
   /// After every input, conflict detection is re-run and the board is checked
   /// for victory. Auto-save is triggered.
-  void inputNumber(int row, int col, int value) {
-    if (_isBlocked) return;
+  void inputNumber(int row, int col, int value, {bool isAuto = false}) {
+    if (!isAuto && _isBlocked) return;
 
     final cell = state.board.cellAt(row, col);
     if (!cell.isEditable) return;
@@ -225,6 +225,7 @@ class GameNotifier extends Notifier<GameState> {
       updatedBoard,
       cumulativeMistakeCount: newMistakeCount,
       newSuperHighlights: superHighlights,
+      isAuto: isAuto,
     );
   }
 
@@ -357,9 +358,10 @@ class GameNotifier extends Notifier<GameState> {
   // Auto-Complete
   // ---------------------------------------------------------------------------
 
-  /// Fills the remaining empty cells one by one with a staggered delay.
   Future<void> triggerAutoComplete() async {
     if (_isBlocked || !state.canAutoComplete) return;
+
+    state = state.copyWith(isAutoCompleteRunning: true);
 
     final board = state.board;
     final gridSize = board.gridSize;
@@ -377,9 +379,21 @@ class GameNotifier extends Notifier<GameState> {
       if (!_mounted) return;
       final cell = state.board.cellAt(pos.$1, pos.$2);
       if (!cell.isFilled) {
-        inputNumber(pos.$1, pos.$2, cell.solutionValue);
+        inputNumber(pos.$1, pos.$2, cell.solutionValue, isAuto: true);
         await Future.delayed(const Duration(milliseconds: 150));
       }
+    }
+
+    if (!_mounted) return;
+
+    // Allow time for the final sweep animation to complete its 500ms cycle
+    await Future.delayed(const Duration(milliseconds: 400));
+    
+    if (_mounted) {
+      state = state.copyWith(
+        isAutoCompleteRunning: false,
+        isVictory: true,
+      );
     }
   }
 
@@ -435,6 +449,14 @@ class GameNotifier extends Notifier<GameState> {
   }
 
   // ---------------------------------------------------------------------------
+  // Helpers
+  // ---------------------------------------------------------------------------
+
+  /// Determines if user input should be ignored (e.g. paused, game over, or auto-complete running).
+  bool get _isBlocked =>
+      state.isPaused || state.isGameOver || state.isVictory || state.isAutoCompleteRunning;
+
+  // ---------------------------------------------------------------------------
   // Timer (private)
   // ---------------------------------------------------------------------------
 
@@ -458,15 +480,13 @@ class GameNotifier extends Notifier<GameState> {
   // Shared helpers
   // ---------------------------------------------------------------------------
 
-  /// Convenience guard: returns `true` when input should be ignored.
-  bool get _isBlocked => state.isPaused || state.isGameOver || state.isVictory;
-
   /// Pushes [updatedBoard] as the new game state, updating conflicts,
   /// undo stack, redo stack, and checking for victory. Triggers auto-save.
   void _applyBoardUpdate(
     SudokuBoard updatedBoard, {
     int? cumulativeMistakeCount,
     Set<(int, int)>? newSuperHighlights,
+    bool isAuto = false,
   }) {
     final conflicts = SudokuValidator.findConflicts(updatedBoard);
     final isVictory = updatedBoard.isCompleted;
@@ -481,7 +501,7 @@ class GameNotifier extends Notifier<GameState> {
       conflictPositions: conflicts,
       superHighlightPositions: newSuperHighlights ?? const <(int, int)>{},
       cumulativeMistakeCount: newMistakeCount,
-      isVictory: isVictory,
+      isVictory: isAuto ? false : isVictory,
       isGameOver: isGameOver,
       isPaused: isGameOver ? false : state.isPaused,
     );
