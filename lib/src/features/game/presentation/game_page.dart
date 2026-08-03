@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../../../core/theme/game_theme.dart';
 import '../application/game_notifier.dart';
@@ -23,19 +22,12 @@ class _GamePageState extends ConsumerState<GamePage> {
   @override
   void initState() {
     super.initState();
-    WakelockPlus.enable();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final state = ref.read(gameNotifierProvider);
-      if (state.board.filledCellCount == 0) {
+      if (state.board.filledCellCount == 0 && !state.isLoading) {
         _showNewGameBottomSheet(context);
       }
     });
-  }
-
-  @override
-  void dispose() {
-    WakelockPlus.disable();
-    super.dispose();
   }
 
   void _startNewGame(BuildContext context, Difficulty difficulty) {
@@ -149,6 +141,7 @@ class _GamePageState extends ConsumerState<GamePage> {
 
     final gameTheme = ref.watch(gameThemeProvider);
     final canAutoComplete = ref.watch(gameNotifierProvider.select((s) => s.canAutoComplete));
+    final isLoading = ref.watch(gameNotifierProvider.select((s) => s.isLoading));
 
     return Scaffold(
       body: Stack(
@@ -214,12 +207,30 @@ class _GamePageState extends ConsumerState<GamePage> {
 
                     // ---- Board ----
                     Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 4,
-                          vertical: 4,
-                        ),
-                        child: Center(child: const SudokuBoardWidget()),
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 2.0,
+                              vertical: 4.0,
+                            ),
+                            child: Center(child: SudokuBoardWidget()),
+                          ),
+                          if (isLoading)
+                            Container(
+                              decoration: BoxDecoration(
+                                color: gameTheme.background.withValues(alpha: 0.6),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              width: 80,
+                              height: 80,
+                              alignment: Alignment.center,
+                              child: const CircularProgressIndicator(
+                                color: Colors.white,
+                              ),
+                            ),
+                        ],
                       ),
                     ),
 

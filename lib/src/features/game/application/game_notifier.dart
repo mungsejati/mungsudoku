@@ -75,6 +75,27 @@ class GameNotifier extends Notifier<GameState> {
     );
     _cancelTimer();
 
+    state = state.copyWith(
+      board: SudokuBoard.empty(subGridSize: subGridSize),
+      difficulty: difficulty,
+      selectedSubGridSize: subGridSize,
+      symbolType: symbolType,
+      gameDuration: Duration.zero,
+      isPaused: false,
+      isGameOver: false,
+      isVictory: false,
+      cumulativeMistakeCount: 0,
+      undoStack: const [],
+      redoStack: const [],
+      conflictPositions: const <(int, int)>{},
+      superHighlightPositions: const <(int, int)>{},
+      isAutoCompleteRunning: false,
+      isLoading: true,
+      clearSelectedCell: true,
+      clearActiveValue: true,
+    );
+    await Future.delayed(Duration.zero);
+
     final board = await compute(_generatePuzzle, (difficulty, subGridSize));
 
     state = GameState(
@@ -93,6 +114,7 @@ class GameNotifier extends Notifier<GameState> {
       redoStack: const [],
       conflictPositions: const <(int, int)>{},
       superHighlightPositions: const <(int, int)>{},
+      isLoading: false,
     );
 
     _startTimer();
@@ -361,6 +383,7 @@ class GameNotifier extends Notifier<GameState> {
   Future<void> triggerAutoComplete() async {
     if (_isBlocked || !state.canAutoComplete) return;
 
+    _cancelTimer();
     state = state.copyWith(isAutoCompleteRunning: true);
 
     final board = state.board;
@@ -394,6 +417,7 @@ class GameNotifier extends Notifier<GameState> {
         isAutoCompleteRunning: false,
         isVictory: true,
       );
+      _clearSave();
     }
   }
 
@@ -461,6 +485,7 @@ class GameNotifier extends Notifier<GameState> {
   // ---------------------------------------------------------------------------
 
   void _startTimer() {
+    _cancelTimer();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) => _tick());
   }
 
@@ -514,7 +539,10 @@ class GameNotifier extends Notifier<GameState> {
       });
     }
 
-    if (isVictory || isGameOver) _cancelTimer();
+    if (isVictory || isGameOver) {
+      _cancelTimer();
+      _clearSave();
+    }
     _autoSave();
   }
 
@@ -522,17 +550,23 @@ class GameNotifier extends Notifier<GameState> {
   // Auto-save
   // ---------------------------------------------------------------------------
 
-  /// Persists the current game state to local storage.
-  Future<void> _autoSave() async {
+  /// Clears the saved game state from local storage.
+  Future<void> _clearSave() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      
-      // If game is finished, clear the save so it cannot be resumed.
-      if (state.isVictory || state.isGameOver) {
-        await prefs.remove('current_game');
-        _log.fine('Auto-save — game finished, save cleared.');
-        return;
-      }
+      await prefs.remove('current_game');
+      _log.fine('Auto-save — game finished, save cleared.');
+    } catch (e, stack) {
+      _log.warning('Failed to clear save', e, stack);
+    }
+  }
+
+  /// Persists the current game state to local storage.
+  Future<void> _autoSave() async {
+    if (state.isVictory || state.isGameOver || state.isLoading) return;
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
       
       await prefs.setString('current_game', jsonEncode(state.toJson()));
       _log.fine(

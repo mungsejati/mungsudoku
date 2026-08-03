@@ -48,6 +48,7 @@ class GameState {
     this.selectedCol,
     this.activeValue,
     this.isAutoCompleteRunning = false,
+    this.isLoading = false,
     this.isGameOver = false,
     this.isVictory = false,
   });
@@ -142,6 +143,9 @@ class GameState {
   /// `true` when auto-complete sequence is currently playing.
   final bool isAutoCompleteRunning;
 
+  /// `true` while the game engine is busy generating a new puzzle.
+  final bool isLoading;
+
   // --- End-of-game flags ---
 
   /// `true` after a game-over condition is triggered (e.g. mistake limit).
@@ -192,6 +196,7 @@ class GameState {
         conflictPositions: const <(int, int)>{},
         superHighlightPositions: const <(int, int)>{},
         isAutoCompleteRunning: false,
+        isLoading: false,
       );
 
   // --- Immutable copy ---
@@ -222,6 +227,7 @@ class GameState {
     Set<(int, int)>? conflictPositions,
     Set<(int, int)>? superHighlightPositions,
     bool? isAutoCompleteRunning,
+    bool? isLoading,
     bool? isGameOver,
     bool? isVictory,
   }) =>
@@ -248,6 +254,7 @@ class GameState {
         conflictPositions: conflictPositions ?? this.conflictPositions,
         superHighlightPositions: superHighlightPositions ?? this.superHighlightPositions,
         isAutoCompleteRunning: isAutoCompleteRunning ?? this.isAutoCompleteRunning,
+        isLoading: isLoading ?? this.isLoading,
         isGameOver: isGameOver ?? this.isGameOver,
         isVictory: isVictory ?? this.isVictory,
       );
@@ -272,7 +279,7 @@ class GameState {
         'undoStack': undoStack.map((b) => b.toJson()).toList(),
         'redoStack': redoStack.map((b) => b.toJson()).toList(),
         'conflictPositions': conflictPositions.map((p) => {'row': p.$1, 'col': p.$2}).toList(),
-        // Note: superHighlightPositions & isAutoCompleteRunning are ephemeral, no need to persist.
+        // Note: superHighlightPositions, isAutoCompleteRunning, & isLoading are ephemeral, no need to persist.
         'isGameOver': isGameOver,
         'isVictory': isVictory,
       };
@@ -304,6 +311,7 @@ class GameState {
           .toSet(),
       superHighlightPositions: const <(int, int)>{}, // Ephemeral
       isAutoCompleteRunning: false, // Ephemeral
+      isLoading: false, // Ephemeral
       isGameOver: json['isGameOver'] as bool,
       isVictory: json['isVictory'] as bool,
     );
