@@ -32,6 +32,7 @@ class GameTheme {
     required this.numpadButtonBackground,
     required this.numpadButtonShadow,
     required this.arcColor,
+    required this.topBarTextColor,
   });
 
   // ---- Board background ----
@@ -70,6 +71,9 @@ class GameTheme {
 
   // ---- Decorative arcs (bottom-right corner ornament) ----
   final Color arcColor;
+
+  // ---- Top Bar / Nav Bar (Timer, mistakes, title) ----
+  final Color topBarTextColor;
 
   // ---------------------------------------------------------------------------
   // Built-in themes
@@ -116,49 +120,183 @@ class GameTheme {
       ),
     ],
     arcColor: const Color(0xFF0D7EC4),
+    topBarTextColor: Colors.white,
   );
 
-  /// Dark / night theme.
-  static final dark = GameTheme(
-    background: const Color(0xFF1A1A2E),
-    subGridBackground: const Color(0xFF252540),
+  /// Red theme.
+  static final red = GameTheme(
+    background: const Color(0xFFE53935),
+    subGridBackground: Colors.white,
     subGridBorderRadius: 12,
     subGridSpacing: 7,
     subGridShadow: [
       BoxShadow(
-        color: Colors.black.withValues(alpha: 0.5),
+        color: const Color(0xFFB71C1C).withValues(alpha: 0.55),
+        blurRadius: 0,
+        offset: const Offset(3, 4),
+      ),
+    ],
+    cellBorderColor: const Color(0xFFFFCDD2),
+    selectedCellColor: const Color(0xFFFFF59D),
+    selectedCellBorderColor: const Color(0xFFC62828),
+    identicalValueCellColor: const Color(0xFFFFCDD2),
+    originalCellColor: Colors.transparent,
+    conflictCellColor: const Color(0xFFE57373),
+    crosshairColor: const Color(0xFFFFEBEE),
+    originalTextColor: const Color(0xFF212121),
+    inputTextColor: const Color(0xFFC62828),
+    conflictTextColor: const Color(0xFFD32F2F),
+    controlPadBackground: Colors.white,
+    controlPadShadow: [
+      BoxShadow(
+        color: const Color(0xFFB71C1C).withValues(alpha: 0.50),
+        blurRadius: 0,
+        offset: const Offset(0, 5),
+      ),
+    ],
+    numpadBackground: const Color(0xFFFFCDD2),
+    numpadButtonBackground: Colors.white,
+    numpadButtonShadow: [
+      BoxShadow(
+        color: const Color(0xFFB71C1C).withValues(alpha: 0.50),
+        blurRadius: 0,
+        offset: const Offset(0, 4),
+      ),
+    ],
+    arcColor: const Color(0xFFC62828),
+    topBarTextColor: Colors.white,
+  );
+
+  /// Green theme.
+  static final green = GameTheme(
+    background: const Color(0xFF43A047),
+    subGridBackground: Colors.white,
+    subGridBorderRadius: 12,
+    subGridSpacing: 7,
+    subGridShadow: [
+      BoxShadow(
+        color: const Color(0xFF1B5E20).withValues(alpha: 0.55),
+        blurRadius: 0,
+        offset: const Offset(3, 4),
+      ),
+    ],
+    cellBorderColor: const Color(0xFFC8E6C9),
+    selectedCellColor: const Color(0xFFFFF59D),
+    selectedCellBorderColor: const Color(0xFF2E7D32),
+    identicalValueCellColor: const Color(0xFFC8E6C9),
+    originalCellColor: Colors.transparent,
+    conflictCellColor: const Color(0xFFFFCDD2),
+    crosshairColor: const Color(0xFFE8F5E9),
+    originalTextColor: const Color(0xFF212121),
+    inputTextColor: const Color(0xFF2E7D32),
+    conflictTextColor: const Color(0xFFD32F2F),
+    controlPadBackground: Colors.white,
+    controlPadShadow: [
+      BoxShadow(
+        color: const Color(0xFF1B5E20).withValues(alpha: 0.50),
+        blurRadius: 0,
+        offset: const Offset(0, 5),
+      ),
+    ],
+    numpadBackground: const Color(0xFFC8E6C9),
+    numpadButtonBackground: Colors.white,
+    numpadButtonShadow: [
+      BoxShadow(
+        color: const Color(0xFF1B5E20).withValues(alpha: 0.50),
+        blurRadius: 0,
+        offset: const Offset(0, 4),
+      ),
+    ],
+    arcColor: const Color(0xFF2E7D32),
+    topBarTextColor: Colors.white,
+  );
+
+  /// White / Light Minimalist theme.
+  static final white = GameTheme(
+    background: const Color(0xFFF5F5F5),
+    subGridBackground: Colors.white,
+    subGridBorderRadius: 12,
+    subGridSpacing: 7,
+    subGridShadow: [
+      BoxShadow(
+        color: const Color(0xFFBDBDBD).withValues(alpha: 0.55),
+        blurRadius: 0,
+        offset: const Offset(3, 4),
+      ),
+    ],
+    cellBorderColor: const Color(0xFFE0E0E0),
+    selectedCellColor: const Color(0xFFFFF59D),
+    selectedCellBorderColor: const Color(0xFF424242),
+    identicalValueCellColor: const Color(0xFFE0E0E0),
+    originalCellColor: Colors.transparent,
+    conflictCellColor: const Color(0xFFFFCDD2),
+    crosshairColor: const Color(0xFFEEEEEE),
+    originalTextColor: const Color(0xFF212121),
+    inputTextColor: const Color(0xFF424242),
+    conflictTextColor: const Color(0xFFD32F2F),
+    controlPadBackground: Colors.white,
+    controlPadShadow: [
+      BoxShadow(
+        color: const Color(0xFFBDBDBD).withValues(alpha: 0.50),
+        blurRadius: 0,
+        offset: const Offset(0, 5),
+      ),
+    ],
+    numpadBackground: const Color(0xFFE0E0E0),
+    numpadButtonBackground: Colors.white,
+    numpadButtonShadow: [
+      BoxShadow(
+        color: const Color(0xFFBDBDBD).withValues(alpha: 0.50),
+        blurRadius: 0,
+        offset: const Offset(0, 4),
+      ),
+    ],
+    arcColor: const Color(0xFFE0E0E0),
+    topBarTextColor: Colors.black87,
+  );
+
+  /// Black / Dark OLED theme.
+  static final black = GameTheme(
+    background: const Color(0xFF121212),
+    subGridBackground: const Color(0xFF1E1E1E),
+    subGridBorderRadius: 12,
+    subGridSpacing: 7,
+    subGridShadow: [
+      BoxShadow(
+        color: Colors.black.withValues(alpha: 0.8),
         blurRadius: 8,
         offset: const Offset(0, 4),
       ),
     ],
-    cellBorderColor: const Color(0xFF3A3A5A),
+    cellBorderColor: const Color(0xFF333333),
     selectedCellColor: const Color(0xFF5D4037),
     selectedCellBorderColor: const Color(0xFFFFD54F),
-    identicalValueCellColor: const Color(0xFF263238),
-    originalCellColor: const Color(0xFF37374A),
+    identicalValueCellColor: const Color(0xFF2C2C2C),
+    originalCellColor: const Color(0xFF242424),
     conflictCellColor: const Color(0xFF4E1A1A),
-    crosshairColor: const Color(0xFF2C2C4A),
-    originalTextColor: const Color(0xFFEEEEEE),
+    crosshairColor: const Color(0xFF222222),
+    originalTextColor: const Color(0xFFE0E0E0),
     inputTextColor: const Color(0xFF90CAF9),
     conflictTextColor: const Color(0xFFEF9A9A),
-    controlPadBackground: const Color(0xFF252540),
+    controlPadBackground: const Color(0xFF1E1E1E),
     controlPadShadow: [
       BoxShadow(
-        color: Colors.black.withValues(alpha: 0.4),
+        color: Colors.black.withValues(alpha: 0.6),
         blurRadius: 10,
         offset: const Offset(0, 4),
       ),
     ],
-    numpadBackground: const Color(0xFF1E1E38),
-    numpadButtonBackground: const Color(0xFF303050),
+    numpadBackground: const Color(0xFF151515),
+    numpadButtonBackground: const Color(0xFF2A2A2A),
     numpadButtonShadow: [
       BoxShadow(
-        color: Colors.black.withValues(alpha: 0.4),
+        color: Colors.black.withValues(alpha: 0.6),
         blurRadius: 6,
         offset: const Offset(0, 3),
       ),
     ],
-    arcColor: const Color(0xFF0D0D20),
+    arcColor: const Color(0xFF000000),
+    topBarTextColor: Colors.white,
   );
 }
 
@@ -167,6 +305,18 @@ class GameTheme {
 /// Watches the GameNotifier's state to determine the active theme.
 final gameThemeProvider = Provider<GameTheme>((ref) {
   final activeThemePreset = ref.watch(gameNotifierProvider.select((state) => state.activeThemePreset));
-  if (activeThemePreset == 'dark') return GameTheme.dark;
-  return GameTheme.blue;
+  switch (activeThemePreset) {
+    case 'red':
+      return GameTheme.red;
+    case 'green':
+      return GameTheme.green;
+    case 'white':
+      return GameTheme.white;
+    case 'black':
+    case 'dark':
+      return GameTheme.black;
+    case 'blue':
+    default:
+      return GameTheme.blue;
+  }
 });

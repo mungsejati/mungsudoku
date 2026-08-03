@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../application/game_notifier.dart';
 import '../../application/game_state.dart';
+import '../../../../core/theme/game_theme.dart';
 
 class GameTopBar extends ConsumerWidget {
   const GameTopBar({super.key});
@@ -16,6 +17,7 @@ class GameTopBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(gameNotifierProvider);
+    final gameTheme = ref.watch(gameThemeProvider);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -30,7 +32,7 @@ class GameTopBar extends ConsumerWidget {
                 state.difficulty.displayName,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: gameTheme.topBarTextColor,
                     ),
               ),
               const SizedBox(height: 4),
@@ -39,7 +41,7 @@ class GameTopBar extends ConsumerWidget {
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: state.cumulativeMistakeCount > 0
                           ? Colors.redAccent
-                          : Colors.white,
+                          : gameTheme.topBarTextColor,
                       fontWeight: FontWeight.w600,
                     ),
               ),
@@ -49,13 +51,13 @@ class GameTopBar extends ConsumerWidget {
           // Timer & Pause
           Row(
             children: [
-              const Icon(Icons.timer_outlined, size: 20, color: Colors.white),
+              Icon(Icons.timer_outlined, size: 20, color: gameTheme.topBarTextColor),
               const SizedBox(width: 4),
               Text(
                 _formatDuration(state.gameDuration),
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontFeatures: const [FontFeature.tabularFigures()],
-                      color: Colors.white,
+                      color: gameTheme.topBarTextColor,
                       fontWeight: FontWeight.w600,
                     ),
               ),
@@ -63,7 +65,7 @@ class GameTopBar extends ConsumerWidget {
               IconButton(
                 icon: Icon(
                   state.isPaused ? Icons.play_arrow : Icons.pause,
-                  color: Colors.white,
+                  color: gameTheme.topBarTextColor,
                 ),
                 onPressed: () {
                   if (state.isPaused) {
