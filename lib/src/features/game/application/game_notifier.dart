@@ -121,6 +121,35 @@ class GameNotifier extends Notifier<GameState> {
     _log.info('Game ready. $board');
   }
 
+  /// Restarts the current puzzle from the beginning without generating a new one.
+  void restartPuzzle() {
+    _cancelTimer();
+    
+    // We recreate the board from initial state
+    final initialBoard = state.board.reset();
+    
+    state = state.copyWith(
+      board: initialBoard,
+      gameDuration: Duration.zero,
+      isPaused: false,
+      isVictory: false,
+      isGameOver: false,
+      cumulativeMistakeCount: 0,
+      undoStack: const [],
+      redoStack: const [],
+      conflictPositions: const <(int, int)>{},
+      superHighlightPositions: const <(int, int)>{},
+      isAutoCompleteRunning: false,
+      isLoading: false,
+      clearSelectedCell: true,
+      clearActiveValue: true,
+    );
+    
+    _startTimer();
+    _autoSave();
+    _log.info('Puzzle restarted.');
+  }
+
   /// Pauses the game: stops the timer. Board is hidden in the UI.
   void pauseGame() {
     if (state.isPaused || state.isGameOver || state.isVictory) return;

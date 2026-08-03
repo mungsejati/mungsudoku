@@ -113,6 +113,40 @@ class SudokuBoard {
     );
   }
 
+  /// Returns a new board resetting all user inputs and notes, 
+  /// restoring the board to its initial state.
+  SudokuBoard reset() {
+    final rowNums = <int, Set<int>>{for (var i = 0; i < gridSize; i++) i: {}};
+    final colNums = <int, Set<int>>{for (var i = 0; i < gridSize; i++) i: {}};
+    final sgNums = <int, Set<int>>{for (var i = 0; i < gridSize; i++) i: {}};
+
+    final newCells = List.generate(gridSize, (r) {
+      return List.generate(gridSize, (c) {
+        final cell = cells[r][c];
+        final newCell = cell.isOriginal
+            ? cell
+            : cell.copyWith(clearValue: true, notes: const {});
+            
+        final val = newCell.value;
+        if (val != null && val != 0) {
+          final sgIndex = (r ~/ subGridSize) * subGridSize + (c ~/ subGridSize);
+          rowNums[r]!.add(val);
+          colNums[c]!.add(val);
+          sgNums[sgIndex]!.add(val);
+        }
+        return newCell;
+      }, growable: false);
+    }, growable: false);
+
+    return SudokuBoard(
+      cells: newCells,
+      subGridSize: subGridSize,
+      rowNumbers: rowNums,
+      colNumbers: colNums,
+      subGridNumbers: sgNums,
+    );
+  }
+
   /// Creates a board from two flat integer lists in row-major order.
   ///
   /// - [given]: The puzzle's initial state. Use `0` for empty (player-fillable)

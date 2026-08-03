@@ -108,13 +108,9 @@ class SudokuBoardWidget extends ConsumerWidget {
                               foregroundColor: Colors.white,
                               side: const BorderSide(color: Colors.white54),
                             ),
-                            onPressed: () => ref
-                                .read(gameNotifierProvider.notifier)
-                                .initNewGame(
-                                  state.difficulty,
-                                  subGridSize: state.selectedSubGridSize,
-                                  symbolType: state.symbolType,
-                                ),
+                            onPressed: () {
+                              ref.read(gameNotifierProvider.notifier).restartPuzzle();
+                            },
                             icon: const Icon(Icons.refresh),
                             label: const Text('Restart Puzzle'),
                           ),

@@ -106,14 +106,7 @@ class _GamePageState extends ConsumerState<GamePage> {
           FilledButton(
             onPressed: () {
               Navigator.of(context).pop();
-              final s = ref.read(gameNotifierProvider);
-              ref
-                  .read(gameNotifierProvider.notifier)
-                  .initNewGame(
-                    s.difficulty,
-                    subGridSize: s.selectedSubGridSize,
-                    symbolType: s.symbolType,
-                  );
+              ref.read(gameNotifierProvider.notifier).restartPuzzle();
             },
             child: const Text('Try Again'),
           ),

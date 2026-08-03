@@ -133,4 +133,39 @@ void main() {
     expect(notifier.state.isAutoCompleteRunning, isFalse);
     expect(notifier.state.isVictory, isTrue);
   });
+
+  test('Test 5: restartPuzzle restores initial board and resets mistakes', () async {
+    final container = makeProviderContainer();
+    final notifier = container.read(gameNotifierProvider.notifier);
+    
+    await notifier.initNewGame(Difficulty.easy, subGridSize: 2);
+    final initialBoard = notifier.state.board;
+    
+    // Simulate some moves and mistakes
+    final board = notifier.state.board;
+    var emptyPos = (0, 0);
+    for (int r = 0; r < board.gridSize; r++) {
+      for (int c = 0; c < board.gridSize; c++) {
+        if (!board.cellAt(r, c).isFilled) {
+          emptyPos = (r, c);
+          break;
+        }
+      }
+    }
+    
+    // Input something to increase mistakes
+    final correctVal = board.cellAt(emptyPos.$1, emptyPos.$2).solutionValue;
+    final wrongVal = correctVal == 1 ? 2 : 1; 
+    notifier.inputNumber(emptyPos.$1, emptyPos.$2, wrongVal);
+    
+    expect(notifier.state.cumulativeMistakeCount, equals(1));
+    expect(notifier.state.board.filledCellCount, greaterThan(initialBoard.filledCellCount));
+    
+    // Now restart
+    notifier.restartPuzzle();
+    
+    expect(notifier.state.cumulativeMistakeCount, equals(0));
+    expect(notifier.state.board.filledCellCount, equals(initialBoard.filledCellCount));
+    expect(notifier.state.gameDuration, equals(Duration.zero));
+  });
 }
