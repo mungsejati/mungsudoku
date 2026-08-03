@@ -388,7 +388,9 @@ class GameNotifier extends Notifier<GameState> {
       value: cell.solutionValue,
       notes: const {},
     );
-    final updatedBoard = state.board.updateCell(row, col, hintedCell);
+    final updatedBoard = state.board
+        .updateCell(row, col, hintedCell)
+        .pruneNotesForPlacement(row, col, cell.solutionValue);
     final conflicts = SudokuValidator.findConflicts(updatedBoard);
     final isVictory = updatedBoard.isCompleted;
 

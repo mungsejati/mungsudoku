@@ -168,4 +168,59 @@ void main() {
     expect(notifier.state.board.filledCellCount, equals(initialBoard.filledCellCount));
     expect(notifier.state.gameDuration, equals(Duration.zero));
   });
+
+  test('Test 6: useHint auto-prunes notes from peers', () async {
+    final container = makeProviderContainer();
+    final notifier = container.read(gameNotifierProvider.notifier);
+    
+    await notifier.initNewGame(Difficulty.easy, subGridSize: 2);
+    
+    // Find two empty cells in the same row
+    final board = notifier.state.board;
+    var empty1 = (-1, -1);
+    var empty2 = (-1, -1);
+    for (int r = 0; r < board.gridSize; r++) {
+      for (int c = 0; c < board.gridSize; c++) {
+        if (!board.cellAt(r, c).isFilled) {
+          if (empty1.$1 == -1) {
+            empty1 = (r, c);
+          } else if (empty1.$1 == r) {
+            empty2 = (r, c);
+            break;
+          }
+        }
+      }
+      if (empty2.$1 != -1) break;
+    }
+    
+    // If not found in same row, just use any two empty cells, but ideally we want peers
+    // For a generated board with 2x2, there should be some empty peers.
+    if (empty2.$1 == -1) return; // skip if no two empty cells in same row
+    
+    final correctVal = board.cellAt(empty1.$1, empty1.$2).solutionValue;
+    
+    // Add notes to both empty cells
+    // Turn on note mode
+    notifier.toggleNoteMode();
+    
+    // Add correctVal as a note to empty2
+    notifier.inputNumber(empty2.$1, empty2.$2, correctVal);
+    expect(notifier.state.board.cellAt(empty2.$1, empty2.$2).notes, contains(correctVal));
+    
+    // Turn off note mode
+    notifier.toggleNoteMode();
+    
+    // Use hint on empty1
+    notifier.selectCell(empty1.$1, empty1.$2);
+    notifier.useHint();
+    
+    // Verify empty1 is filled with correctVal
+    final filledCell = notifier.state.board.cellAt(empty1.$1, empty1.$2);
+    expect(filledCell.value, equals(correctVal));
+    expect(filledCell.notes, isEmpty, reason: 'Hint should clear notes on target cell');
+    
+    // Verify empty2 note was auto-pruned
+    final peerCell = notifier.state.board.cellAt(empty2.$1, empty2.$2);
+    expect(peerCell.notes, isNot(contains(correctVal)), reason: 'Hint should auto-prune notes from peers');
+  });
 }
