@@ -89,7 +89,7 @@ class GameTheme {
       BoxShadow(
         color: const Color(0xFF0D5FA0).withValues(alpha: 0.55),
         blurRadius: 0,
-        offset: const Offset(3, 4),
+        offset: const Offset(0, 4),
       ),
     ],
     cellBorderColor: const Color(0xFFADD8F7),
@@ -133,7 +133,7 @@ class GameTheme {
       BoxShadow(
         color: const Color(0xFFB71C1C).withValues(alpha: 0.55),
         blurRadius: 0,
-        offset: const Offset(3, 4),
+        offset: const Offset(0, 4),
       ),
     ],
     cellBorderColor: const Color(0xFFFFCDD2),
@@ -177,7 +177,7 @@ class GameTheme {
       BoxShadow(
         color: const Color(0xFF1B5E20).withValues(alpha: 0.55),
         blurRadius: 0,
-        offset: const Offset(3, 4),
+        offset: const Offset(0, 4),
       ),
     ],
     cellBorderColor: const Color(0xFFC8E6C9),
@@ -221,7 +221,7 @@ class GameTheme {
       BoxShadow(
         color: const Color(0xFFBDBDBD).withValues(alpha: 0.55),
         blurRadius: 0,
-        offset: const Offset(3, 4),
+        offset: const Offset(0, 4),
       ),
     ],
     cellBorderColor: const Color(0xFFE0E0E0),
@@ -264,7 +264,7 @@ class GameTheme {
     subGridShadow: [
       BoxShadow(
         color: Colors.black.withValues(alpha: 0.8),
-        blurRadius: 8,
+        blurRadius: 0,
         offset: const Offset(0, 4),
       ),
     ],

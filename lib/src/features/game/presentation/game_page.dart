@@ -241,12 +241,13 @@ class _GamePageState extends ConsumerState<GamePage> {
                     // ---- Board ----
                     Expanded(
                       child: Stack(
+                        clipBehavior: Clip.none,
                         alignment: Alignment.center,
                         children: [
                           const Padding(
                             padding: EdgeInsets.symmetric(
                               horizontal: 2.0,
-                              vertical: 4.0,
+                              vertical: 12.0,
                             ),
                             child: Center(child: SudokuBoardWidget()),
                           ),

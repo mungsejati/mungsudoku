@@ -31,9 +31,11 @@ class SudokuBoardWidget extends ConsumerWidget {
     return AspectRatio(
       aspectRatio: 1.0,
       child: Stack(
+        clipBehavior: Clip.none,
         children: [
           // Sub-grid grid (separated cards)
           GridView.builder(
+            clipBehavior: Clip.none,
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: board.subGridSize,
