@@ -224,6 +224,20 @@ class GameNotifier extends Notifier<GameState> {
     final Set<(int, int)> superHighlights = {};
 
     if (state.isNoteMode) {
+      if (!cell.notes.contains(value)) {
+        // Validation: Prevent adding a note if the value already exists in row, col, or sub-grid
+        final conflicts = SudokuValidator.findConflictPositionsForValue(state.board, row, col, value);
+        if (conflicts.isNotEmpty) {
+          state = state.copyWith(conflictPositions: conflicts);
+          Future.delayed(const Duration(milliseconds: 600), () {
+            // Only clear if the current conflict positions match what we set
+            if (state.conflictPositions == conflicts) {
+              state = state.copyWith(conflictPositions: const <(int, int)>{});
+            }
+          });
+          return;
+        }
+      }
       updatedBoard = state.board.updateCell(row, col, cell.toggleNote(value));
     } else {
       final newValue = cell.value == value ? null : value;

@@ -173,54 +173,76 @@ void main() {
     final container = makeProviderContainer();
     final notifier = container.read(gameNotifierProvider.notifier);
     
+    // Deterministic board
+    final size = 4;
+    final cells = List.generate(size, (r) => List.generate(size, (c) => SudokuCell(row: r, col: c, solutionValue: 1, value: 0)));
+    cells[0][0] = const SudokuCell(row: 0, col: 0, value: 0, solutionValue: 1, isOriginal: false);
+    cells[0][1] = const SudokuCell(row: 0, col: 1, value: 0, solutionValue: 2, isOriginal: false);
+    
+    final board = SudokuBoard(
+      cells: cells, 
+      subGridSize: 2, 
+      rowNumbers: {0: {}, 1: {}, 2: {}, 3: {}}, 
+      colNumbers: {0: {}, 1: {}, 2: {}, 3: {}}, 
+      subGridNumbers: {0: {}, 1: {}, 2: {}, 3: {}}
+    );
+    
     await notifier.initNewGame(Difficulty.easy, subGridSize: 2);
+    notifier.state = notifier.state.copyWith(board: board);
     
-    // Find two empty cells in the same row
-    final board = notifier.state.board;
-    var empty1 = (-1, -1);
-    var empty2 = (-1, -1);
-    for (int r = 0; r < board.gridSize; r++) {
-      for (int c = 0; c < board.gridSize; c++) {
-        if (!board.cellAt(r, c).isFilled) {
-          if (empty1.$1 == -1) {
-            empty1 = (r, c);
-          } else if (empty1.$1 == r) {
-            empty2 = (r, c);
-            break;
-          }
-        }
-      }
-      if (empty2.$1 != -1) break;
-    }
+    final correctVal = 1; // Solution for (0,0)
     
-    // If not found in same row, just use any two empty cells, but ideally we want peers
-    // For a generated board with 2x2, there should be some empty peers.
-    if (empty2.$1 == -1) return; // skip if no two empty cells in same row
-    
-    final correctVal = board.cellAt(empty1.$1, empty1.$2).solutionValue;
-    
-    // Add notes to both empty cells
-    // Turn on note mode
+    // Add notes to (0,1)
     notifier.toggleNoteMode();
-    
-    // Add correctVal as a note to empty2
-    notifier.inputNumber(empty2.$1, empty2.$2, correctVal);
-    expect(notifier.state.board.cellAt(empty2.$1, empty2.$2).notes, contains(correctVal));
+    notifier.inputNumber(0, 1, correctVal);
+    expect(notifier.state.board.cellAt(0, 1).notes, contains(correctVal));
     
     // Turn off note mode
     notifier.toggleNoteMode();
     
-    // Use hint on empty1
-    notifier.selectCell(empty1.$1, empty1.$2);
+    // Use hint on (0,0)
+    notifier.selectCell(0, 0);
     notifier.useHint();
     
-    // Verify empty1 is filled with correctVal
-    final filledCell = notifier.state.board.cellAt(empty1.$1, empty1.$2);
+    // Verify (0,0) is filled with correctVal
+    final filledCell = notifier.state.board.cellAt(0, 0);
     expect(filledCell.value, equals(correctVal));
     expect(filledCell.notes, isEmpty, reason: 'Hint should clear notes on target cell');
     
-    // Verify empty2 note was auto-pruned
-    final peerCell = notifier.state.board.cellAt(empty2.$1, empty2.$2);
+    // Verify (0,1) note was auto-pruned
+    final peerCell = notifier.state.board.cellAt(0, 1);
     expect(peerCell.notes, isNot(contains(correctVal)), reason: 'Hint should auto-prune notes from peers');
+  });
+
+  test('Test 7: invalid note triggers conflict and is not added', () async {
+    final container = makeProviderContainer();
+    final notifier = container.read(gameNotifierProvider.notifier);
+    
+    final size = 4;
+    final cells = List.generate(size, (r) => List.generate(size, (c) => SudokuCell(row: r, col: c, solutionValue: 1, value: 0)));
+    cells[0][0] = const SudokuCell(row: 0, col: 0, value: 1, solutionValue: 1, isOriginal: true);
+    cells[0][1] = const SudokuCell(row: 0, col: 1, value: 0, solutionValue: 2, isOriginal: false);
+    
+    final board = SudokuBoard(
+      cells: cells, 
+      subGridSize: 2, 
+      rowNumbers: {0: {1}, 1: {}, 2: {}, 3: {}}, 
+      colNumbers: {0: {1}, 1: {}, 2: {}, 3: {}}, 
+      subGridNumbers: {0: {1}, 1: {}, 2: {}, 3: {}}
+    );
+    
+    await notifier.initNewGame(Difficulty.easy, subGridSize: 2);
+    notifier.state = notifier.state.copyWith(board: board);
+    
+    notifier.toggleNoteMode();
+    
+    // Try to add note 1 to (0,1). 1 is already at (0,0) (same row/subgrid)
+    notifier.inputNumber(0, 1, 1);
+    
+    // The note should not be added
+    expect(notifier.state.board.cellAt(0, 1).notes.contains(1), isFalse, reason: 'Invalid note should not be added');
+    
+    // It should flag (0,0) as conflict
+    expect(notifier.state.conflictPositions, contains(const (0, 0)), reason: 'Should flag conflicting peer position');
   });
 }

@@ -155,9 +155,10 @@ void main() {
       expect(state.board.cellAt(targetRow, targetCol).isEmpty, isTrue);
 
       notifier.toggleNoteMode(); // Turn note mode ON
-      notifier.inputNumber(targetRow, targetCol, 3); // add note 3
+      final validNote = state.board.cellAt(targetRow, targetCol).solutionValue;
+      notifier.inputNumber(targetRow, targetCol, validNote); // add valid note
       state = container.read(gameNotifierProvider);
-      expect(state.board.cellAt(targetRow, targetCol).notes, contains(3));
+      expect(state.board.cellAt(targetRow, targetCol).notes, contains(validNote));
     });
 
     test('undo and redo restore board states accurately', () async {

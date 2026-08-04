@@ -56,6 +56,43 @@ abstract final class SudokuValidator {
   // Private helpers
   // ---------------------------------------------------------------------------
 
+  /// Returns the set of `(row, col)` positions of cells that already contain
+  /// [value] in the same row, column, or sub-grid as the cell at ([row], [col]).
+  /// 
+  /// Used for validating Note inputs.
+  static Set<(int, int)> findConflictPositionsForValue(
+    SudokuBoard board,
+    int row,
+    int col,
+    int value,
+  ) {
+    final conflicts = <(int, int)>{};
+
+    // Check Row
+    for (var c = 0; c < board.gridSize; c++) {
+      if (c == col) continue;
+      if (board.cellAt(row, c).value == value) conflicts.add((row, c));
+    }
+
+    // Check Col
+    for (var r = 0; r < board.gridSize; r++) {
+      if (r == row) continue;
+      if (board.cellAt(r, col).value == value) conflicts.add((r, col));
+    }
+
+    // Check Subgrid
+    final startRow = (row ~/ board.subGridSize) * board.subGridSize;
+    final startCol = (col ~/ board.subGridSize) * board.subGridSize;
+    for (var r = startRow; r < startRow + board.subGridSize; r++) {
+      for (var c = startCol; c < startCol + board.subGridSize; c++) {
+        if (r == row && c == col) continue;
+        if (board.cellAt(r, c).value == value) conflicts.add((r, c));
+      }
+    }
+
+    return conflicts;
+  }
+
   static bool _hasConflict(
     SudokuBoard board,
     int row,
