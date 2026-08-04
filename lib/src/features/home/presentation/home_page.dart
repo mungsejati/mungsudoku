@@ -318,7 +318,9 @@ class _GameModes extends StatelessWidget {
               child: _SecondaryButton(
                 icon: Icons.design_services_rounded,
                 label: 'Custom',
-                onTap: () {},
+                onTap: () {
+                  context.push(AppRouter.customSudokuListPath);
+                },
               ),
             ),
             const SizedBox(width: 16),

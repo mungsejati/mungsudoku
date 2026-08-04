@@ -107,12 +107,13 @@ class SudokuCell {
     bool clearValue = false,
     Set<int>? notes,
     bool? isOriginal,
+    int? solutionValue,
   }) {
     final newValue = clearValue ? null : (value ?? this.value);
     return SudokuCell(
       row: row,
       col: col,
-      solutionValue: solutionValue,
+      solutionValue: solutionValue ?? this.solutionValue,
       value: newValue,
       isOriginal: isOriginal ?? this.isOriginal,
       notes: clearValue ? const {} : (notes ?? this.notes),

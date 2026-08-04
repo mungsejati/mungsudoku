@@ -149,4 +149,22 @@ abstract final class SudokuGenerator {
     solve(0, 0);
     return count;
   }
+
+  /// Checks if the given grid has exactly one unique solution.
+  static bool hasUniqueSolution(List<List<int>> grid, int size, int subGridSize) {
+    // We must pass a copy because _countSolutions might modify it temporarily
+    // although it backtracks.
+    return _countSolutions(grid, size, subGridSize, limit: 2) == 1;
+  }
+
+  /// Attempts to solve the grid and returns the flat 1D solution list.
+  /// Returns null if no solution exists.
+  static List<int>? solveGrid(List<List<int>> grid, int size, int subGridSize) {
+    // Create a deep copy to avoid mutating the input
+    final gridCopy = List.generate(size, (r) => List<int>.from(grid[r]));
+    if (_solve(gridCopy, size, subGridSize)) {
+      return [for (final row in gridCopy) ...row];
+    }
+    return null;
+  }
 }

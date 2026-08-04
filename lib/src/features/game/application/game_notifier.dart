@@ -121,6 +121,33 @@ class GameNotifier extends Notifier<GameState> {
     _log.info('Game ready. $board');
   }
 
+  /// Initializes a custom game session with a pre-built board.
+  void initCustomGame(SudokuBoard board) {
+    _cancelTimer();
+
+    state = GameState(
+      board: board,
+      difficulty: Difficulty.hard, // Custom games can be considered 'hard'
+      selectedSubGridSize: board.subGridSize,
+      symbolType: SymbolType.standard,
+      gameDuration: Duration.zero,
+      isPaused: false,
+      hintQuota: 3,
+      fastNoteQuota: 3,
+      activeThemePreset: 'blue',
+      isNoteMode: false,
+      cumulativeMistakeCount: 0,
+      undoStack: const [],
+      redoStack: const [],
+      conflictPositions: const <(int, int)>{},
+      superHighlightPositions: const <(int, int)>{},
+      isLoading: false,
+    );
+
+    _startTimer();
+    _log.info('Custom game ready.');
+  }
+
   /// Restarts the current puzzle from the beginning without generating a new one.
   void restartPuzzle() {
     _cancelTimer();

@@ -243,7 +243,7 @@ class _SubGridCard extends StatelessWidget {
                   cell.value == null &&
                   cell.notes.contains(state.highlightedValue);
 
-              return _CellTile(
+              return SudokuCellTile(
                 cell: cell,
                 isSelected: isSelected,
                 isConflict: isConflict,
@@ -282,8 +282,9 @@ class _SubGridCard extends StatelessWidget {
 // Single cell tile
 // ---------------------------------------------------------------------------
 
-class _CellTile extends StatelessWidget {
-  const _CellTile({
+class SudokuCellTile extends StatelessWidget {
+  const SudokuCellTile({
+    super.key,
     required this.cell,
     required this.isSelected,
     required this.isConflict,
@@ -538,42 +539,6 @@ class _DashedGridPainter extends CustomPainter {
   @override
   bool shouldRepaint(_DashedGridPainter old) =>
       old.color != color || old.divisions != divisions;
-}
-
-// ---------------------------------------------------------------------------
-// Re-export old public widget name so game_page.dart doesn't need changes
-// ---------------------------------------------------------------------------
-
-/// Public-facing cell widget — kept so that any external references compile.
-/// Internally the board now uses [_CellTile] directly.
-class SudokuCellWidget extends StatelessWidget {
-  const SudokuCellWidget({
-    super.key,
-    required this.cell,
-    required this.isSelected,
-    required this.isConflict,
-    required this.isCrosshair,
-    required this.isIdenticalValue,
-    this.highlightedValue,
-    required this.gridSize,
-    required this.subGridSize,
-    required this.symbolType,
-    required this.onTap,
-  });
-
-  final SudokuCell cell;
-  final bool isSelected;
-  final bool isConflict;
-  final bool isCrosshair;
-  final bool isIdenticalValue;
-  final int? highlightedValue;
-  final int gridSize;
-  final int subGridSize;
-  final SymbolType symbolType;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) => const SizedBox.shrink();
 }
 
 // ---------------------------------------------------------------------------

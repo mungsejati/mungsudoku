@@ -1,5 +1,8 @@
 import 'package:go_router/go_router.dart';
 
+import '../../features/custom_sudoku/presentation/custom_sudoku_list_page.dart';
+
+import '../../features/custom_sudoku/presentation/custom_sudoku_page.dart';
 import '../../features/game/presentation/game_page.dart';
 import '../../features/home/presentation/home_page.dart';
 
@@ -10,6 +13,8 @@ import '../../features/home/presentation/home_page.dart';
 abstract final class AppRouter {
   static const String homePath = '/';
   static const String gamePath = '/game';
+  static const String customSudokuPath = '/custom';
+  static const String customSudokuListPath = '/custom_list';
 
   static final GoRouter router = GoRouter(
     initialLocation: homePath,
@@ -24,6 +29,16 @@ abstract final class AppRouter {
         path: gamePath,
         name: 'game',
         builder: (context, state) => const GamePage(),
+      ),
+      GoRoute(
+        path: customSudokuPath,
+        name: 'custom_sudoku',
+        builder: (context, state) => const CustomSudokuPage(),
+      ),
+      GoRoute(
+        path: customSudokuListPath,
+        name: 'custom_sudoku_list',
+        builder: (context, state) => const CustomSudokuListPage(),
       ),
     ],
   );

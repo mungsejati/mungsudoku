@@ -8,6 +8,7 @@ import '../application/game_state.dart';
 import 'widgets/game_control_pad.dart';
 import 'widgets/game_number_pad.dart';
 import '../domain/enums/difficulty.dart';
+import 'widgets/game_theme_picker.dart';
 import 'widgets/game_top_bar.dart';
 import 'widgets/sudoku_board_widget.dart';
 
@@ -185,52 +186,7 @@ class _GamePageState extends ConsumerState<GamePage> {
                               ),
                             ),
                           ),
-                          MenuAnchor(
-                            builder: (context, controller, child) {
-                              return IconButton(
-                                icon: const Icon(Icons.palette_outlined),
-                                color: gameTheme.topBarTextColor,
-                                tooltip: 'Theme',
-                                onPressed: () {
-                                  if (controller.isOpen) {
-                                    controller.close();
-                                  } else {
-                                    controller.open();
-                                  }
-                                },
-                              );
-                            },
-                            menuChildren: [
-                              Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      'Select Theme',
-                                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: const [
-                                        _ThemeSwatch(name: 'Blue', preset: 'blue', color: Color(0xFF1E9BED)),
-                                        SizedBox(width: 8),
-                                        _ThemeSwatch(name: 'Red', preset: 'red', color: Color(0xFFE53935)),
-                                        SizedBox(width: 8),
-                                        _ThemeSwatch(name: 'Green', preset: 'green', color: Color(0xFF43A047)),
-                                        SizedBox(width: 8),
-                                        _ThemeSwatch(name: 'White', preset: 'white', color: Color(0xFFF5F5F5)),
-                                        SizedBox(width: 8),
-                                        _ThemeSwatch(name: 'Black', preset: 'black', color: Color(0xFF121212)),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
+                          const GameThemePopupMenu(),
                         ],
                       ),
                     ),
@@ -299,56 +255,6 @@ class _GamePageState extends ConsumerState<GamePage> {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _ThemeSwatch extends ConsumerWidget {
-  const _ThemeSwatch({
-    required this.name,
-    required this.preset,
-    required this.color,
-  });
-
-  final String name;
-  final String preset;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final activeTheme = ref.watch(gameNotifierProvider.select((state) => state.activeThemePreset));
-    final isSelected = activeTheme == preset || (activeTheme == 'dark' && preset == 'black');
-
-    return GestureDetector(
-      onTap: () {
-        ref.read(gameNotifierProvider.notifier).changeTheme(preset);
-      },
-      child: Container(
-        width: 36,
-        height: 36,
-        decoration: BoxDecoration(
-          color: color,
-          shape: BoxShape.circle,
-          border: Border.all(
-            color: isSelected ? Colors.white : Colors.grey.withValues(alpha: 0.3),
-            width: isSelected ? 3 : 1,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: isSelected
-            ? Icon(
-                Icons.check,
-                size: 20,
-                color: preset == 'white' ? Colors.black : Colors.white,
-              )
-            : null,
       ),
     );
   }
