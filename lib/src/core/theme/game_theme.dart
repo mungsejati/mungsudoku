@@ -33,6 +33,7 @@ class GameTheme {
     required this.numpadButtonShadow,
     required this.arcColor,
     required this.topBarTextColor,
+    required this.topBarMistakeColor,
   });
 
   // ---- Board background ----
@@ -74,6 +75,7 @@ class GameTheme {
 
   // ---- Top Bar / Nav Bar (Timer, mistakes, title) ----
   final Color topBarTextColor;
+  final Color topBarMistakeColor;
 
   // ---------------------------------------------------------------------------
   // Built-in themes
@@ -121,6 +123,7 @@ class GameTheme {
     ],
     arcColor: const Color(0xFF0D7EC4),
     topBarTextColor: Colors.white,
+    topBarMistakeColor: const Color(0xFFFFB74D),
   );
 
   /// Red theme.
@@ -165,6 +168,7 @@ class GameTheme {
     ],
     arcColor: const Color(0xFFC62828),
     topBarTextColor: Colors.white,
+    topBarMistakeColor: const Color(0xFFFFE082),
   );
 
   /// Green theme.
@@ -209,6 +213,7 @@ class GameTheme {
     ],
     arcColor: const Color(0xFF2E7D32),
     topBarTextColor: Colors.white,
+    topBarMistakeColor: const Color(0xFFFF8A65),
   );
 
   /// White / Light Minimalist theme.
@@ -253,11 +258,12 @@ class GameTheme {
     ],
     arcColor: const Color(0xFFE0E0E0),
     topBarTextColor: Colors.black87,
+    topBarMistakeColor: const Color(0xFFD32F2F),
   );
 
   /// Black / Dark OLED theme.
   static final black = GameTheme(
-    background: const Color(0xFF121212),
+    background: const Color(0xFF000000),
     subGridBackground: const Color(0xFF1E1E1E),
     subGridBorderRadius: 12,
     subGridSpacing: 7,
@@ -269,13 +275,13 @@ class GameTheme {
       ),
     ],
     cellBorderColor: const Color(0xFF333333),
-    selectedCellColor: const Color(0xFF5D4037),
+    selectedCellColor: const Color(0xFF424248),
     selectedCellBorderColor: const Color(0xFFFFD54F),
-    identicalValueCellColor: const Color(0xFF2C2C2C),
+    identicalValueCellColor: const Color(0xFF65687C),
     originalCellColor: const Color(0xFF242424),
     conflictCellColor: const Color(0xFF4E1A1A),
-    crosshairColor: const Color(0xFF222222),
-    originalTextColor: const Color(0xFFE0E0E0),
+    crosshairColor: const Color(0xFF33333C),
+    originalTextColor: const Color(0xFF90CAF9),
     inputTextColor: const Color(0xFF90CAF9),
     conflictTextColor: const Color(0xFFEF9A9A),
     controlPadBackground: const Color(0xFF1E1E1E),
@@ -296,7 +302,8 @@ class GameTheme {
       ),
     ],
     arcColor: const Color(0xFF000000),
-    topBarTextColor: Colors.white,
+    topBarTextColor: const Color(0xFF90CAF9),
+    topBarMistakeColor: const Color(0xFFEF9A9A),
   );
 }
 

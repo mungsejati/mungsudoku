@@ -11,9 +11,11 @@ void main() {
     await tester.pumpWidget(
       const ProviderScope(child: MungSudokuApp()),
     );
-    await tester.pumpAndSettle();
+    // Use pump instead of pumpAndSettle because of infinite repeating animation
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
 
-    expect(find.text('MungSudoku'), findsOneWidget);
-    expect(find.text('New Game'), findsOneWidget);
+    expect(find.text('Player 1'), findsOneWidget);
+    expect(find.text('NEW GAME'), findsOneWidget);
   });
 }

@@ -40,7 +40,7 @@ class GameTopBar extends ConsumerWidget {
                 'Mistakes: ${state.cumulativeMistakeCount}/${GameState.maxMistakes}',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: state.cumulativeMistakeCount > 0
-                          ? Colors.redAccent
+                          ? gameTheme.topBarMistakeColor
                           : gameTheme.topBarTextColor,
                       fontWeight: FontWeight.w600,
                     ),
