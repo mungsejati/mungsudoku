@@ -33,6 +33,7 @@ class GameNumberPad extends ConsumerWidget {
           gameTheme,
           board,
           isSmallScreen,
+          ref,
         ),
     ];
 
@@ -83,6 +84,7 @@ class GameNumberPad extends ConsumerWidget {
     GameTheme gameTheme,
     dynamic board,
     bool isSmallScreen,
+    WidgetRef ref,
   ) {
     int placedCount = 0;
     for (var r = 0; r < gridSize; r++) {
@@ -108,19 +110,20 @@ class GameNumberPad extends ConsumerWidget {
       onPressed: isComplete
           ? null
           : () {
-              Future.microtask(() {
-                if (state.hasSelection) {
-                  notifier.inputNumber(
-                    state.selectedRow!,
-                    state.selectedCol!,
-                    digit,
-                  );
-                } else {
-                  notifier.activateValue(digit);
-                }
-              });
+              // Always read the LATEST state at the moment of the tap,
+              // not the stale snapshot captured during build().
+              final freshState = ref.read(gameNotifierProvider);
+              if (freshState.hasSelection) {
+                notifier.inputNumber(
+                  freshState.selectedRow!,
+                  freshState.selectedCol!,
+                  digit,
+                );
+              } else {
+                notifier.activateValue(digit);
+              }
             },
-      onLongPress: () => Future.microtask(() => notifier.activateValue(digit)),
+      onLongPress: () => notifier.activateValue(digit),
     );
   }
 }
