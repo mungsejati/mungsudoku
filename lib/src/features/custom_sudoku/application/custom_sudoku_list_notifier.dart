@@ -28,4 +28,15 @@ class CustomSudokuListNotifier extends AsyncNotifier<List<SudokuBoard>> {
       state = AsyncValue.error(e, stack);
     }
   }
+
+  Future<void> deletePuzzle(String id) async {
+    state = const AsyncValue.loading();
+    try {
+      final repository = ref.read(customSudokuRepositoryProvider);
+      await repository.deleteCustomPuzzle(id);
+      state = AsyncValue.data(await _loadPuzzles());
+    } catch (e, stack) {
+      state = AsyncValue.error(e, stack);
+    }
+  }
 }

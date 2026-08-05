@@ -41,6 +41,8 @@ class SudokuBoard {
     required this.rowNumbers,
     required this.colNumbers,
     required this.subGridNumbers,
+    this.id,
+    this.createdAt,
   })  : assert(subGridSize >= 2, 'subGridSize must be at least 2.'),
         assert(
           cells.length == subGridSize * subGridSize &&
@@ -72,6 +74,12 @@ class SudokuBoard {
 
   /// O(1) lookup: values currently present in each sub-grid.
   final Map<int, Set<int>> subGridNumbers;
+
+  /// Unique identifier for this specific puzzle (especially custom puzzles).
+  final String? id;
+
+  /// The timestamp when this puzzle was created.
+  final DateTime? createdAt;
 
   // --- Derived dimensions ---
 
@@ -144,6 +152,8 @@ class SudokuBoard {
       rowNumbers: rowNums,
       colNumbers: colNums,
       subGridNumbers: sgNums,
+      id: id,
+      createdAt: createdAt,
     );
   }
 
@@ -282,6 +292,8 @@ class SudokuBoard {
       rowNumbers: newRowNums,
       colNumbers: newColNums,
       subGridNumbers: newSgNums,
+      id: id,
+      createdAt: createdAt,
     );
   }
 
@@ -292,6 +304,8 @@ class SudokuBoard {
     Map<int, Set<int>>? rowNumbers,
     Map<int, Set<int>>? colNumbers,
     Map<int, Set<int>>? subGridNumbers,
+    String? id,
+    DateTime? createdAt,
   }) =>
       SudokuBoard(
         cells: cells ?? this.cells,
@@ -299,6 +313,8 @@ class SudokuBoard {
         rowNumbers: rowNumbers ?? this.rowNumbers,
         colNumbers: colNumbers ?? this.colNumbers,
         subGridNumbers: subGridNumbers ?? this.subGridNumbers,
+        id: id ?? this.id,
+        createdAt: createdAt ?? this.createdAt,
       );
 
   /// Returns a new board with [value] removed from the [SudokuCell.notes] of
@@ -406,11 +422,15 @@ class SudokuBoard {
   // --- Serialization ---
 
   Map<String, dynamic> toJson() => {
+        'id': id,
+        'createdAt': createdAt?.toIso8601String(),
         'subGridSize': subGridSize,
         'cells': cells.expand((row) => row).map((c) => c.toJson()).toList(),
       };
 
   factory SudokuBoard.fromJson(Map<String, dynamic> json) {
+    final id = json['id'] as String?;
+    final createdAt = json['createdAt'] != null ? DateTime.parse(json['createdAt'] as String) : null;
     final subGridSize = json['subGridSize'] as int;
     final flatCells = (json['cells'] as List<dynamic>)
         .map((e) => SudokuCell.fromJson(e as Map<String, dynamic>))
@@ -441,6 +461,8 @@ class SudokuBoard {
       rowNumbers: Map.unmodifiable(rowNums.map((k, v) => MapEntry(k, Set.unmodifiable(v)))),
       colNumbers: Map.unmodifiable(colNums.map((k, v) => MapEntry(k, Set.unmodifiable(v)))),
       subGridNumbers: Map.unmodifiable(sgNums.map((k, v) => MapEntry(k, Set.unmodifiable(v)))),
+      id: id,
+      createdAt: createdAt,
     );
   }
 }

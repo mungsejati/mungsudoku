@@ -74,6 +74,28 @@ class CustomSudokuListPage extends ConsumerWidget {
                   ref.read(gameNotifierProvider.notifier).initCustomGame(puzzle);
                   context.go(AppRouter.gamePath);
                 },
+                onDelete: () async {
+                  final confirm = await showDialog<bool>(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                      title: const Text('Delete Puzzle?'),
+                      content: const Text('Are you sure you want to delete this puzzle?'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(ctx, false),
+                          child: const Text('Cancel'),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.pop(ctx, true),
+                          child: const Text('Delete', style: TextStyle(color: Colors.red)),
+                        ),
+                      ],
+                    ),
+                  );
+                  if (confirm == true && puzzle.id != null) {
+                    ref.read(customSudokuListNotifierProvider.notifier).deletePuzzle(puzzle.id!);
+                  }
+                },
               );
             },
           );
@@ -99,12 +121,14 @@ class _CustomSudokuCard extends StatelessWidget {
     required this.index,
     required this.gameTheme,
     required this.onTap,
+    required this.onDelete,
   });
 
   final SudokuBoard puzzle;
   final int index;
   final GameTheme gameTheme;
   final VoidCallback onTap;
+  final VoidCallback onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -142,24 +166,29 @@ class _CustomSudokuCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Custom Puzzle #$index',
+                    'Code: ${puzzle.id ?? "Unknown"}',
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: gameTheme.topBarTextColor,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${puzzle.gridSize}x${puzzle.gridSize} Grid',
+                    '${puzzle.gridSize}x${puzzle.gridSize} Grid • Created: ${puzzle.createdAt?.toString().substring(0, 16) ?? "-"}',
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 12,
                       color: gameTheme.topBarTextColor.withValues(alpha: 0.7),
                     ),
                   ),
                 ],
               ),
             ),
+            IconButton(
+              icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+              onPressed: onDelete,
+            ),
+            const SizedBox(width: 8),
             Icon(Icons.play_arrow_rounded, color: gameTheme.arcColor, size: 32),
           ],
         ),

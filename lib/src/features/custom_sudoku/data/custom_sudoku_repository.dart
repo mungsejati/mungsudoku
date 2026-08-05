@@ -18,8 +18,17 @@ class CustomSudokuRepository {
     final prefs = await SharedPreferences.getInstance();
     final List<String> currentSaved = prefs.getStringList(_storageKey) ?? [];
     
+    // Generate ID and createdAt if null
+    var boardToSave = board;
+    if (boardToSave.id == null || boardToSave.createdAt == null) {
+      boardToSave = boardToSave.copyWith(
+        id: boardToSave.id ?? DateTime.now().millisecondsSinceEpoch.toRadixString(36),
+        createdAt: boardToSave.createdAt ?? DateTime.now(),
+      );
+    }
+    
     // Add the new board at the beginning of the list
-    currentSaved.insert(0, jsonEncode(board.toJson()));
+    currentSaved.insert(0, jsonEncode(boardToSave.toJson()));
     
     await prefs.setStringList(_storageKey, currentSaved);
   }
@@ -40,5 +49,16 @@ class CustomSudokuRepository {
     }
     
     return boards;
+  }
+
+  /// Deletes a custom board by its unique id.
+  Future<void> deleteCustomPuzzle(String id) async {
+    final prefs = await SharedPreferences.getInstance();
+    final boards = await getCustomPuzzles();
+    
+    boards.removeWhere((b) => b.id == id);
+    
+    final List<String> newSaved = boards.map((b) => jsonEncode(b.toJson())).toList();
+    await prefs.setStringList(_storageKey, newSaved);
   }
 }
