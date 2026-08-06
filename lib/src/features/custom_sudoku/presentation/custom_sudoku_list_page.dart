@@ -49,7 +49,7 @@ class CustomSudokuListPage extends ConsumerWidget {
         children: [
           // + Create New Button
           Padding(
-            padding: const EdgeInsets.only(top: 8, bottom: 24),
+            padding: const EdgeInsets.only(top: 24, bottom: 8),
             child: TextButton.icon(
               onPressed: () => context.push(AppRouter.customSudokuPath),
               icon: Icon(Icons.add, color: gameTheme.topBarTextColor, size: 28),
@@ -107,35 +107,6 @@ class CustomSudokuListPage extends ConsumerWidget {
                             .initCustomGame(puzzle);
                         context.go(AppRouter.gamePath);
                       },
-                      onDelete: () async {
-                        final confirm = await showDialog<bool>(
-                          context: context,
-                          builder: (ctx) => AlertDialog(
-                            title: const Text('Delete Puzzle?'),
-                            content: const Text(
-                              'Are you sure you want to delete this puzzle?',
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(ctx, false),
-                                child: const Text('Cancel'),
-                              ),
-                              TextButton(
-                                onPressed: () => Navigator.pop(ctx, true),
-                                child: const Text(
-                                  'Delete',
-                                  style: TextStyle(color: Colors.red),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                        if (confirm == true && puzzle.id != null) {
-                          ref
-                              .read(customSudokuListNotifierProvider.notifier)
-                              .deletePuzzle(puzzle.id!);
-                        }
-                      },
                     );
                   },
                 );
@@ -164,13 +135,11 @@ class _CustomSudokuCard extends StatelessWidget {
     required this.puzzle,
     required this.gameTheme,
     required this.onTap,
-    required this.onDelete,
   });
 
   final SudokuBoard puzzle;
   final GameTheme gameTheme;
   final VoidCallback onTap;
-  final VoidCallback onDelete;
 
   Color _getCardThemeColor(GameTheme theme) {
     if (theme.background.computeLuminance() > 0.8) {
@@ -261,7 +230,7 @@ class _CustomSudokuCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        padding: const EdgeInsets.only(left: 32, right: 16, top: 8, bottom: 8),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(50),
@@ -295,7 +264,7 @@ class _CustomSudokuCard extends StatelessWidget {
                           BlendMode.srcIn,
                         ),
                       ),
-                      const SizedBox(width: 6),
+                      const SizedBox(width: 12),
                       Text(
                         dateStr,
                         style: const TextStyle(
@@ -317,10 +286,6 @@ class _CustomSudokuCard extends StatelessWidget {
                 colorFilter: ColorFilter.mode(cardThemeColor, BlendMode.srcIn),
               ),
               onPressed: () => _showShareOptions(context, gameTheme),
-            ),
-            IconButton(
-              icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
-              onPressed: onDelete,
             ),
           ],
         ),
