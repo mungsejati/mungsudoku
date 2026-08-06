@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../core/theme/game_theme.dart';
 import '../../game/domain/enums/symbol_type.dart';
@@ -24,6 +25,15 @@ class CustomSudokuPage extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
+        leading: IconButton(
+          icon: SvgPicture.asset(
+            'assets/arrow-left.svg',
+            width: 24,
+            height: 24,
+            colorFilter: ColorFilter.mode(gameTheme.topBarTextColor, BlendMode.srcIn),
+          ),
+          onPressed: () => Navigator.pop(context),
+        ),
         iconTheme: IconThemeData(color: gameTheme.topBarTextColor),
         title: Text(
           'Custom Puzzle',

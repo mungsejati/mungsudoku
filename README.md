@@ -73,19 +73,13 @@ Folder ini berisi seluruh *source code* (kode sumber) dari aplikasi MungSudoku. 
 - *Konfigurasi routing navigasi layar dalam aplikasi menggunakan `go_router`.*
 
 ### 📄 `lib/src/features/home/presentation/home_page.dart`
-- **Class/Widget `HomePage`**: Halaman utama aplikasi (Main Menu) yang menyajikan profil, stat, dan navigasi ke berbagai mode permainan.
-- **Class/Widget `_HomePageState`**: Mengelola state animasi dan interaksi dari halaman utama.
-- **Class/Widget `_PlayerStatsHeader`**: Menampilkan nama pemain, level, dan ringkasan pencapaian di bagian atas Home Page.
-- **Class/Widget `_QuotaBadge`**: Komponen visual kecil untuk menunjukkan jumlah kuota fitur (seperti Hint atau Fast Note) yang tersisa.
-- **Class/Widget `_MiniSudokuHero`**: Elemen visual pemanis berupa animasi papan Sudoku mini berukuran 3x3 di layar utama.
-- **Class/Widget `_MiniSudokuHeroState`**: Mengatur timer atau logika animasi acak untuk `_MiniSudokuHero`.
-- **Class/Widget `_GameModes`**: Daftar tata letak tombol/kartu navigasi untuk memilih mode permainan (Classic, Custom, Daily).
-- **Class/Widget `_GamifiedCard`**: Desain tombol kustom bergaya kartu 3D yang interaktif untuk navigasi menu utama.
-- **Class/Widget `_SecondaryButton`**: Desain tombol sekunder yang lebih sederhana untuk opsi tambahan di menu.
-- **Class/Widget `_Footer`**: Bagian bawah Home Page yang umumnya berisi informasi versi aplikasi atau tautan eksternal.
+- **Class/Widget `HomePage`**: Halaman utama aplikasi (Main Menu) yang kini mengusung gaya desain *Clean & Minimalist*. Berisi logo, tombol navigasi permainan, dan baris aksi (action row) dengan palet dasar biru `#0092DF`.
+- **Class/Widget `_HomePageState`**: Mengelola state awal dari halaman utama (termasuk mendeteksi adanya *save game*).
+- **Class/Widget `_OutlinedPillButton`**: Desain tombol sekunder/lanjutan (seperti tombol "Continue") berbentuk kapsul dengan garis batas tepi berwarna biru `#0092DF`. Menampilkan teks dinamis sisa waktu dan tingkat kesulitan (contoh: "Medium • 02:30").
+- **Class/Widget `_FilledPillButton`**: Desain tombol utama (seperti tombol "New Game") berbentuk kapsul dengan warna latar biru tebal dan *drop shadow*.
+- **Class/Widget `_ActionItem`**: Ikon beserta label (me, create, shop, settings) yang diletakkan berjejer di bagian bawah layar menggunakan dukungan `flutter_svg`.
 
-### 📄 `lib/src/features/home/presentation/widgets/menu_button.dart`
-- **Class/Widget `MenuButton`**: A reusable menu button for the [HomePage].  When [isEnabled] is false the button is rendered in a disabled state and [onPressed] will never be invoked, signalling to the user that the feature is not yet available.
+
 
 ### 📄 `lib/src/features/custom_sudoku/application/custom_sudoku_list_notifier.dart`
 - **Class/Widget `CustomSudokuListNotifier`**: Bertugas mengambil dan memperbarui daftar puzzle kustom dari penyimpanan lokal untuk ditampilkan di list.
@@ -105,8 +99,8 @@ Folder ini berisi seluruh *source code* (kode sumber) dari aplikasi MungSudoku. 
   - `function getCustomPuzzles()`: Retrieves the list of all saved custom boards.
 
 ### 📄 `lib/src/features/custom_sudoku/presentation/custom_sudoku_list_page.dart`
-- **Class/Widget `CustomSudokuListPage`**: Halaman untuk menampilkan seluruh koleksi teka-teki Sudoku hasil karya pengguna.
-- **Class/Widget `_CustomSudokuCard`**: Desain *card* (kartu) untuk setiap item teka-teki dalam daftar di `CustomSudokuListPage`.
+- **Class/Widget `CustomSudokuListPage`**: Layar _List_ untuk menampilkan puzzle hasil buatan sendiri (Custom Sudoku). Layar ini kini dirombak mengikuti _Clean Architecture_ dan bergaya dinamis (merespons warna latar _primaryColor_ tema aktif). Dilengkapi AppBar dengan fungsi tema (`assets/theme.svg`) dan tombol *+ Create New* (pengganti *FloatingActionButton*) di area atas.
+- **Class/Widget `_CustomSudokuCard`**: Desain kartu list kini berbentuk _Pill / Rounded_ dengan _bottom drop shadow_ tebal dan latar putih. Berisi informasi tanggal (dihiasi aset `calendar.svg`), judul kode kustom puzzle, fungsi Hapus (`Delete`), fungsi Eksekusi Main (`Play`), serta fitur berbagi (Share). Fungsi _Share_ menggunakan modal yang memfasilitasi _Copy Code_ ke papan klip (menggunakan `flutter/services.dart` - `Clipboard`) dan rintisan pembagian _Share Link_ ke eksternal.
 
 ### 📄 `lib/src/features/custom_sudoku/presentation/custom_sudoku_page.dart`
 - **Class/Widget `CustomSudokuPage`**: Halaman editor (kanvas) untuk menyusun teka-teki Sudoku buatan sendiri dengan *numpad* 2-baris.

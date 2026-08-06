@@ -9,7 +9,7 @@ abstract final class AppTheme {
     useMaterial3: true,
     brightness: Brightness.dark,
     colorScheme: ColorScheme.fromSeed(
-      seedColor: const Color(0xFF6C63FF),
+      seedColor: const Color(0xFF0092DF),
       brightness: Brightness.dark,
     ),
   );
@@ -18,7 +18,7 @@ abstract final class AppTheme {
     useMaterial3: true,
     brightness: Brightness.light,
     colorScheme: ColorScheme.fromSeed(
-      seedColor: const Color(0xFF6C63FF),
+      seedColor: const Color(0xFF0092DF),
     ),
   );
 }

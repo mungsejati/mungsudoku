@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../core/theme/game_theme.dart';
 import '../application/game_notifier.dart';
@@ -170,8 +171,12 @@ class _GamePageState extends ConsumerState<GamePage> {
                       child: Row(
                         children: [
                           IconButton(
-                            icon: const Icon(Icons.arrow_back_ios_new_rounded),
-                            color: gameTheme.topBarTextColor,
+                            icon: SvgPicture.asset(
+                              'assets/arrow-left.svg',
+                              width: 24,
+                              height: 24,
+                              colorFilter: ColorFilter.mode(gameTheme.topBarTextColor, BlendMode.srcIn),
+                            ),
                             onPressed: () => context.go('/'),
                           ),
                           Expanded(

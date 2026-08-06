@@ -1,10 +1,13 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../core/router/app_router.dart';
 import '../../game/application/game_notifier.dart';
+import '../../game/application/game_state.dart';
 import '../../game/domain/enums/difficulty.dart';
 
 class HomePage extends ConsumerStatefulWidget {
@@ -16,6 +19,7 @@ class HomePage extends ConsumerStatefulWidget {
 
 class _HomePageState extends ConsumerState<HomePage> {
   bool _hasSavedGame = false;
+  String _savedGameSubtitle = 'Saved Game';
 
   @override
   void initState() {
@@ -26,6 +30,29 @@ class _HomePageState extends ConsumerState<HomePage> {
   Future<void> _checkSavedGame() async {
     final prefs = await SharedPreferences.getInstance();
     if (prefs.containsKey('current_game')) {
+      final savedData = prefs.getString('current_game');
+      if (savedData != null) {
+        try {
+          final json = jsonDecode(savedData);
+          final state = GameState.fromJson(json);
+          final diffName = state.difficulty.displayName;
+          final duration = state.gameDuration;
+          String twoDigits(int n) => n.toString().padLeft(2, "0");
+          String minutes = twoDigits(duration.inMinutes.remainder(60));
+          String seconds = twoDigits(duration.inSeconds.remainder(60));
+          String time = duration.inHours > 0 
+            ? '${duration.inHours}:$minutes:$seconds' 
+            : '$minutes:$seconds';
+
+          setState(() {
+            _hasSavedGame = true;
+            _savedGameSubtitle = '$diffName • $time';
+          });
+          return;
+        } catch (e) {
+          // Fallback if parsing fails
+        }
+      }
       setState(() => _hasSavedGame = true);
     }
   }
@@ -33,206 +60,79 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF3F4F6),
+      backgroundColor: Colors.white,
       body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const _PlayerStatsHeader(),
-                const SizedBox(height: 48),
-                const _MiniSudokuHero(),
-                const SizedBox(height: 64),
-                _GameModes(hasSavedGame: _hasSavedGame, ref: ref),
-                const SizedBox(height: 40),
-                const Center(child: _Footer()),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _PlayerStatsHeader extends StatelessWidget {
-  const _PlayerStatsHeader();
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        // Avatar & Name
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Row(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+          child: Column(
             children: [
-              CircleAvatar(
-                radius: 16,
-                backgroundColor: Colors.blue.shade100,
-                child: const Icon(Icons.person, color: Colors.blueAccent, size: 20),
-              ),
-              const SizedBox(width: 8),
-              const Text(
-                'Player 1',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-              ),
-            ],
-          ),
-        ),
-        // Quotas
-        Row(
-          children: [
-            _QuotaBadge(icon: Icons.lightbulb_rounded, color: Colors.amber.shade600, count: '3'),
-            const SizedBox(width: 8),
-            _QuotaBadge(icon: Icons.bolt_rounded, color: Colors.blue.shade600, count: '5'),
-          ],
-        )
-      ],
-    );
-  }
-}
-
-class _QuotaBadge extends StatelessWidget {
-  const _QuotaBadge({required this.icon, required this.color, required this.count});
-  final IconData icon;
-  final Color color;
-  final String count;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: color.withValues(alpha: 0.2),
-            blurRadius: 6,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Icon(icon, size: 16, color: color),
-          const SizedBox(width: 4),
-          Text(count, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-        ],
-      ),
-    );
-  }
-}
-
-class _MiniSudokuHero extends StatefulWidget {
-  const _MiniSudokuHero();
-
-  @override
-  State<_MiniSudokuHero> createState() => _MiniSudokuHeroState();
-}
-
-class _MiniSudokuHeroState extends State<_MiniSudokuHero> with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _anim;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(vsync: this, duration: const Duration(seconds: 3))..repeat(reverse: true);
-    _anim = Tween<double>(begin: 0, end: 1).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _anim,
-      builder: (context, child) {
-        return Transform.translate(
-          offset: Offset(0, -6 * _anim.value),
-          child: child,
-        );
-      },
-      child: Center(
-        child: Container(
-          width: 160,
-          height: 160,
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(24),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.blue.shade200.withValues(alpha: 0.5),
-                blurRadius: 20,
-                offset: const Offset(0, 10),
-              ),
-            ],
-          ),
-          child: GridView.builder(
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: 9,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              crossAxisSpacing: 6,
-              mainAxisSpacing: 6,
-            ),
-            itemBuilder: (context, index) {
-              final val = [1, 5, 9, 3, 8, 2, 6, 7, 4][index];
-              final isHighlighted = index == 4;
-              return Container(
-                decoration: BoxDecoration(
-                  color: isHighlighted ? Colors.blue.shade100 : Colors.blue.shade50,
-                  borderRadius: BorderRadius.circular(12),
+              const Spacer(flex: 2),
+              
+              // Logo
+              Center(
+                child: SvgPicture.asset(
+                  'assets/logo.svg',
+                  height: 160,
+                  width: 160,
                 ),
-                alignment: Alignment.center,
-                child: Text(
-                  '$val',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: isHighlighted ? Colors.blue.shade800 : Colors.blue.shade300,
+              ),
+              
+              const Spacer(flex: 3),
+              
+              // Menu Buttons
+              if (_hasSavedGame) ...[
+                _OutlinedPillButton(
+                  label: 'Continue',
+                  subLabel: _savedGameSubtitle,
+                  onTap: () {
+                    ref.read(gameNotifierProvider.notifier).loadSavedGame();
+                    context.go(AppRouter.gamePath);
+                  },
+                ),
+                const SizedBox(height: 16),
+              ],
+              
+              _FilledPillButton(
+                label: 'New Game',
+                onTap: () => _showNewGameBottomSheet(context),
+              ),
+              
+              const Spacer(flex: 4),
+              
+              // Bottom Action Row
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _ActionItem(
+                    iconPath: 'assets/person.svg',
+                    label: 'me',
+                    onTap: () {},
                   ),
-                ),
-              );
-            },
+                  _ActionItem(
+                    iconPath: 'assets/create.svg',
+                    label: 'create',
+                    onTap: () {
+                      context.push(AppRouter.customSudokuListPath);
+                    },
+                  ),
+                  _ActionItem(
+                    iconPath: 'assets/shop.svg',
+                    label: 'shop',
+                    onTap: () {},
+                  ),
+                  _ActionItem(
+                    iconPath: 'assets/setting.svg',
+                    label: 'settings',
+                    onTap: () {},
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+            ],
           ),
         ),
       ),
     );
-  }
-}
-
-class _GameModes extends StatelessWidget {
-  const _GameModes({required this.hasSavedGame, required this.ref});
-
-  final bool hasSavedGame;
-  final WidgetRef ref;
-
-  void _startNewGame(BuildContext context, Difficulty difficulty) {
-    ref.read(gameNotifierProvider.notifier).initNewGame(difficulty);
-    context.go(AppRouter.gamePath);
   }
 
   void _showNewGameBottomSheet(BuildContext context) {
@@ -263,7 +163,7 @@ class _GameModes extends StatelessWidget {
                         diff.displayName,
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                       ),
-                      trailing: const Icon(Icons.play_arrow_rounded, color: Colors.blue),
+                      trailing: const Icon(Icons.play_arrow_rounded, color: Color(0xFF0092DF)),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                         side: BorderSide(color: Colors.grey.shade200),
@@ -271,7 +171,8 @@ class _GameModes extends StatelessWidget {
                       tileColor: Colors.grey.shade50,
                       onTap: () {
                         Navigator.pop(context);
-                        _startNewGame(context, diff);
+                        ref.read(gameNotifierProvider.notifier).initNewGame(diff);
+                        context.go(AppRouter.gamePath);
                       },
                     ),
                   );
@@ -283,84 +184,17 @@ class _GameModes extends StatelessWidget {
       },
     );
   }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        if (hasSavedGame) ...[
-          _GamifiedCard(
-            title: 'RESUME GAME',
-            subtitle: 'Continue your last puzzle',
-            icon: Icons.play_circle_fill_rounded,
-            colors: const [Color(0xFF4CAF50), Color(0xFF2E7D32)],
-            shadowColor: Colors.green.shade800,
-            onTap: () {
-              ref.read(gameNotifierProvider.notifier).loadSavedGame();
-              context.go(AppRouter.gamePath);
-            },
-          ),
-          const SizedBox(height: 20),
-        ],
-        _GamifiedCard(
-          title: 'NEW GAME',
-          subtitle: 'Start a fresh puzzle',
-          icon: Icons.videogame_asset_rounded,
-          colors: const [Color(0xFF2196F3), Color(0xFF1565C0)],
-          shadowColor: Colors.blue.shade800,
-          onTap: () => _showNewGameBottomSheet(context),
-        ),
-        const SizedBox(height: 32),
-        // Secondary buttons
-        Row(
-          children: [
-            Expanded(
-              child: _SecondaryButton(
-                icon: Icons.design_services_rounded,
-                label: 'Custom',
-                onTap: () {
-                  context.push(AppRouter.customSudokuListPath);
-                },
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: _SecondaryButton(
-                icon: Icons.vpn_key_rounded,
-                label: 'Code',
-                onTap: () {},
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: _SecondaryButton(
-                icon: Icons.settings_rounded,
-                label: 'Settings',
-                onTap: () {},
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
 }
 
-class _GamifiedCard extends StatelessWidget {
-  const _GamifiedCard({
-    required this.title,
-    required this.subtitle,
-    required this.icon,
-    required this.colors,
-    required this.shadowColor,
+class _OutlinedPillButton extends StatelessWidget {
+  const _OutlinedPillButton({
+    required this.label,
+    required this.subLabel,
     required this.onTap,
   });
 
-  final String title;
-  final String subtitle;
-  final IconData icon;
-  final List<Color> colors;
-  final Color shadowColor;
+  final String label;
+  final String subLabel;
   final VoidCallback onTap;
 
   @override
@@ -369,66 +203,34 @@ class _GamifiedCard extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(24),
-        highlightColor: Colors.white.withValues(alpha: 0.2),
-        splashColor: Colors.white.withValues(alpha: 0.2),
-        child: Ink(
+        borderRadius: BorderRadius.circular(50),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: colors,
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(24),
-            boxShadow: [
-              BoxShadow(
-                color: shadowColor,
-                blurRadius: 0,
-                offset: const Offset(0, 6),
+            borderRadius: BorderRadius.circular(50),
+            border: Border.all(color: const Color(0xFF0092DF), width: 2),
+          ),
+          child: Column(
+            children: [
+              Text(
+                label,
+                style: const TextStyle(
+                  color: Color(0xFF0092DF),
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                subLabel,
+                style: const TextStyle(
+                  color: Color(0xFF5A5A5A),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ],
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(icon, color: Colors.white, size: 36),
-                ),
-                const SizedBox(width: 20),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 1.2,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        subtitle,
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.8),
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white, size: 24),
-              ],
-            ),
           ),
         ),
       ),
@@ -436,53 +238,41 @@ class _GamifiedCard extends StatelessWidget {
   }
 }
 
-class _SecondaryButton extends StatelessWidget {
-  const _SecondaryButton({
-    required this.icon,
+class _FilledPillButton extends StatelessWidget {
+  const _FilledPillButton({
     required this.label,
     required this.onTap,
   });
 
-  final IconData icon;
   final String label;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(16),
-      elevation: 0,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Ink(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.grey.shade300, width: 2),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.shade300,
-                blurRadius: 0,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Column(
-            children: [
-              Icon(icon, color: Colors.grey.shade600, size: 28),
-              const SizedBox(height: 8),
-              Text(
-                label,
-                style: TextStyle(
-                  color: Colors.grey.shade700,
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration: BoxDecoration(
+          color: const Color(0xFF0092DF),
+          borderRadius: BorderRadius.circular(50),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0xFF0578B3),
+              offset: Offset(0, 4),
+              blurRadius: 0,
+            ),
+          ],
+        ),
+        child: Center(
+          child: Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
       ),
@@ -490,17 +280,44 @@ class _SecondaryButton extends StatelessWidget {
   }
 }
 
-class _Footer extends StatelessWidget {
-  const _Footer();
+class _ActionItem extends StatelessWidget {
+  const _ActionItem({
+    required this.iconPath,
+    required this.label,
+    required this.onTap,
+  });
+
+  final String iconPath;
+  final String label;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      'MungSudoku v1.0.0',
-      style: TextStyle(
-        color: Colors.grey.shade500,
-        fontWeight: FontWeight.w600,
-        fontSize: 12,
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SvgPicture.asset(
+              iconPath,
+              width: 28,
+              height: 28,
+              colorFilter: const ColorFilter.mode(Color(0xFF0092DF), BlendMode.srcIn),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              label,
+              style: const TextStyle(
+                color: Color(0xFF5A5A5A),
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

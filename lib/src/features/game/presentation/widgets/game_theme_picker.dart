@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:flutter_svg/flutter_svg.dart';
+
 import '../../application/game_notifier.dart';
 import '../../../../core/theme/game_theme.dart';
 
@@ -13,8 +15,12 @@ class GameThemePopupMenu extends ConsumerWidget {
     return MenuAnchor(
       builder: (context, controller, child) {
         return IconButton(
-          icon: const Icon(Icons.palette_outlined),
-          color: gameTheme.topBarTextColor,
+          icon: SvgPicture.asset(
+            'assets/theme.svg',
+            width: 24,
+            height: 24,
+            colorFilter: ColorFilter.mode(gameTheme.topBarTextColor, BlendMode.srcIn),
+          ),
           tooltip: 'Theme',
           onPressed: () {
             if (controller.isOpen) {
