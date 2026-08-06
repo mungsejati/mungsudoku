@@ -25,7 +25,15 @@ class CustomSudokuListPage extends ConsumerWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: SvgPicture.asset('assets/arrow-left.svg', width: 24, height: 24, colorFilter: ColorFilter.mode(gameTheme.topBarTextColor, BlendMode.srcIn)),
+          icon: SvgPicture.asset(
+            'assets/arrow-left.svg',
+            width: 24,
+            height: 24,
+            colorFilter: ColorFilter.mode(
+              gameTheme.topBarTextColor,
+              BlendMode.srcIn,
+            ),
+          ),
           onPressed: () => context.pop(),
         ),
         title: Text(
@@ -35,9 +43,7 @@ class CustomSudokuListPage extends ConsumerWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        actions: const [
-          GameThemePopupMenu(),
-        ],
+        actions: const [GameThemePopupMenu()],
       ),
       body: Column(
         children: [
@@ -56,7 +62,10 @@ class CustomSudokuListPage extends ConsumerWidget {
                 ),
               ),
               style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(50),
                 ),
@@ -80,16 +89,22 @@ class CustomSudokuListPage extends ConsumerWidget {
                 }
 
                 return ListView.separated(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   itemCount: puzzles.length,
-                  separatorBuilder: (context, index) => const SizedBox(height: 16),
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 16),
                   itemBuilder: (context, index) {
                     final puzzle = puzzles[index];
                     return _CustomSudokuCard(
                       puzzle: puzzle,
                       gameTheme: gameTheme,
                       onTap: () {
-                        ref.read(gameNotifierProvider.notifier).initCustomGame(puzzle);
+                        ref
+                            .read(gameNotifierProvider.notifier)
+                            .initCustomGame(puzzle);
                         context.go(AppRouter.gamePath);
                       },
                       onDelete: () async {
@@ -97,7 +112,9 @@ class CustomSudokuListPage extends ConsumerWidget {
                           context: context,
                           builder: (ctx) => AlertDialog(
                             title: const Text('Delete Puzzle?'),
-                            content: const Text('Are you sure you want to delete this puzzle?'),
+                            content: const Text(
+                              'Are you sure you want to delete this puzzle?',
+                            ),
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.pop(ctx, false),
@@ -105,21 +122,35 @@ class CustomSudokuListPage extends ConsumerWidget {
                               ),
                               TextButton(
                                 onPressed: () => Navigator.pop(ctx, true),
-                                child: const Text('Delete', style: TextStyle(color: Colors.red)),
+                                child: const Text(
+                                  'Delete',
+                                  style: TextStyle(color: Colors.red),
+                                ),
                               ),
                             ],
                           ),
                         );
                         if (confirm == true && puzzle.id != null) {
-                          ref.read(customSudokuListNotifierProvider.notifier).deletePuzzle(puzzle.id!);
+                          ref
+                              .read(customSudokuListNotifierProvider.notifier)
+                              .deletePuzzle(puzzle.id!);
                         }
                       },
                     );
                   },
                 );
               },
-              loading: () => Center(child: CircularProgressIndicator(color: gameTheme.topBarTextColor)),
-              error: (err, _) => Center(child: Text('Error loading puzzles: $err', style: TextStyle(color: gameTheme.topBarTextColor))),
+              loading: () => Center(
+                child: CircularProgressIndicator(
+                  color: gameTheme.topBarTextColor,
+                ),
+              ),
+              error: (err, _) => Center(
+                child: Text(
+                  'Error loading puzzles: $err',
+                  style: TextStyle(color: gameTheme.topBarTextColor),
+                ),
+              ),
             ),
           ),
         ],
@@ -161,16 +192,29 @@ class _CustomSudokuCard extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               const SizedBox(height: 12),
-              Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2))),
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
               const SizedBox(height: 24),
               ListTile(
                 leading: SvgPicture.asset(
                   'assets/copy.svg',
                   width: 24,
                   height: 24,
-                  colorFilter: ColorFilter.mode(cardThemeColor, BlendMode.srcIn),
+                  colorFilter: ColorFilter.mode(
+                    cardThemeColor,
+                    BlendMode.srcIn,
+                  ),
                 ),
-                title: const Text('Copy Code', style: TextStyle(fontWeight: FontWeight.bold)),
+                title: const Text(
+                  'Copy Code',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
                 onTap: () {
                   Navigator.pop(ctx);
                   Clipboard.setData(ClipboardData(text: puzzle.id ?? ''));
@@ -181,13 +225,20 @@ class _CustomSudokuCard extends StatelessWidget {
               ),
               ListTile(
                 leading: Icon(Icons.link_rounded, color: cardThemeColor),
-                title: const Text('Share Link', style: TextStyle(fontWeight: FontWeight.bold)),
+                title: const Text(
+                  'Share Link',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
                 onTap: () {
                   Navigator.pop(ctx);
                   // Mock print for Share Link
-                  debugPrint('Mock Share: Sharing link for puzzle ${puzzle.id}');
+                  debugPrint(
+                    'Mock Share: Sharing link for puzzle ${puzzle.id}',
+                  );
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Membuka menu share... (Mock)')),
+                    const SnackBar(
+                      content: Text('Membuka menu share... (Mock)'),
+                    ),
                   );
                 },
               ),
@@ -201,8 +252,8 @@ class _CustomSudokuCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final puzzleIdStr = puzzle.id != null 
-        ? '#SDK-${puzzle.id!.length > 8 ? puzzle.id!.substring(0, 8).toUpperCase() : puzzle.id!.toUpperCase()}' 
+    final puzzleIdStr = puzzle.id != null
+        ? '#SDK-${puzzle.id!.length > 8 ? puzzle.id!.substring(0, 8).toUpperCase() : puzzle.id!.toUpperCase()}'
         : '#SDK-UNKNOWN';
     final dateStr = puzzle.createdAt?.toString().substring(0, 10) ?? '-';
     final cardThemeColor = _getCardThemeColor(gameTheme);
@@ -230,10 +281,7 @@ class _CustomSudokuCard extends StatelessWidget {
                 children: [
                   Text(
                     'Sudoku $puzzleIdStr',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: cardThemeColor,
-                    ),
+                    style: TextStyle(fontSize: 16, color: cardThemeColor),
                   ),
                   const SizedBox(height: 4),
                   Row(
@@ -242,7 +290,10 @@ class _CustomSudokuCard extends StatelessWidget {
                         'assets/calendar.svg',
                         width: 14,
                         height: 14,
-                        colorFilter: const ColorFilter.mode(Color(0xFF5A5A5A), BlendMode.srcIn),
+                        colorFilter: const ColorFilter.mode(
+                          Color(0xFF5A5A5A),
+                          BlendMode.srcIn,
+                        ),
                       ),
                       const SizedBox(width: 6),
                       Text(
@@ -259,7 +310,12 @@ class _CustomSudokuCard extends StatelessWidget {
               ),
             ),
             IconButton(
-              icon: SvgPicture.asset('assets/share.svg', width: 24, height: 24, colorFilter: ColorFilter.mode(cardThemeColor, BlendMode.srcIn)),
+              icon: SvgPicture.asset(
+                'assets/share.svg',
+                width: 24,
+                height: 24,
+                colorFilter: ColorFilter.mode(cardThemeColor, BlendMode.srcIn),
+              ),
               onPressed: () => _showShareOptions(context, gameTheme),
             ),
             IconButton(
