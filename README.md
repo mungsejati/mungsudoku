@@ -75,9 +75,19 @@ Folder ini berisi seluruh *source code* (kode sumber) dari aplikasi MungSudoku. 
 ### 📄 `lib/src/features/home/presentation/home_page.dart`
 - **Class/Widget `HomePage`**: Halaman utama aplikasi (Main Menu) yang kini mengusung gaya desain *Clean & Minimalist*. Berisi logo, tombol navigasi permainan, dan baris aksi (action row) dengan palet dasar biru `#0092DF`.
 - **Class/Widget `_HomePageState`**: Mengelola state awal dari halaman utama (termasuk mendeteksi adanya *save game*).
-- **Class/Widget `_OutlinedPillButton`**: Desain tombol sekunder/lanjutan (seperti tombol "Continue") berbentuk kapsul dengan garis batas tepi berwarna biru `#0092DF`. Menampilkan teks dinamis sisa waktu dan tingkat kesulitan (contoh: "Medium • 02:30").
+- **Class/Widget `_OutlinedPillButton`**: Desain tombol sekunder/lanjutan (seperti tombol "Continue") berbentuk kapsul dengan garis batas tepi berwarna biru `#0092DF`. Menampilkan teks dinamis sisa waktu dan tingkat kesulitan (contoh: "Medium • 02:30"). Jika tidak ada save data, tombol ini akan disembunyikan.
 - **Class/Widget `_FilledPillButton`**: Desain tombol utama (seperti tombol "New Game") berbentuk kapsul dengan warna latar biru tebal dan *drop shadow*.
 - **Class/Widget `_ActionItem`**: Ikon beserta label (me, create, shop, settings) yang diletakkan berjejer di bagian bawah layar menggunakan dukungan `flutter_svg`.
+
+### 📄 `lib/src/features/shop/presentation/shop_page.dart`
+- **Class/Widget `ShopPage`**: Fitur `ShopPage` menyediakan antarmuka toko fiktif (*mock*) yang diakses melalui ikon keranjang ("Shop") di menu utama.
+  - **Antarmuka**: Mengadopsi gaya visual *gamification* dari Main Menu, dengan latar warna primer dan daftar produk berbentuk kapsul dengan efek *drop shadow* bawah tebal (`_ProductCard`).
+  - **Produk Mock**: *Remove Ads*, *Skins / Themes*, *Hints*, *Fast Notes Pack*.
+  - **Interaksi**: Saat pengguna menekan salah satu produk, sebuah `SnackBar` akan muncul menginformasikan status simulasi pembelian.
+
+---
+
+## 5. Pengujian (Testing)
 
 
 

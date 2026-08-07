@@ -5,6 +5,7 @@ import '../../features/custom_sudoku/presentation/custom_sudoku_list_page.dart';
 import '../../features/custom_sudoku/presentation/custom_sudoku_page.dart';
 import '../../features/game/presentation/game_page.dart';
 import '../../features/home/presentation/home_page.dart';
+import '../../features/shop/presentation/shop_page.dart';
 
 /// Centralized routing configuration for MungSudoku.
 ///
@@ -15,6 +16,7 @@ abstract final class AppRouter {
   static const String gamePath = '/game';
   static const String customSudokuPath = '/custom';
   static const String customSudokuListPath = '/custom_list';
+  static const String shopPath = '/shop';
 
   static final GoRouter router = GoRouter(
     initialLocation: homePath,
@@ -39,6 +41,11 @@ abstract final class AppRouter {
         path: customSudokuListPath,
         name: 'custom_sudoku_list',
         builder: (context, state) => const CustomSudokuListPage(),
+      ),
+      GoRoute(
+        path: shopPath,
+        name: 'shop',
+        builder: (context, state) => const ShopPage(),
       ),
     ],
   );
