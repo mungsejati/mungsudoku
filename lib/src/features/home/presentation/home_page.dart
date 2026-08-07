@@ -40,9 +40,9 @@ class _HomePageState extends ConsumerState<HomePage> {
           String twoDigits(int n) => n.toString().padLeft(2, "0");
           String minutes = twoDigits(duration.inMinutes.remainder(60));
           String seconds = twoDigits(duration.inSeconds.remainder(60));
-          String time = duration.inHours > 0 
-            ? '${duration.inHours}:$minutes:$seconds' 
-            : '$minutes:$seconds';
+          String time = duration.inHours > 0
+              ? '${duration.inHours}:$minutes:$seconds'
+              : '$minutes:$seconds';
 
           setState(() {
             _hasSavedGame = true;
@@ -67,7 +67,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           child: Column(
             children: [
               const Spacer(flex: 2),
-              
+
               // Logo
               Center(
                 child: SvgPicture.asset(
@@ -76,9 +76,9 @@ class _HomePageState extends ConsumerState<HomePage> {
                   width: 160,
                 ),
               ),
-              
+
               const Spacer(flex: 3),
-              
+
               // Menu Buttons
               if (_hasSavedGame) ...[
                 _OutlinedPillButton(
@@ -91,14 +91,14 @@ class _HomePageState extends ConsumerState<HomePage> {
                 ),
                 const SizedBox(height: 16),
               ],
-              
+
               _FilledPillButton(
                 label: 'New Game',
                 onTap: () => _showNewGameBottomSheet(context),
               ),
-              
+
               const Spacer(flex: 4),
-              
+
               // Bottom Action Row
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -150,7 +150,7 @@ class _HomePageState extends ConsumerState<HomePage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const Text(
-                  'Select Difficulty',
+                  'New Game',
                   style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 16),
@@ -158,12 +158,21 @@ class _HomePageState extends ConsumerState<HomePage> {
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 8.0),
                     child: ListTile(
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 4,
+                      ),
                       title: Text(
                         diff.displayName,
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
                       ),
-                      trailing: const Icon(Icons.play_arrow_rounded, color: Color(0xFF0092DF)),
+                      trailing: const Icon(
+                        Icons.play_arrow_rounded,
+                        color: Color(0xFF0092DF),
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                         side: BorderSide(color: Colors.grey.shade200),
@@ -171,7 +180,9 @@ class _HomePageState extends ConsumerState<HomePage> {
                       tileColor: Colors.grey.shade50,
                       onTap: () {
                         Navigator.pop(context);
-                        ref.read(gameNotifierProvider.notifier).initNewGame(diff);
+                        ref
+                            .read(gameNotifierProvider.notifier)
+                            .initNewGame(diff);
                         context.go(AppRouter.gamePath);
                       },
                     ),
@@ -239,10 +250,7 @@ class _OutlinedPillButton extends StatelessWidget {
 }
 
 class _FilledPillButton extends StatelessWidget {
-  const _FilledPillButton({
-    required this.label,
-    required this.onTap,
-  });
+  const _FilledPillButton({required this.label, required this.onTap});
 
   final String label;
   final VoidCallback onTap;
@@ -305,7 +313,10 @@ class _ActionItem extends StatelessWidget {
               iconPath,
               width: 28,
               height: 28,
-              colorFilter: const ColorFilter.mode(Color(0xFF0092DF), BlendMode.srcIn),
+              colorFilter: const ColorFilter.mode(
+                Color(0xFF0092DF),
+                BlendMode.srcIn,
+              ),
             ),
             const SizedBox(height: 6),
             Text(
