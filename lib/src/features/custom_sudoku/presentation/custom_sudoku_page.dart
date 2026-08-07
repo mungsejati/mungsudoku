@@ -76,7 +76,8 @@ class CustomSudokuPage extends ConsumerWidget {
                                     for (var c = 0; c < boardState.gridSize; c++) 
                                       boardState.cellAt(r, c).value ?? 0],
                           solution: solution,
-                          subGridSize: boardState.subGridSize,
+                          subGridRows: boardState.subGridRows,
+                          subGridCols: boardState.subGridCols,
                         );
                         
                         
@@ -147,14 +148,16 @@ class _CustomSudokuBoardWidget extends ConsumerWidget {
             clipBehavior: Clip.none,
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: board.subGridSize,
+              crossAxisCount: board.gridSize ~/ board.subGridCols,
+                      childAspectRatio: board.subGridCols / board.subGridRows,
               mainAxisSpacing: gameTheme.subGridSpacing,
               crossAxisSpacing: gameTheme.subGridSpacing,
             ),
-            itemCount: board.subGridSize * board.subGridSize,
+            itemCount: (board.gridSize ~/ board.subGridRows) * (board.gridSize ~/ board.subGridCols),
             itemBuilder: (context, sgIndex) {
-              final sgRow = sgIndex ~/ board.subGridSize;
-              final sgCol = sgIndex % board.subGridSize;
+              final int numCols = board.gridSize ~/ board.subGridCols;
+                      final sgRow = sgIndex ~/ numCols;
+              final sgCol = sgIndex % numCols;
               return Container(
                 decoration: BoxDecoration(
                   color: gameTheme.subGridBackground,
@@ -165,14 +168,15 @@ class _CustomSudokuBoardWidget extends ConsumerWidget {
                 child: GridView.builder(
                   physics: const NeverScrollableScrollPhysics(),
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: board.subGridSize,
+                    crossAxisCount: board.gridSize ~/ board.subGridCols,
+                      childAspectRatio: board.subGridCols / board.subGridRows,
                   ),
-                  itemCount: board.subGridSize * board.subGridSize,
+                  itemCount: (board.gridSize ~/ board.subGridRows) * (board.gridSize ~/ board.subGridCols),
                   itemBuilder: (context, index) {
-                    final localRow = index ~/ board.subGridSize;
-                    final localCol = index % board.subGridSize;
-                    final row = sgRow * board.subGridSize + localRow;
-                    final col = sgCol * board.subGridSize + localCol;
+                    final localRow = index ~/ board.subGridCols;
+                    final localCol = index % board.subGridCols;
+                    final row = sgRow * board.subGridRows + localRow;
+                    final col = sgCol * board.subGridCols + localCol;
                     final cell = board.cellAt(row, col);
 
                     final isSelected = state.selectedRow == row && state.selectedCol == col;
@@ -182,8 +186,8 @@ class _CustomSudokuBoardWidget extends ConsumerWidget {
                     if (state.hasSelection && !isSelected) {
                       final sameRow = row == state.selectedRow;
                       final sameCol = col == state.selectedCol;
-                      final sameSg = (row ~/ board.subGridSize) == (state.selectedRow ~/ board.subGridSize) &&
-                                     (col ~/ board.subGridSize) == (state.selectedCol ~/ board.subGridSize);
+                      final sameSg = (row ~/ board.subGridRows) == (state.selectedRow! ~/ board.subGridRows) &&
+                                     (col ~/ board.subGridCols) == (state.selectedCol! ~/ board.subGridCols);
                       isCrosshair = sameRow || sameCol || sameSg;
                     }
 
@@ -205,7 +209,8 @@ class _CustomSudokuBoardWidget extends ConsumerWidget {
                       isHighlightedNote: false, // Not used here
                       highlightedValue: null,   // Not used here
                       gridSize: board.gridSize,
-                      subGridSize: board.subGridSize,
+                      subGridRows: board.subGridRows,
+                          subGridCols: board.subGridCols,
                       symbolType: SymbolType.standard,
                       gameTheme: gameTheme,
                       onTap: () {

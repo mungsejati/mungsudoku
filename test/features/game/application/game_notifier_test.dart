@@ -29,7 +29,7 @@ void main() {
       fireImmediately: false,
     );
 
-    await notifier.initNewGame(Difficulty.easy, subGridSize: 2);
+    await notifier.initNewGame(Difficulty.easy);
     
     final loadingStates = states.map((s) => s.isLoading).toList();
     expect(loadingStates.contains(true), isTrue, reason: 'Should have emitted isLoading: true');
@@ -41,23 +41,32 @@ void main() {
     final container = makeProviderContainer();
     final notifier = container.read(gameNotifierProvider.notifier);
     
-    await notifier.initNewGame(Difficulty.easy, subGridSize: 2);
+    await notifier.initNewGame(Difficulty.easy);
     
     // Simulate a move to create a save
     final board = notifier.state.board;
     var emptyPos = (0, 0);
+    // Fill board until exactly 9 empty cells remain
+    int emptyCount = 0;
     for (int r = 0; r < board.gridSize; r++) {
       for (int c = 0; c < board.gridSize; c++) {
         if (!board.cellAt(r, c).isFilled) {
-          emptyPos = (r, c);
-          break;
+          emptyCount++;
         }
       }
     }
-    notifier.inputNumber(emptyPos.$1, emptyPos.$2, board.cellAt(emptyPos.$1, emptyPos.$2).solutionValue);
+    
+    for (int r = 0; r < board.gridSize && emptyCount > 9; r++) {
+      for (int c = 0; c < board.gridSize && emptyCount > 9; c++) {
+        if (!board.cellAt(r, c).isFilled) {
+          notifier.inputNumber(r, c, board.cellAt(r, c).solutionValue);
+          emptyCount--;
+        }
+      }
+    }
     
     await Future.delayed(const Duration(milliseconds: 100)); // wait for auto save
-    expect(prefs.containsKey('current_game'), isTrue, reason: 'Save should exist after a move');
+    expect(prefs.containsKey('current_game'), isTrue, reason: 'Save should exist after moves');
     
     // Now autocomplete to victory
     await notifier.triggerAutoComplete();
@@ -94,13 +103,13 @@ void main() {
 
     final board = SudokuBoard(
       cells: cells, 
-      subGridSize: 2, 
+      subGridRows: 2, subGridCols: 2, 
       rowNumbers: {0: {1, 2, 3}, 1: {}, 2: {}, 3: {}}, 
       colNumbers: {0: {1}, 1: {2}, 2: {3}, 3: {}}, 
       subGridNumbers: {0: {1, 2}, 1: {3}, 2: {}, 3: {}}
     );
     
-    await notifier.initNewGame(Difficulty.easy, subGridSize: 2);
+    await notifier.initNewGame(Difficulty.easy);
     notifier.state = notifier.state.copyWith(board: board);
     
     // Input WRONG number (2) in (0,3). 2 is already in row 0.
@@ -114,7 +123,26 @@ void main() {
     final container = makeProviderContainer();
     final notifier = container.read(gameNotifierProvider.notifier);
     
-    await notifier.initNewGame(Difficulty.easy, subGridSize: 2);
+    await notifier.initNewGame(Difficulty.easy);
+    
+    // Fill board until exactly 9 empty cells remain
+    int emptyCount = 0;
+    for (int r = 0; r < notifier.state.board.gridSize; r++) {
+      for (int c = 0; c < notifier.state.board.gridSize; c++) {
+        if (!notifier.state.board.cellAt(r, c).isFilled) {
+          emptyCount++;
+        }
+      }
+    }
+    
+    for (int r = 0; r < notifier.state.board.gridSize && emptyCount > 9; r++) {
+      for (int c = 0; c < notifier.state.board.gridSize && emptyCount > 9; c++) {
+        if (!notifier.state.board.cellAt(r, c).isFilled) {
+          notifier.inputNumber(r, c, notifier.state.board.cellAt(r, c).solutionValue);
+          emptyCount--;
+        }
+      }
+    }
     
     final states = <GameState>[];
     container.listen<GameState>(
@@ -138,7 +166,7 @@ void main() {
     final container = makeProviderContainer();
     final notifier = container.read(gameNotifierProvider.notifier);
     
-    await notifier.initNewGame(Difficulty.easy, subGridSize: 2);
+    await notifier.initNewGame(Difficulty.easy);
     final initialBoard = notifier.state.board;
     
     // Simulate some moves and mistakes
@@ -181,13 +209,13 @@ void main() {
     
     final board = SudokuBoard(
       cells: cells, 
-      subGridSize: 2, 
+      subGridRows: 2, subGridCols: 2, 
       rowNumbers: {0: {}, 1: {}, 2: {}, 3: {}}, 
       colNumbers: {0: {}, 1: {}, 2: {}, 3: {}}, 
       subGridNumbers: {0: {}, 1: {}, 2: {}, 3: {}}
     );
     
-    await notifier.initNewGame(Difficulty.easy, subGridSize: 2);
+    await notifier.initNewGame(Difficulty.easy);
     notifier.state = notifier.state.copyWith(board: board);
     
     final correctVal = 1; // Solution for (0,0)
@@ -225,13 +253,13 @@ void main() {
     
     final board = SudokuBoard(
       cells: cells, 
-      subGridSize: 2, 
+      subGridRows: 2, subGridCols: 2, 
       rowNumbers: {0: {1}, 1: {}, 2: {}, 3: {}}, 
       colNumbers: {0: {1}, 1: {}, 2: {}, 3: {}}, 
       subGridNumbers: {0: {1}, 1: {}, 2: {}, 3: {}}
     );
     
-    await notifier.initNewGame(Difficulty.easy, subGridSize: 2);
+    await notifier.initNewGame(Difficulty.easy);
     notifier.state = notifier.state.copyWith(board: board);
     
     notifier.toggleNoteMode();

@@ -81,10 +81,10 @@ abstract final class SudokuValidator {
     }
 
     // Check Subgrid
-    final startRow = (row ~/ board.subGridSize) * board.subGridSize;
-    final startCol = (col ~/ board.subGridSize) * board.subGridSize;
-    for (var r = startRow; r < startRow + board.subGridSize; r++) {
-      for (var c = startCol; c < startCol + board.subGridSize; c++) {
+    final startRow = (row ~/ board.subGridRows) * board.subGridRows;
+    final startCol = (col ~/ board.subGridCols) * board.subGridCols;
+    for (var r = startRow; r < startRow + board.subGridRows; r++) {
+      for (var c = startCol; c < startCol + board.subGridCols; c++) {
         if (r == row && c == col) continue;
         if (board.cellAt(r, c).value == value) conflicts.add((r, c));
       }
@@ -117,7 +117,7 @@ abstract final class SudokuValidator {
     // However, since we just need isValidPlacement to be O(1):
     
     if (!excludeSelf) {
-      final sgIndex = (row ~/ board.subGridSize) * board.subGridSize + (col ~/ board.subGridSize);
+      final sgIndex = (row ~/ board.subGridRows) * (board.gridSize ~/ board.subGridCols) + (col ~/ board.subGridCols);
       return board.rowNumbers[row]!.contains(value) ||
              board.colNumbers[col]!.contains(value) ||
              board.subGridNumbers[sgIndex]!.contains(value);
@@ -165,13 +165,13 @@ abstract final class SudokuValidator {
     int value,
     bool excludeSelf,
   ) {
-    final sgIndex = (row ~/ board.subGridSize) * board.subGridSize + (col ~/ board.subGridSize);
+    final sgIndex = (row ~/ board.subGridRows) * (board.gridSize ~/ board.subGridCols) + (col ~/ board.subGridCols);
     if (!excludeSelf) return board.subGridNumbers[sgIndex]!.contains(value);
 
-    final startRow = (row ~/ board.subGridSize) * board.subGridSize;
-    final startCol = (col ~/ board.subGridSize) * board.subGridSize;
-    for (var r = startRow; r < startRow + board.subGridSize; r++) {
-      for (var c = startCol; c < startCol + board.subGridSize; c++) {
+    final startRow = (row ~/ board.subGridRows) * board.subGridRows;
+    final startCol = (col ~/ board.subGridCols) * board.subGridCols;
+    for (var r = startRow; r < startRow + board.subGridRows; r++) {
+      for (var c = startCol; c < startCol + board.subGridCols; c++) {
         if (r == row && c == col) continue;
         if (board.cellAt(r, c).value == value) return true;
       }

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../domain/entities/sudoku_board.dart';
 import '../domain/enums/difficulty.dart';
+import '../domain/entities/board_config.dart';
 import '../domain/enums/symbol_type.dart';
 
 /// Immutable snapshot of all game-related state for a single Sudoku session.
@@ -31,7 +32,7 @@ class GameState {
   const GameState({
     required this.board,
     required this.difficulty,
-    required this.selectedSubGridSize,
+    required this.selectedBoardConfig,
     required this.symbolType,
     required this.gameDuration,
     required this.isPaused,
@@ -65,7 +66,7 @@ class GameState {
   final Difficulty difficulty;
 
   /// The requested subGridSize for this session (e.g. 2, 3, 4, 5).
-  final int selectedSubGridSize;
+  final BoardConfig selectedBoardConfig;
 
   /// The visual symbol type used for the game (e.g., standard, roman).
   final SymbolType symbolType;
@@ -168,13 +169,14 @@ class GameState {
   /// `true` when there is at least one action to redo.
   bool get canRedo => redoStack.isNotEmpty;
 
-  /// `true` when there are 10 or fewer empty cells and no conflicts.
+  /// `true` when there are exactly 9 empty cells and no conflicts. Not applicable to Fast Mode.
   bool get canAutoComplete =>
+      difficulty != Difficulty.fast &&
       !isVictory &&
       !isGameOver &&
       conflictPositions.isEmpty &&
       board.filledCellCount < board.totalCells &&
-      (board.totalCells - board.filledCellCount <= 10);
+      (board.totalCells - board.filledCellCount == 9);
 
   // --- Factory ---
 
@@ -182,7 +184,7 @@ class GameState {
   factory GameState.initial() => GameState(
         board: SudokuBoard.empty(),
         difficulty: Difficulty.easy,
-        selectedSubGridSize: 3,
+        selectedBoardConfig: BoardConfig.standard,
         symbolType: SymbolType.standard,
         gameDuration: Duration.zero,
         isPaused: false,
@@ -208,7 +210,7 @@ class GameState {
   GameState copyWith({
     SudokuBoard? board,
     Difficulty? difficulty,
-    int? selectedSubGridSize,
+    BoardConfig? selectedBoardConfig,
     SymbolType? symbolType,
     Duration? gameDuration,
     bool? isPaused,
@@ -234,7 +236,7 @@ class GameState {
       GameState(
         board: board ?? this.board,
         difficulty: difficulty ?? this.difficulty,
-        selectedSubGridSize: selectedSubGridSize ?? this.selectedSubGridSize,
+        selectedBoardConfig: selectedBoardConfig ?? this.selectedBoardConfig,
         symbolType: symbolType ?? this.symbolType,
         gameDuration: gameDuration ?? this.gameDuration,
         isPaused: isPaused ?? this.isPaused,
@@ -264,7 +266,7 @@ class GameState {
   Map<String, dynamic> toJson() => {
         'board': board.toJson(),
         'difficulty': difficulty.name,
-        'selectedSubGridSize': selectedSubGridSize,
+        'selectedBoardConfig': {'r': selectedBoardConfig.subGridRows, 'c': selectedBoardConfig.subGridCols},
         'symbolType': symbolType.name,
         'gameDurationSeconds': gameDuration.inSeconds,
         'isPaused': isPaused,
@@ -288,7 +290,15 @@ class GameState {
     return GameState(
       board: SudokuBoard.fromJson(json['board'] as Map<String, dynamic>),
       difficulty: Difficulty.values.firstWhere((e) => e.name == json['difficulty']),
-      selectedSubGridSize: json['selectedSubGridSize'] as int,
+      selectedBoardConfig: json['selectedBoardConfig'] is Map 
+          ? BoardConfig(
+              subGridRows: json['selectedBoardConfig']['r'] as int,
+              subGridCols: json['selectedBoardConfig']['c'] as int,
+            )
+          : BoardConfig(
+              subGridRows: json['selectedSubGridSize'] as int? ?? 3,
+              subGridCols: json['selectedSubGridSize'] as int? ?? 3,
+            ),
       symbolType: SymbolType.values.firstWhere((e) => e.name == json['symbolType']),
       gameDuration: Duration(seconds: json['gameDurationSeconds'] as int),
       isPaused: json['isPaused'] as bool,

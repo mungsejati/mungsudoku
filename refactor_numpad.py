@@ -1,4 +1,20 @@
-import 'package:flutter/material.dart';
+import re
+
+with open('lib/src/features/game/presentation/widgets/game_number_pad.dart', 'r') as f:
+    content = f.read()
+
+# Remove `final state = ref.watch(gameNotifierProvider);`
+content = content.replace("    final state = ref.watch(gameNotifierProvider);\n", "")
+
+# Change board = state.board to use select
+content = content.replace("    final board = state.board;\n", "    final board = ref.watch(gameNotifierProvider.select((s) => s.board));\n")
+
+# Note: board is also changing frequently? Yes, when we input. But we need board.gridSize, which doesn't change during a game.
+# Wait, `gridSize` doesn't change, but if we watch `board`, we rebuild on EVERY INPUT.
+# Is that okay? We want the numpad to rebuild only when `placedCount` changes, or when `activeValue` changes.
+# Actually, the user asked to make `_NumpadDigitButton` smart. Let's rewrite `GameNumberPad` and `_NumpadDigitButton` completely.
+
+new_code = """import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/game_theme.dart';
@@ -262,3 +278,7 @@ class _NumpadDigitButton extends StatelessWidget {
     );
   }
 }
+"""
+
+with open('lib/src/features/game/presentation/widgets/game_number_pad.dart', 'w') as f:
+    f.write(new_code)

@@ -154,40 +154,47 @@ class _HomePageState extends ConsumerState<HomePage> {
                   style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 16),
-                ...Difficulty.values.map((diff) {
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 8.0),
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 4,
-                      ),
-                      title: Text(
-                        diff.displayName,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                      trailing: const Icon(
-                        Icons.play_arrow_rounded,
-                        color: Color(0xFF0092DF),
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        side: BorderSide(color: Colors.grey.shade200),
-                      ),
-                      tileColor: Colors.grey.shade50,
-                      onTap: () {
-                        Navigator.pop(context);
-                        ref
-                            .read(gameNotifierProvider.notifier)
-                            .initNewGame(diff);
-                        context.go(AppRouter.gamePath);
-                      },
+                Flexible(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: Difficulty.values.map((diff) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 8.0),
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 4,
+                            ),
+                            title: Text(
+                              diff.displayName,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                            trailing: const Icon(
+                              Icons.play_arrow_rounded,
+                              color: Color(0xFF0092DF),
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              side: BorderSide(color: Colors.grey.shade200),
+                            ),
+                            tileColor: Colors.grey.shade50,
+                            onTap: () {
+                              Navigator.pop(context);
+                              ref
+                                  .read(gameNotifierProvider.notifier)
+                                  .initNewGame(diff);
+                              context.go(AppRouter.gamePath);
+                            },
+                          ),
+                        );
+                      }).toList(),
                     ),
-                  );
-                }),
+                  ),
+                ),
               ],
             ),
           ),

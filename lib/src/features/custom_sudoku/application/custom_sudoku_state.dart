@@ -58,7 +58,7 @@ class CustomSudokuState {
     return CustomSudokuState(
       board: SudokuBoard(
         cells: cells,
-        subGridSize: subGridSize,
+        subGridRows: 3, subGridCols: 3,
         rowNumbers: {for (var i = 0; i < gridSize; i++) i: <int>{}},
         colNumbers: {for (var i = 0; i < gridSize; i++) i: <int>{}},
         subGridNumbers: {for (var i = 0; i < gridSize; i++) i: <int>{}},

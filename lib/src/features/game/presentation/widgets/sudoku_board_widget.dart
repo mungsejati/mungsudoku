@@ -38,14 +38,16 @@ class SudokuBoardWidget extends ConsumerWidget {
             clipBehavior: Clip.none,
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: board.subGridSize,
+              crossAxisCount: board.gridSize ~/ board.subGridCols,
+              childAspectRatio: board.subGridCols / board.subGridRows,
               mainAxisSpacing: gameTheme.subGridSpacing,
               crossAxisSpacing: gameTheme.subGridSpacing,
             ),
-            itemCount: board.subGridSize * board.subGridSize,
+            itemCount: (board.gridSize ~/ board.subGridRows) * (board.gridSize ~/ board.subGridCols),
             itemBuilder: (context, sgIndex) {
-              final sgRow = sgIndex ~/ board.subGridSize;
-              final sgCol = sgIndex % board.subGridSize;
+              final int numCols = board.gridSize ~/ board.subGridCols;
+              final sgRow = sgIndex ~/ numCols;
+              final sgCol = sgIndex % numCols;
               return _SubGridCard(
                 sgRow: sgRow,
                 sgCol: sgCol,
@@ -187,7 +189,8 @@ class _SubGridCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final s = board.subGridSize;
+    final sRows = board.subGridRows;
+      final sCols = board.subGridCols;
 
     return Container(
       decoration: BoxDecoration(
@@ -202,14 +205,14 @@ class _SubGridCard extends StatelessWidget {
           GridView.builder(
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: s,
+              crossAxisCount: sCols,
             ),
-            itemCount: s * s,
+            itemCount: sRows * sCols,
             itemBuilder: (context, index) {
-              final localRow = index ~/ s;
-              final localCol = index % s;
-              final row = sgRow * s + localRow;
-              final col = sgCol * s + localCol;
+              final localRow = index ~/ sCols;
+              final localCol = index % sCols;
+              final row = sgRow * sRows + localRow;
+              final col = sgCol * sCols + localCol;
               final cell = board.cellAt(row, col);
 
               final isSelected =
@@ -227,8 +230,8 @@ class _SubGridCard extends StatelessWidget {
                 final sameRow = row == state.selectedRow;
                 final sameCol = col == state.selectedCol;
                 final sameSg =
-                    (row ~/ s) == (state.selectedRow! ~/ s) &&
-                    (col ~/ s) == (state.selectedCol! ~/ s);
+                    (row ~/ sRows) == (state.selectedRow! ~/ sRows) &&
+                    (col ~/ sCols) == (state.selectedCol! ~/ sCols);
                 isCrosshair = sameRow || sameCol || sameSg;
               }
 
@@ -253,7 +256,8 @@ class _SubGridCard extends StatelessWidget {
                 isHighlightedNote: isHighlightedNote,
                 highlightedValue: state.highlightedValue,
                 gridSize: board.gridSize,
-                subGridSize: s,
+                subGridRows: sRows,
+                subGridCols: sCols,
                 symbolType: state.symbolType,
                 gameTheme: gameTheme,
                 onTap: () => onCellTap(row, col),
@@ -267,7 +271,7 @@ class _SubGridCard extends StatelessWidget {
               child: CustomPaint(
                 painter: _DashedGridPainter(
                   color: gameTheme.cellBorderColor,
-                  divisions: s,
+                  rows: sRows, cols: sCols,
                 ),
               ),
             ),
@@ -294,7 +298,8 @@ class SudokuCellTile extends StatelessWidget {
     required this.isHighlightedNote,
     required this.highlightedValue,
     required this.gridSize,
-    required this.subGridSize,
+    required this.subGridRows,
+    required this.subGridCols,
     required this.symbolType,
     required this.gameTheme,
     required this.onTap,
@@ -309,7 +314,8 @@ class SudokuCellTile extends StatelessWidget {
   final bool isHighlightedNote;
   final int? highlightedValue;
   final int gridSize;
-  final int subGridSize;
+  final int subGridRows;
+  final int subGridCols;
   final SymbolType symbolType;
   final GameTheme gameTheme;
   final VoidCallback onTap;
@@ -371,7 +377,8 @@ class SudokuCellTile extends StatelessWidget {
         child: _NotesGrid(
           cell: cell,
           gridSize: gridSize,
-          subGridSize: subGridSize,
+          subGridRows: subGridRows,
+          subGridCols: subGridCols,
           symbolType: symbolType,
           highlightedValue: highlightedValue,
           gameTheme: gameTheme,
@@ -414,7 +421,8 @@ class _NotesGrid extends StatelessWidget {
   const _NotesGrid({
     required this.cell,
     required this.gridSize,
-    required this.subGridSize,
+    required this.subGridRows,
+    required this.subGridCols,
     required this.symbolType,
     required this.highlightedValue,
     required this.gameTheme,
@@ -422,7 +430,8 @@ class _NotesGrid extends StatelessWidget {
 
   final SudokuCell cell;
   final int gridSize;
-  final int subGridSize;
+  final int subGridRows;
+  final int subGridCols;
   final SymbolType symbolType;
   final int? highlightedValue;
   final GameTheme gameTheme;
@@ -434,7 +443,7 @@ class _NotesGrid extends StatelessWidget {
       shrinkWrap: true,
       padding: EdgeInsets.zero,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: subGridSize,
+        crossAxisCount: subGridCols,
       ),
       itemCount: gridSize,
       itemBuilder: (context, index) {
@@ -480,10 +489,11 @@ class _NotesGrid extends StatelessWidget {
 // ---------------------------------------------------------------------------
 
 class _DashedGridPainter extends CustomPainter {
-  const _DashedGridPainter({required this.color, required this.divisions});
+  const _DashedGridPainter({required this.color, required this.rows, required this.cols});
 
   final Color color;
-  final int divisions;
+  final int rows;
+  final int cols;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -495,9 +505,8 @@ class _DashedGridPainter extends CustomPainter {
     const dashLen = 4.0;
     const gapLen = 4.0;
 
-    for (var i = 1; i < divisions; i++) {
-      final x = size.width * i / divisions;
-      final y = size.height * i / divisions;
+    for (var i = 1; i < cols; i++) {
+      final x = size.width * i / cols;
       _dash(
         canvas,
         paint,
@@ -506,6 +515,9 @@ class _DashedGridPainter extends CustomPainter {
         dashLen,
         gapLen,
       );
+    }
+    for (var i = 1; i < rows; i++) {
+      final y = size.height * i / rows;
       _dash(
         canvas,
         paint,
@@ -538,7 +550,7 @@ class _DashedGridPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_DashedGridPainter old) =>
-      old.color != color || old.divisions != divisions;
+      old.color != color || old.rows != rows || old.cols != cols;
 }
 
 // ---------------------------------------------------------------------------

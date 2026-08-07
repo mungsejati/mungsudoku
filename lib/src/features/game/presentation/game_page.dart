@@ -68,7 +68,7 @@ class _GamePageState extends ConsumerState<GamePage> {
           'Congratulations!\n'
           'Difficulty: ${state.difficulty.displayName}\n'
           'Time: ${_formatDuration(state.gameDuration)}\n'
-          'Mistakes: ${state.board.mistakeCount}',
+          'Mistakes: ${state.cumulativeMistakeCount}/${GameState.maxMistakes}',
         ),
         actions: [
           TextButton(
@@ -135,7 +135,7 @@ class _GamePageState extends ConsumerState<GamePage> {
     });
 
     final gameTheme = ref.watch(gameThemeProvider);
-    final canAutoComplete = ref.watch(gameNotifierProvider.select((s) => s.canAutoComplete));
+    
     final isLoading = ref.watch(gameNotifierProvider.select((s) => s.isLoading));
 
     return Scaffold(
@@ -225,16 +225,29 @@ class _GamePageState extends ConsumerState<GamePage> {
                                 color: Colors.white,
                               ),
                             ),
+                          if (ref.watch(gameNotifierProvider.select((s) => s.isAutoCompleteRunning)))
+                            Positioned.fill(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: gameTheme.background.withValues(alpha: 0.8),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  'Auto completing...',
+                                  style: TextStyle(
+                                    color: gameTheme.topBarTextColor,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 24,
+                                  ),
+                                ),
+                              ),
+                            ),
                         ],
                       ),
                     ),
 
-                    // ---- Auto Complete Button ----
-                    if (canAutoComplete)
-                      const Padding(
-                        padding: EdgeInsets.only(bottom: 12.0),
-                        child: _PulseAutoCompleteButton(),
-                      ),
+
 
                     // ---- Toolbar overlapping numpad (Stack overlap) ----
                     SizedBox(
@@ -265,76 +278,3 @@ class _GamePageState extends ConsumerState<GamePage> {
   }
 }
 
-class _PulseAutoCompleteButton extends ConsumerStatefulWidget {
-  const _PulseAutoCompleteButton();
-
-  @override
-  ConsumerState<_PulseAutoCompleteButton> createState() => _PulseAutoCompleteButtonState();
-}
-
-class _PulseAutoCompleteButtonState extends ConsumerState<_PulseAutoCompleteButton> with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-  late final Animation<double> _scaleAnimation;
-  late final Animation<double> _shadowAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 800),
-    )..repeat(reverse: true);
-
-    _scaleAnimation = Tween<double>(begin: 0.97, end: 1.03).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
-    
-    _shadowAnimation = Tween<double>(begin: 4.0, end: 12.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        return Transform.scale(
-          scale: _scaleAnimation.value,
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF10B981).withValues(alpha: 0.4),
-                  blurRadius: _shadowAnimation.value,
-                  spreadRadius: _shadowAnimation.value / 4,
-                ),
-              ],
-            ),
-            child: FilledButton.icon(
-              onPressed: () => ref.read(gameNotifierProvider.notifier).triggerAutoComplete(),
-              icon: const Icon(Icons.auto_awesome_rounded, size: 20),
-              label: const Text(
-                'Auto Complete ✨',
-                style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
-              ),
-              style: FilledButton.styleFrom(
-                backgroundColor: const Color(0xFF10B981), // Emerald Green
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-}

@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../data/services/sudoku_generator.dart';
 import '../domain/entities/sudoku_board.dart';
 import '../domain/enums/difficulty.dart';
+import '../domain/entities/board_config.dart';
 import '../domain/enums/symbol_type.dart';
 import '../domain/services/sudoku_validator.dart';
 import 'game_state.dart';
@@ -67,18 +68,21 @@ class GameNotifier extends Notifier<GameState> {
   /// that the UI thread is never blocked (backtracking can take several ms).
   Future<void> initNewGame(
     Difficulty difficulty, {
-    int subGridSize = 3,
     SymbolType symbolType = SymbolType.standard,
   }) async {
+    final boardConfig = difficulty == Difficulty.fast ? BoardConfig.fast : BoardConfig.standard;
+    final subGridRows = boardConfig.subGridRows;
+    final subGridCols = boardConfig.subGridCols;
+
     _log.info(
-      'Starting new game — difficulty: ${difficulty.displayName}, size: $subGridSize, symbol: ${symbolType.name}',
+      'Starting new game — difficulty: ${difficulty.displayName}, size: ${subGridRows}x${subGridCols}, symbol: ${symbolType.name}',
     );
     _cancelTimer();
 
     state = state.copyWith(
-      board: SudokuBoard.empty(subGridSize: subGridSize),
+      board: SudokuBoard.empty(subGridRows: subGridRows, subGridCols: subGridCols),
       difficulty: difficulty,
-      selectedSubGridSize: subGridSize,
+      selectedBoardConfig: boardConfig,
       symbolType: symbolType,
       gameDuration: Duration.zero,
       isPaused: false,
@@ -96,12 +100,12 @@ class GameNotifier extends Notifier<GameState> {
     );
     await Future.delayed(Duration.zero);
 
-    final board = await compute(_generatePuzzle, (difficulty, subGridSize));
+    final board = await compute(_generatePuzzle, (difficulty, boardConfig));
 
     state = GameState(
       board: board,
       difficulty: difficulty,
-      selectedSubGridSize: subGridSize,
+      selectedBoardConfig: boardConfig,
       symbolType: symbolType,
       gameDuration: Duration.zero,
       isPaused: false,
@@ -128,7 +132,7 @@ class GameNotifier extends Notifier<GameState> {
     state = GameState(
       board: board,
       difficulty: Difficulty.hard, // Custom games can be considered 'hard'
-      selectedSubGridSize: board.subGridSize,
+      selectedBoardConfig: BoardConfig(subGridRows: board.subGridRows, subGridCols: board.subGridCols),
       symbolType: SymbolType.standard,
       gameDuration: Duration.zero,
       isPaused: false,
@@ -288,8 +292,9 @@ class GameNotifier extends Notifier<GameState> {
       // Check for sweep animation
       if (newValue != null && newValue == cell.solutionValue) {
         final int gridSize = state.board.gridSize;
-        final int sgSize = state.board.subGridSize;
-        final int sgIndex = (row ~/ sgSize) * sgSize + (col ~/ sgSize);
+        final int sgRows = state.board.subGridRows;
+        final int sgCols = state.board.subGridCols;
+        final int sgIndex = (row ~/ sgRows) * (gridSize ~/ sgCols) + (col ~/ sgCols);
         
         if (updatedBoard.rowNumbers[row]!.length == gridSize) {
           for (int c = 0; c < gridSize; c++) {
@@ -302,10 +307,10 @@ class GameNotifier extends Notifier<GameState> {
           }
         }
         if (updatedBoard.subGridNumbers[sgIndex]!.length == gridSize) {
-          final int startRow = (sgIndex ~/ sgSize) * sgSize;
-          final int startCol = (sgIndex % sgSize) * sgSize;
-          for (int r = startRow; r < startRow + sgSize; r++) {
-            for (int c = startCol; c < startCol + sgSize; c++) {
+          final int startRow = (row ~/ sgRows) * sgRows;
+          final int startCol = (col ~/ sgCols) * sgCols;
+          for (int r = startRow; r < startRow + sgRows; r++) {
+            for (int c = startCol; c < startCol + sgCols; c++) {
               superHighlights.add((r, c));
             }
           }
@@ -319,6 +324,15 @@ class GameNotifier extends Notifier<GameState> {
       newSuperHighlights: superHighlights,
       isAuto: isAuto,
     );
+
+    // Auto-complete trigger when 9 empty cells remain
+    if (!isAuto && updatedBoard.totalCells - updatedBoard.filledCellCount == 9) {
+      if (SudokuValidator.findConflicts(updatedBoard).isEmpty && newMistakeCount < GameState.maxMistakes) {
+        Future.delayed(const Duration(milliseconds: 300), () {
+          triggerAutoComplete();
+        });
+      }
+    }
   }
 
   /// Clears the value (and notes) from the cell at ([row], [col]).
@@ -371,7 +385,7 @@ class GameNotifier extends Notifier<GameState> {
         final cell = board.cellAt(r, c);
         if (!cell.isEditable || cell.isFilled) continue;
 
-        final sgIndex = (r ~/ board.subGridSize) * board.subGridSize + (c ~/ board.subGridSize);
+        final sgIndex = (r ~/ board.subGridRows) * (size ~/ board.subGridCols) + (c ~/ board.subGridCols);
         final used = <int>{
           ...board.rowNumbers[r]!,
           ...board.colNumbers[c]!,
@@ -680,8 +694,8 @@ class GameNotifier extends Notifier<GameState> {
 ///
 /// Must NOT be a lambda or an instance method — [compute] serialises the
 /// function reference to pass it to a background isolate.
-SudokuBoard _generatePuzzle((Difficulty, int) args) =>
-    SudokuGenerator.generate(args.$1, subGridSize: args.$2);
+SudokuBoard _generatePuzzle((Difficulty, BoardConfig) args) =>
+    SudokuGenerator.generate(args.$1, subGridRows: args.$2.subGridRows, subGridCols: args.$2.subGridCols);
 
 // ---------------------------------------------------------------------------
 // Provider

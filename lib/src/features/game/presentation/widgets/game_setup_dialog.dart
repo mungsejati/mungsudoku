@@ -22,7 +22,6 @@ class GameSetupDialog extends ConsumerStatefulWidget {
 
 class _GameSetupDialogState extends ConsumerState<GameSetupDialog> {
   Difficulty _difficulty = Difficulty.easy;
-  int _subGridSize = 3;
   SymbolType _symbolType = SymbolType.standard;
   bool _isLoading = false;
 
@@ -33,7 +32,6 @@ class _GameSetupDialogState extends ConsumerState<GameSetupDialog> {
     
     await ref.read(gameNotifierProvider.notifier).initNewGame(
       _difficulty,
-      subGridSize: _subGridSize,
       symbolType: _symbolType,
     );
     
@@ -65,19 +63,7 @@ class _GameSetupDialogState extends ConsumerState<GameSetupDialog> {
             ),
             const SizedBox(height: 16),
             
-            const Text('Grid Size', style: TextStyle(fontWeight: FontWeight.bold)),
-            DropdownButton<int>(
-              value: _subGridSize,
-              isExpanded: true,
-              items: const [
-                DropdownMenuItem(value: 2, child: Text('2x2 (4x4 Board)')),
-                DropdownMenuItem(value: 3, child: Text('3x3 (9x9 Standard)')),
-                DropdownMenuItem(value: 4, child: Text('4x4 (16x16 Mega)')),
-                DropdownMenuItem(value: 5, child: Text('5x5 (25x25 Ultra)')),
-              ],
-              onChanged: (v) => setState(() => _subGridSize = v!),
-            ),
-            const SizedBox(height: 16),
+
 
             const Text('Symbol Type', style: TextStyle(fontWeight: FontWeight.bold)),
             DropdownButton<SymbolType>(

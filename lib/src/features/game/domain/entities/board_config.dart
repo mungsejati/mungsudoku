@@ -43,6 +43,12 @@ class BoardConfig {
     subGridCols: 3,
   );
 
+  /// Fast 6x6 Sudoku with 2x3 sub-grids.
+  static const BoardConfig fast = BoardConfig(
+    subGridRows: 2,
+    subGridCols: 3,
+  );
+
   /// Mini 4×4 Sudoku with 2×2 sub-grids (Phase 2).
   static const BoardConfig mini = BoardConfig(
     subGridRows: 2,

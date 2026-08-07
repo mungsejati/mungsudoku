@@ -95,7 +95,7 @@ class CustomSudokuNotifier extends Notifier<CustomSudokuState> {
       // 3. Offload to isolate if needed, but for uniqueness limit 2 it might be fast enough
       // To prevent UI freeze, we can use a microtask or compute
       final isUnique = await Future.microtask(() => 
-          SudokuGenerator.hasUniqueSolution(grid, state.board.gridSize, state.board.subGridSize));
+          SudokuGenerator.hasUniqueSolution(grid, state.board.gridSize, state.board.subGridRows, state.board.subGridCols));
       
       if (!isUnique) {
         state = state.copyWith(isValidating: false);
@@ -114,6 +114,6 @@ class CustomSudokuNotifier extends Notifier<CustomSudokuState> {
     final grid = List.generate(state.board.gridSize, (r) {
       return List.generate(state.board.gridSize, (c) => state.board.cellAt(r, c).value ?? 0);
     });
-    return SudokuGenerator.solveGrid(grid, state.board.gridSize, state.board.subGridSize);
+    return SudokuGenerator.solveGrid(grid, state.board.gridSize, state.board.subGridRows, state.board.subGridCols);
   }
 }

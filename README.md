@@ -145,13 +145,19 @@ Folder ini berisi seluruh *source code* (kode sumber) dari aplikasi MungSudoku. 
   - `function initial()`: Creates the default state before any game has been loaded.
   - `function copyWith()`: Returns a new [GameState] with only the specified fields replaced.  Use the `clear*` boolean flags to explicitly set nullable fields to `null` (passing `null` for a nullable field means "no change").
 
+
+### Dynamic Generator & Seed Bank Optimisation
+- **Rotational Symmetry**: Seluruh puzzle yang digenerate secara dinamis (mengurangi dari solusi penuh) kini mengimplementasikan **180-degree Rotational Symmetry**. Jika sel di baris `r` dan kolom `c` dilubangi, sel lawannya di `(size-1-r, size-1-c)` juga otomatis dilubangi, meniru gaya klasik puzzle Sudoku buatan manusia.
+- **Extreme Seed Bank**: Karena komputasi mencari puzzle berukuran tepat 17-clue secara dinamis sangat berat dan memakan waktu, mode Extreme mengambil _seed_ puzzle 17-clue pra-komputasi. _Seed_ ini kemudian ditransformasi secara isometrik (rotasi 90/180/270 derajat) dan nilai angkanya di-acak (permutation) untuk menghasilkan variasi tanpa batas dalam hitungan milidetik.
+- **Expert Strict Looping**: Level Expert (22 clue) menerapkan *strict looping*, di mana generator akan terus merestart algoritma masking apabila buntu di angka 23-24 clue, hingga sukses mengunci persis di angka 22 clue.
+
 ### 📄 `lib/src/features/game/data/services/sudoku_generator.dart`
 - **Function `generate()`**: Returns a fully initialised [SudokuBoard] at the requested [difficulty] and [subGridSize].
 - **Function `hasUniqueSolution()`**: Checks if the given grid has exactly one unique solution.
 - **Function `solveGrid()`**: Attempts to solve the grid and returns the flat 1D solution list. Returns null if no solution exists.
 
 ### 📄 `lib/src/features/game/domain/enums/difficulty.dart`
-- **Class/Widget `Difficulty`**: Defines the available difficulty levels for a Sudoku puzzle.  [givenCellCount] represents the number of pre-filled cells on a standard 9x9 board. The minimum for a uniquely-solvable puzzle is 17 (Hard).
+- **Class/Widget `Difficulty`**: Defines the available difficulty levels for a Sudoku puzzle: Fast (20 for 6x6), Easy (50), Medium (38), Hard (36), Expert (22), and Extreme (17). [givenCellCount] represents the number of pre-filled cells. The minimum for a uniquely-solvable 9x9 puzzle is 17 (Extreme).
   - `function switch()`: Number of pre-filled (given) cells for a standard 9x9 board.
 
 ### 📄 `lib/src/features/game/domain/enums/symbol_type.dart`
@@ -245,3 +251,11 @@ Folder ini berisi kode pengujian (tests) untuk memastikan kualitas dan keandalan
 - **Detail**:
   - Menguji apakah kerangka utama aplikasi (`MungSudokuApp`) dapat diluncurkan (launch) tanpa *crash*.
   - Memverifikasi halaman utama (Home Page) muncul dengan benar dan mendeteksi keberadaan teks kunci, seperti "Player 1" dan tombol "NEW GAME".
+
+### ⚡ Performance Optimizations (UI Jank & Infinite Loading Failsafe)
+
+To guarantee a smooth, jank-free gaming experience on mobile, we've implemented strict performance constraints:
+1. **Numpad Re-rendering Optimization (`GameNumberPad`)**:
+   Instead of rebuilding the entire numpad (and its buttons) every time the 1-second timer ticks or the board changes, we decoupled `_SmartDigitButton`. Each button now uses Riverpod's `.select()` to precisely watch only the specific conditions it cares about (e.g. `activeValue == digit` and `placedCount`). This guarantees instant response for Fast Input mode without triggering heavy whole-tree widget rebuilds.
+2. **Infinite Loading Failsafe (`SudokuGenerator`)**:
+   Procedurally generating high-difficulty standard puzzles involves randomized trial-and-error which can sometimes loop indefinitely if the generator enters a difficult configuration space. A hard `maxAttempts = 100` failsafe is now enforced. If the procedural backtracking fails to find a valid masking solution within 100 attempts, the generator gracefully falls back to the current best-effort board, ensuring the UI thread never freezes.

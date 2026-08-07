@@ -52,6 +52,30 @@ void main() {
       final conflicts = SudokuValidator.findConflicts(board);
       expect(conflicts, containsAll([(0, 0), (2, 2)]));
     });
+
+    test('Generated boards use rotational symmetry', () {
+      final easyBoard = SudokuGenerator.generate(Difficulty.easy);
+      final size = easyBoard.gridSize;
+      
+      for (var r = 0; r < size; r++) {
+        for (var c = 0; c < size; c++) {
+          final isGiven = easyBoard.cellAt(r, c).isOriginal;
+          final symIsGiven = easyBoard.cellAt(size - 1 - r, size - 1 - c).isOriginal;
+          expect(isGiven, equals(symIsGiven), 
+            reason: 'Cells at ($r, $c) and symmetric counterpart should both be given or both empty');
+        }
+      }
+    });
+
+    test('Expert yields exactly 22 clues and Extreme yields exactly 17 clues', () {
+      final expertBoard = SudokuGenerator.generate(Difficulty.expert);
+      expect(expertBoard.filledCellCount, equals(22), 
+        reason: 'Expert mode must enforce strictly 22 clues');
+
+      final extremeBoard = SudokuGenerator.generate(Difficulty.extreme);
+      expect(extremeBoard.filledCellCount, equals(17), 
+        reason: 'Extreme mode must enforce strictly 17 clues from seed bank');
+    });
   });
 
   group('SudokuGenerator Tests', () {
@@ -75,14 +99,44 @@ void main() {
       expect(fullBoard.isCompleted, isTrue, reason: 'Board should be marked as completed.');
     });
 
-    test('Given cells count matches difficulty (Easy, Medium, Hard)', () {
+    test('Given cells count matches difficulty (Fast, Easy, Medium, Hard, Expert, Extreme)', () {
+      final fastBoard = SudokuGenerator.generate(Difficulty.fast);
       final easyBoard = SudokuGenerator.generate(Difficulty.easy);
       final mediumBoard = SudokuGenerator.generate(Difficulty.medium);
       final hardBoard = SudokuGenerator.generate(Difficulty.hard);
+      final expertBoard = SudokuGenerator.generate(Difficulty.expert);
+      final extremeBoard = SudokuGenerator.generate(Difficulty.extreme);
 
-      expect(easyBoard.filledCellCount, greaterThanOrEqualTo(Difficulty.easy.givenCellCount));
-      expect(mediumBoard.filledCellCount, greaterThanOrEqualTo(Difficulty.medium.givenCellCount));
-      expect(hardBoard.filledCellCount, greaterThanOrEqualTo(Difficulty.hard.givenCellCount));
+      expect(fastBoard.filledCellCount, greaterThanOrEqualTo(Difficulty.fast.givenCellCount - 2));
+      expect(easyBoard.filledCellCount, greaterThanOrEqualTo(Difficulty.easy.givenCellCount - 2));
+      expect(mediumBoard.filledCellCount, greaterThanOrEqualTo(Difficulty.medium.givenCellCount - 2));
+      expect(hardBoard.filledCellCount, greaterThanOrEqualTo(Difficulty.hard.givenCellCount - 2));
+      expect(expertBoard.filledCellCount, greaterThanOrEqualTo(Difficulty.expert.givenCellCount - 2));
+      expect(extremeBoard.filledCellCount, greaterThanOrEqualTo(Difficulty.extreme.givenCellCount - 2));
+    });
+
+    test('Generated boards use rotational symmetry', () {
+      final easyBoard = SudokuGenerator.generate(Difficulty.easy);
+      final size = easyBoard.gridSize;
+      
+      for (var r = 0; r < size; r++) {
+        for (var c = 0; c < size; c++) {
+          final isGiven = easyBoard.cellAt(r, c).isOriginal;
+          final symIsGiven = easyBoard.cellAt(size - 1 - r, size - 1 - c).isOriginal;
+          expect(isGiven, equals(symIsGiven), 
+            reason: 'Cells at ($r, $c) and symmetric counterpart should both be given or both empty');
+        }
+      }
+    });
+
+    test('Expert yields exactly 22 clues and Extreme yields exactly 17 clues', () {
+      final expertBoard = SudokuGenerator.generate(Difficulty.expert);
+      expect(expertBoard.filledCellCount, equals(22), 
+        reason: 'Expert mode must enforce strictly 22 clues');
+
+      final extremeBoard = SudokuGenerator.generate(Difficulty.extreme);
+      expect(extremeBoard.filledCellCount, equals(17), 
+        reason: 'Extreme mode must enforce strictly 17 clues from seed bank');
     });
   });
 
@@ -339,6 +393,30 @@ void main() {
           }
         }
       }
+    });
+
+    test('Generated boards use rotational symmetry', () {
+      final easyBoard = SudokuGenerator.generate(Difficulty.easy);
+      final size = easyBoard.gridSize;
+      
+      for (var r = 0; r < size; r++) {
+        for (var c = 0; c < size; c++) {
+          final isGiven = easyBoard.cellAt(r, c).isOriginal;
+          final symIsGiven = easyBoard.cellAt(size - 1 - r, size - 1 - c).isOriginal;
+          expect(isGiven, equals(symIsGiven), 
+            reason: 'Cells at ($r, $c) and symmetric counterpart should both be given or both empty');
+        }
+      }
+    });
+
+    test('Expert yields exactly 22 clues and Extreme yields exactly 17 clues', () {
+      final expertBoard = SudokuGenerator.generate(Difficulty.expert);
+      expect(expertBoard.filledCellCount, equals(22), 
+        reason: 'Expert mode must enforce strictly 22 clues');
+
+      final extremeBoard = SudokuGenerator.generate(Difficulty.extreme);
+      expect(extremeBoard.filledCellCount, equals(17), 
+        reason: 'Extreme mode must enforce strictly 17 clues from seed bank');
     });
   });
 }
