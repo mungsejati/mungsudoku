@@ -193,10 +193,13 @@ Folder ini berisi seluruh *source code* (kode sumber) dari aplikasi MungSudoku. 
   - `function clearNotes()`: Returns a new cell with all pencil marks removed.
 
 ### 📄 `lib/src/features/game/presentation/game_page.dart`
-- **Class/Widget `GamePage`**: Halaman arena bermain Sudoku. Menghubungkan seluruh komponen UI papan, numpad, timer, dan alat.
-- **Class/Widget `_GamePageState`**: Mengatur event daur hidup (lifecycle) `GamePage` dan mendengarkan status menang/kalah.
+- **Class/Widget `GamePage`**: Halaman arena bermain Sudoku. Menghubungkan seluruh komponen UI papan, numpad, timer, dan alat. (Dialog in-game untuk status kemenangan atau kekalahan telah dihapus dan digantikan oleh `GameResultPage`).
+- **Class/Widget `_GamePageState`**: Mengatur event daur hidup (lifecycle) `GamePage` dan mendengarkan status menang/kalah untuk memicu navigasi otomatis ke `/result`.
 - **Class/Widget `_PulseAutoCompleteButton`**: Tombol "Auto Complete" yang akan berdenyut memanggil pemain saat sisa sel kosong sangat sedikit.
 - **Class/Widget `_PulseAutoCompleteButtonState`**: Mengelola animasi denyut tak berujung (looping animation) dari tombol Auto Complete.
+
+### 📄 `lib/src/features/game/presentation/game_result_page.dart`
+- **Class/Widget `GameResultPage`**: Halaman khusus untuk menampilkan hasil akhir dari sebuah permainan (Victory atau Game Over). Halaman ini menerima data statistik (Waktu, Kesulitan, Kesalahan) melalui argumen rute (`GameResultArgs`) dan menggunakan gaya tombol bergaya *pill* yang selaras dengan tema aplikasi.
 
 ### 📄 `lib/src/features/game/presentation/utils/symbol_mapper.dart`
 - *Fungsi utilitas untuk menerjemahkan angka data internal (1-9) menjadi berbagai gaya simbol visual (angka biasa, Romawi, warna, dll) di antarmuka.*

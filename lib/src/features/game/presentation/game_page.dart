@@ -6,6 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../../../core/theme/game_theme.dart';
 import '../application/game_notifier.dart';
 import '../application/game_state.dart';
+import 'game_result_args.dart';
 import 'widgets/game_control_pad.dart';
 import 'widgets/game_number_pad.dart';
 import '../domain/enums/difficulty.dart';
@@ -58,79 +59,26 @@ class _GamePageState extends ConsumerState<GamePage> {
     );
   }
 
-  void _showVictoryDialog(BuildContext context, GameState state) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: const Text('Puzzle Solved! 🎉'),
-        content: Text(
-          'Congratulations!\n'
-          'Difficulty: ${state.difficulty.displayName}\n'
-          'Time: ${_formatDuration(state.gameDuration)}\n'
-          'Mistakes: ${state.cumulativeMistakeCount}/${GameState.maxMistakes}',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              context.go('/');
-            },
-            child: const Text('Main Menu'),
-          ),
-          FilledButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              _showNewGameBottomSheet(context);
-            },
-            child: const Text('Play Again'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showGameOverDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: const Text('Game Over'),
-        content: const Text('You have reached the maximum number of mistakes.'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              context.go('/');
-            },
-            child: const Text('Main Menu'),
-          ),
-          FilledButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              ref.read(gameNotifierProvider.notifier).restartPuzzle();
-            },
-            child: const Text('Try Again'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  String _formatDuration(Duration duration) {
-    final m = duration.inMinutes.toString().padLeft(2, '0');
-    final s = (duration.inSeconds % 60).toString().padLeft(2, '0');
-    return '$m:$s';
-  }
-
   @override
   Widget build(BuildContext context) {
     ref.listen<GameState>(gameNotifierProvider, (prev, next) {
       if (prev?.isVictory != true && next.isVictory) {
-        _showVictoryDialog(context, next);
+        context.go('/result', extra: GameResultArgs(
+          isVictory: true,
+          difficulty: next.difficulty,
+          time: next.gameDuration,
+          mistakes: next.cumulativeMistakeCount,
+          maxMistakes: GameState.maxMistakes,
+        ));
       }
       if (prev?.isGameOver != true && next.isGameOver) {
-        _showGameOverDialog(context);
+        context.go('/result', extra: GameResultArgs(
+          isVictory: false,
+          difficulty: next.difficulty,
+          time: next.gameDuration,
+          mistakes: next.cumulativeMistakeCount,
+          maxMistakes: GameState.maxMistakes,
+        ));
       }
     });
 
