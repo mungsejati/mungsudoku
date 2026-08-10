@@ -45,7 +45,7 @@ void main() {
     
     // Simulate a move to create a save
     final board = notifier.state.board;
-    var emptyPos = (0, 0);
+    // Fill board until exactly 9 empty cells remain
     // Fill board until exactly 9 empty cells remain
     int emptyCount = 0;
     for (int r = 0; r < board.gridSize; r++) {

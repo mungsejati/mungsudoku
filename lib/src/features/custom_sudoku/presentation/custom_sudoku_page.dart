@@ -186,8 +186,8 @@ class _CustomSudokuBoardWidget extends ConsumerWidget {
                     if (state.hasSelection && !isSelected) {
                       final sameRow = row == state.selectedRow;
                       final sameCol = col == state.selectedCol;
-                      final sameSg = (row ~/ board.subGridRows) == (state.selectedRow! ~/ board.subGridRows) &&
-                                     (col ~/ board.subGridCols) == (state.selectedCol! ~/ board.subGridCols);
+                      final sameSg = (row ~/ board.subGridRows) == (state.selectedRow ~/ board.subGridRows) &&
+                                     (col ~/ board.subGridCols) == (state.selectedCol ~/ board.subGridCols);
                       isCrosshair = sameRow || sameCol || sameSg;
                     }
 

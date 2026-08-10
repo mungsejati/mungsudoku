@@ -75,7 +75,7 @@ class GameNotifier extends Notifier<GameState> {
     final subGridCols = boardConfig.subGridCols;
 
     _log.info(
-      'Starting new game — difficulty: ${difficulty.displayName}, size: ${subGridRows}x${subGridCols}, symbol: ${symbolType.name}',
+      'Starting new game — difficulty: ${difficulty.displayName}, size: ${subGridRows}x$subGridCols, symbol: ${symbolType.name}',
     );
     _cancelTimer();
 

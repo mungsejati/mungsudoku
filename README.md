@@ -209,9 +209,6 @@ Folder ini berisi seluruh *source code* (kode sumber) dari aplikasi MungSudoku. 
 - **Class/Widget `GameNumberPad`**: Komponen kumpulan tombol input angka 1-9 (berbentuk keypad) di bagian bawah papan bermain.
 - **Class/Widget `_NumpadDigitButton`**: A square numpad button with an overlapping circular badge showing how many of this digit remain to be placed.
 
-### 📄 `lib/src/features/game/presentation/widgets/game_setup_dialog.dart`
-- **Class/Widget `GameSetupDialog`**: Dialog sembulan (pop-up) awal yang meminta pengguna memilih tingkat kesulitan sebelum memulai puzzle baru.
-- **Class/Widget `_GameSetupDialogState`**: Menyimpan pilihan tombol kesulitan sementara hingga pengguna menekan "Start".
 
 ### 📄 `lib/src/features/game/presentation/widgets/game_theme_picker.dart`
 - **Class/Widget `GameThemePopupMenu`**: Antarmuka *dropdown/popup* untuk mengganti skema warna tema secara dinamis.
