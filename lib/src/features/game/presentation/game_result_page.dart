@@ -20,7 +20,7 @@ class GameResultPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final gameTheme = ref.watch(gameThemeProvider);
-    final primaryColor = const Color(0xFF0092DF); // Primary color used in HomePage
+    final primaryColor = Theme.of(context).colorScheme.primary; // Primary color used in HomePage
 
     return Scaffold(
       body: Stack(

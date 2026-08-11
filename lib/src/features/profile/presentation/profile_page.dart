@@ -21,13 +21,13 @@ class ProfilePage extends ConsumerWidget {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Color(0xFF0092DF)),
+          icon: Icon(Icons.arrow_back_ios_new, color: Theme.of(context).colorScheme.primary),
           onPressed: () => context.pop(),
         ),
-        title: const Text(
-          'Mental Focus',
+        title: Text(
+          'Me',
           style: TextStyle(
-            color: Color(0xFF0092DF),
+            color: Theme.of(context).colorScheme.primary,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -48,12 +48,12 @@ class ProfilePage extends ConsumerWidget {
               const SizedBox(height: 40),
               
               // Productivity Metrics
-              const Text(
+              Text(
                 'Productivity Metrics',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF5A5A5A),
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
               const SizedBox(height: 16),
@@ -120,17 +120,17 @@ class _ProfileHeader extends StatelessWidget {
           width: 100,
           height: 100,
           decoration: BoxDecoration(
-            color: const Color(0xFFF0F8FF),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
             shape: BoxShape.circle,
             border: Border.all(
-              color: const Color(0xFF0092DF),
+              color: Theme.of(context).colorScheme.primary,
               width: 3,
             ),
-            boxShadow: const [
+            boxShadow: [
               BoxShadow(
-                color: Color(0x330092DF),
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
                 blurRadius: 12,
-                offset: Offset(0, 6),
+                offset: const Offset(0, 6),
               ),
             ],
           ),
@@ -138,8 +138,8 @@ class _ProfileHeader extends StatelessWidget {
             padding: const EdgeInsets.all(20.0),
             child: SvgPicture.asset(
               avatarAsset,
-              colorFilter: const ColorFilter.mode(
-                Color(0xFF0092DF),
+              colorFilter: ColorFilter.mode(
+                Theme.of(context).colorScheme.primary,
                 BlendMode.srcIn,
               ),
             ),
@@ -158,15 +158,15 @@ class _ProfileHeader extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
           decoration: BoxDecoration(
-            color: const Color(0x1A0092DF), // 10% opacity of #0092DF
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(20),
           ),
           child: Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF0092DF),
+              color: Theme.of(context).colorScheme.primary,
             ),
           ),
         ),
@@ -209,7 +209,7 @@ class _MetricCard extends StatelessWidget {
           Icon(
             iconData,
             size: 32,
-            color: const Color(0xFF0092DF),
+            color: Theme.of(context).colorScheme.primary,
           ),
           const SizedBox(height: 12),
           Text(

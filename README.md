@@ -91,6 +91,12 @@ Folder ini berisi seluruh *source code* (kode sumber) dari aplikasi MungSudoku. 
 ### 📄 `lib/src/features/profile/data/mock_profile_repository.dart`
 - **Class/Widget `MockProfileRepository`**: Menyediakan data metrik *hardcode* (`ProfileEntity`) untuk halaman profil. Data ini dirancang agar mudah dibaca dan diubah secara manual oleh developer untuk keperluan pengujian UI.
 
+### 📄 `lib/src/features/settings/presentation/settings_page.dart`
+- **Class/Widget `SettingsPage`**: Halaman pengaturan aplikasi yang memungkinkan pengguna mengubah tema (Light/Dark/System) dan ukuran font secara dinamis. Perubahan langsung tercermin di seluruh aplikasi dan dapat dilihat secara langsung melalui bagian *Live Preview*.
+
+### 📄 `lib/src/features/settings/application/settings_notifier.dart`
+- **Class/Widget `SettingsNotifier`**: Riverpod Notifier yang menyimpan *state* global (`SettingsState`) untuk tema dan ukuran font, menghubungkannya dengan konfigurasi `AppTheme` di `main.dart`.
+
 ---
 
 ## 5. Pengujian (Testing)

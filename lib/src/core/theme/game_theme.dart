@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../features/game/application/game_notifier.dart';
+import '../../features/settings/application/settings_notifier.dart';
 
 /// Defines the visual style of the Sudoku game board and its surrounding UI.
 ///
@@ -309,9 +309,9 @@ class GameTheme {
 
 /// Riverpod provider for the active [GameTheme].
 ///
-/// Watches the GameNotifier's state to determine the active theme.
+/// Watches the SettingsNotifier's state to determine the active theme.
 final gameThemeProvider = Provider<GameTheme>((ref) {
-  final activeThemePreset = ref.watch(gameNotifierProvider.select((state) => state.activeThemePreset));
+  final activeThemePreset = ref.watch(settingsNotifierProvider.select((state) => state.gameThemePreset));
   switch (activeThemePreset) {
     case 'red':
       return GameTheme.red;

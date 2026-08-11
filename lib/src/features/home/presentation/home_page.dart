@@ -123,7 +123,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                   _ActionItem(
                     iconPath: 'assets/setting.svg',
                     label: 'settings',
-                    onTap: () {},
+                    onTap: () => context.push(AppRouter.settingsPath),
                   ),
                 ],
               ),
@@ -173,9 +173,9 @@ class _HomePageState extends ConsumerState<HomePage> {
                                 fontSize: 16,
                               ),
                             ),
-                            trailing: const Icon(
+                            trailing: Icon(
                               Icons.play_arrow_rounded,
-                              color: Color(0xFF0092DF),
+                              color: Theme.of(context).colorScheme.primary,
                             ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
@@ -227,14 +227,14 @@ class _OutlinedPillButton extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(50),
-            border: Border.all(color: const Color(0xFF0092DF), width: 2),
+            border: Border.all(color: Theme.of(context).colorScheme.primary, width: 2),
           ),
           child: Column(
             children: [
               Text(
                 label,
-                style: const TextStyle(
-                  color: Color(0xFF0092DF),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
@@ -270,12 +270,12 @@ class _FilledPillButton extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          color: const Color(0xFF0092DF),
+          color: Theme.of(context).colorScheme.primary,
           borderRadius: BorderRadius.circular(50),
-          boxShadow: const [
+          boxShadow: [
             BoxShadow(
-              color: Color(0xFF0578B3),
-              offset: Offset(0, 4),
+              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
+              offset: const Offset(0, 4),
               blurRadius: 0,
             ),
           ],
@@ -320,8 +320,8 @@ class _ActionItem extends StatelessWidget {
               iconPath,
               width: 28,
               height: 28,
-              colorFilter: const ColorFilter.mode(
-                Color(0xFF0092DF),
+              colorFilter: ColorFilter.mode(
+                Theme.of(context).colorScheme.primary,
                 BlendMode.srcIn,
               ),
             ),

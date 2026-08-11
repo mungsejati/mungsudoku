@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:flutter_svg/flutter_svg.dart';
 
-import '../../application/game_notifier.dart';
+import '../../../settings/application/settings_notifier.dart';
 import '../../../../core/theme/game_theme.dart';
 
 class GameThemePopupMenu extends ConsumerWidget {
@@ -78,12 +78,12 @@ class _ThemeSwatch extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final activeTheme = ref.watch(gameNotifierProvider.select((state) => state.activeThemePreset));
+    final activeTheme = ref.watch(settingsNotifierProvider.select((state) => state.gameThemePreset));
     final isSelected = activeTheme == preset || (activeTheme == 'dark' && preset == 'black');
 
     return GestureDetector(
       onTap: () {
-        ref.read(gameNotifierProvider.notifier).changeTheme(preset);
+        ref.read(settingsNotifierProvider.notifier).setGameThemePreset(preset);
       },
       child: Container(
         width: 36,

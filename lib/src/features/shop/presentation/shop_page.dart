@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/theme/game_theme.dart';
+
 
 class ShopPage extends ConsumerWidget {
   const ShopPage({super.key});
@@ -18,10 +18,7 @@ class ShopPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final gameTheme = ref.watch(gameThemeProvider);
-    final isWhiteTheme = gameTheme.background.computeLuminance() > 0.8;
-    // Gunakan warna biru default jika temanya terlalu terang (misal tema putih)
-    final primaryColor = isWhiteTheme ? const Color(0xFF0092DF) : gameTheme.background;
+    final primaryColor = Theme.of(context).colorScheme.primary;
     const topBarTextColor = Colors.white;
     
     return Scaffold(
@@ -127,7 +124,7 @@ class _ProductCard extends StatelessWidget {
                 color: Color(0xFFF5F5F5),
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, color: const Color(0xFF0092DF), size: 28),
+              child: Icon(icon, color: Theme.of(context).colorScheme.primary, size: 28),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -145,10 +142,10 @@ class _ProductCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     price,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF0092DF),
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
                 ],

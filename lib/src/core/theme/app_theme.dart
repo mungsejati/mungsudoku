@@ -1,24 +1,31 @@
 import 'package:flutter/material.dart';
+import 'game_theme.dart';
 
-/// Application-wide [ThemeData] configuration.
+/// Defines the global application theme.
 ///
-/// Extend this class as the design system grows (colors, typography,
-/// component themes, etc.).
+/// The theme uses the [GameTheme]'s accent color as the seed, but does NOT
+/// override background or text colors globally — each page manages those.
 abstract final class AppTheme {
-  static ThemeData get dark => ThemeData(
-    useMaterial3: true,
-    brightness: Brightness.dark,
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: const Color(0xFF0092DF),
-      brightness: Brightness.dark,
-    ),
-  );
+  static ThemeData build(GameTheme gameTheme) {
+    // Derive light/dark brightness from the game background luminance.
+    final isDark = gameTheme.background.computeLuminance() < 0.5;
+    final isWhiteTheme = gameTheme.background.computeLuminance() > 0.8;
 
-  static ThemeData get light => ThemeData(
-    useMaterial3: true,
-    brightness: Brightness.light,
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: const Color(0xFF0092DF),
-    ),
-  );
+    // Use background as accent seed.
+    // If the game theme is white, it will be invisible on a white menu background,
+    // so we fall back to the brand blue. Black and other colors work perfectly.
+    final seed = isWhiteTheme
+        ? const Color(0xFF0092DF)
+        : gameTheme.background;
+
+    return ThemeData(
+      useMaterial3: true,
+      brightness: isDark ? Brightness.dark : Brightness.light,
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: seed,
+        brightness: isDark ? Brightness.dark : Brightness.light,
+        primary: seed, // Ensures the exact solid color is used instead of a faded variant
+      ),
+    );
+  }
 }
