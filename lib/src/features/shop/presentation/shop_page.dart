@@ -101,6 +101,10 @@ class _ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final primaryColor = Theme.of(context).colorScheme.primary;
+    final isBlackTheme = primaryColor == const Color(0xFF5A5A5A);
+    final shadowColor = isBlackTheme ? const Color(0xFF3E3E3E) : Colors.black.withValues(alpha: 0.15);
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -110,7 +114,7 @@ class _ProductCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(50),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.15),
+              color: shadowColor,
               offset: const Offset(0, 4),
               blurRadius: 0,
             ),
@@ -124,7 +128,7 @@ class _ProductCard extends StatelessWidget {
                 color: Color(0xFFF5F5F5),
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, color: Theme.of(context).colorScheme.primary, size: 28),
+              child: Icon(icon, color: primaryColor, size: 28),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -133,10 +137,10 @@ class _ProductCard extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color: primaryColor,
                     ),
                   ),
                   const SizedBox(height: 4),

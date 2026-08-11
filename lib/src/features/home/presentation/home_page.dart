@@ -141,37 +141,42 @@ class _HomePageState extends ConsumerState<HomePage> {
       builder: (context) {
         return SafeArea(
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 const Text(
                   'New Game',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 20, 
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF5A5A5A),
+                  ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 8),
                 Flexible(
                   child: SingleChildScrollView(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: Difficulty.values.map((diff) {
                         return Padding(
-                          padding: const EdgeInsets.only(bottom: 8.0),
+                          padding: const EdgeInsets.only(bottom: 4.0),
                           child: ListTile(
                             contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 4,
+                              horizontal: 16,
+                              vertical: 0,
                             ),
                             title: Text(
                               diff.displayName,
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
+                                color: Color(0xFF5A5A5A),
                               ),
                             ),
-                            trailing: Icon(
+                            trailing: const Icon(
                               Icons.play_arrow_rounded,
-                              color: Theme.of(context).colorScheme.primary,
+                              color: Color(0xFF5A5A5A),
                             ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
@@ -222,8 +227,16 @@ class _OutlinedPillButton extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
+            color: Colors.white, // Solid white so shadow doesn't bleed through
             borderRadius: BorderRadius.circular(50),
             border: Border.all(color: Theme.of(context).colorScheme.primary, width: 2),
+            boxShadow: [
+              BoxShadow(
+                color: Theme.of(context).colorScheme.primary,
+                offset: const Offset(0, 4),
+                blurRadius: 0,
+              ),
+            ],
           ),
           child: Column(
             children: [
@@ -260,17 +273,23 @@ class _FilledPillButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final primaryColor = Theme.of(context).colorScheme.primary;
+    // For #5A5A5A, a lerp of 0.31 yields approx #3e3e3e. We'll use exactly #3e3e3e if it's #5a5a5a
+    final shadowColor = primaryColor == const Color(0xFF5A5A5A) 
+        ? const Color(0xFF3E3E3E) 
+        : Color.lerp(primaryColor, Colors.black, 0.2) ?? Colors.black;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.primary,
+          color: primaryColor,
           borderRadius: BorderRadius.circular(50),
           boxShadow: [
             BoxShadow(
-              color: Color.lerp(Theme.of(context).colorScheme.primary, Colors.black, 0.2) ?? Colors.black,
+              color: shadowColor,
               offset: const Offset(0, 4),
               blurRadius: 0,
             ),

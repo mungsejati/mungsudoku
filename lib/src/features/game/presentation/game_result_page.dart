@@ -20,7 +20,6 @@ class GameResultPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final gameTheme = ref.watch(gameThemeProvider);
-    final primaryColor = Theme.of(context).colorScheme.primary; // Primary color used in HomePage
 
     return Scaffold(
       body: Stack(
@@ -110,7 +109,7 @@ class GameResultPage extends ConsumerWidget {
                       _FilledPillButton(
                         label: args.isVictory ? 'Play Again' : 'Try Again',
                         backgroundColor: gameTheme.subGridBackground,
-                        textColor: primaryColor,
+                        textColor: gameTheme.inputTextColor,
                         onTap: () {
                           if (args.isVictory) {
                             ref.read(gameNotifierProvider.notifier).initNewGame(args.difficulty);

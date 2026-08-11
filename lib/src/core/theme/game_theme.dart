@@ -263,13 +263,13 @@ class GameTheme {
 
   /// Black / Dark OLED theme.
   static final black = GameTheme(
-    background: const Color(0xFF000000),
+    background: const Color(0xFF5A5A5A),
     subGridBackground: const Color(0xFF1E1E1E),
     subGridBorderRadius: 12,
     subGridSpacing: 7,
     subGridShadow: [
       BoxShadow(
-        color: Colors.black.withValues(alpha: 0.8),
+        color: const Color(0xFF3E3E3E),
         blurRadius: 0,
         offset: const Offset(0, 4),
       ),
@@ -287,7 +287,7 @@ class GameTheme {
     controlPadBackground: const Color(0xFF1E1E1E),
     controlPadShadow: [
       BoxShadow(
-        color: Colors.black.withValues(alpha: 0.6),
+        color: const Color(0xFF3E3E3E),
         blurRadius: 10,
         offset: const Offset(0, 4),
       ),
@@ -296,12 +296,12 @@ class GameTheme {
     numpadButtonBackground: const Color(0xFF2A2A2A),
     numpadButtonShadow: [
       BoxShadow(
-        color: Colors.black.withValues(alpha: 0.6),
+        color: const Color(0xFF3E3E3E),
         blurRadius: 6,
         offset: const Offset(0, 3),
       ),
     ],
-    arcColor: const Color(0xFF000000),
+    arcColor: const Color(0xFF5A5A5A),
     topBarTextColor: const Color(0xFF90CAF9),
     topBarMistakeColor: const Color(0xFFEF9A9A),
   );
