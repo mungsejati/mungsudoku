@@ -85,6 +85,12 @@ Folder ini berisi seluruh *source code* (kode sumber) dari aplikasi MungSudoku. 
   - **Produk Mock**: *Remove Ads*, *Skins / Themes*, *Hints*, *Fast Notes Pack*.
   - **Interaksi**: Saat pengguna menekan salah satu produk, sebuah `SnackBar` akan muncul menginformasikan status simulasi pembelian.
 
+### 📄 `lib/src/features/profile/presentation/profile_page.dart`
+- **Class/Widget `ProfilePage`**: Halaman "Me" yang berfungsi sebagai *Mental Focus & Productivity Dashboard*. Menampilkan metrik produktivitas pemain (Games Played, Win Rate, Daily Focus Streak, Deep Work Sessions, Silent Productivity Time) dengan gaya visual minimalis dan *pill-shaped cards*.
+
+### 📄 `lib/src/features/profile/data/mock_profile_repository.dart`
+- **Class/Widget `MockProfileRepository`**: Menyediakan data metrik *hardcode* (`ProfileEntity`) untuk halaman profil. Data ini dirancang agar mudah dibaca dan diubah secara manual oleh developer untuk keperluan pengujian UI.
+
 ---
 
 ## 5. Pengujian (Testing)

@@ -106,7 +106,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                   _ActionItem(
                     iconPath: 'assets/person.svg',
                     label: 'me',
-                    onTap: () {},
+                    onTap: () => context.push(AppRouter.profilePath),
                   ),
                   _ActionItem(
                     iconPath: 'assets/create.svg',
