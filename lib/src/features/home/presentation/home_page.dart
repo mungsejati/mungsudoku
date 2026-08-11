@@ -70,11 +70,7 @@ class _HomePageState extends ConsumerState<HomePage> {
 
               // Logo
               Center(
-                child: SvgPicture.asset(
-                  'assets/logo.svg',
-                  height: 160,
-                  width: 160,
-                ),
+                child: ThemedLogo(size: 160),
               ),
 
               const Spacer(flex: 3),
@@ -274,7 +270,7 @@ class _FilledPillButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(50),
           boxShadow: [
             BoxShadow(
-              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
+              color: Color.lerp(Theme.of(context).colorScheme.primary, Colors.black, 0.2) ?? Colors.black,
               offset: const Offset(0, 4),
               blurRadius: 0,
             ),
@@ -340,3 +336,57 @@ class _ActionItem extends StatelessWidget {
     );
   }
 }
+
+class ThemedLogo extends StatelessWidget {
+  final double size;
+
+  const ThemedLogo({super.key, required this.size});
+
+  String _colorToHex(Color color) {
+    final r = (color.r * 255).toInt().toRadixString(16).padLeft(2, '0');
+    final g = (color.g * 255).toInt().toRadixString(16).padLeft(2, '0');
+    final b = (color.b * 255).toInt().toRadixString(16).padLeft(2, '0');
+    return '#$r$g$b'.toUpperCase();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final primaryColor = Theme.of(context).colorScheme.primary;
+    // Create a darker shade for the shadow slice (similar to what we did for the button)
+    final shadowColor = Color.lerp(primaryColor, Colors.black, 0.2) ?? Colors.black;
+
+    final primaryHex = _colorToHex(primaryColor);
+    final shadowHex = _colorToHex(shadowColor);
+
+    final String coloredSvg = _rawLogoSvg
+        .replaceAll('#0092DF', primaryHex)
+        .replaceAll('#0578B3', shadowHex);
+
+    return SvgPicture.string(
+      coloredSvg,
+      width: size,
+      height: size,
+    );
+  }
+}
+
+const String _rawLogoSvg = '''
+<svg width="321" height="321" viewBox="0 0 321 321" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="160.5" cy="160.5" r="160.5" fill="#0092DF"/>
+<path d="M296.752 75.6724C315.13 105.193 323.425 139.883 320.386 174.524C317.348 209.165 303.141 241.882 279.903 267.752C256.666 293.622 225.655 311.246 191.538 317.97C157.42 324.695 122.042 320.157 90.7258 305.04L160.5 160.5L296.752 75.6724Z" fill="#0578B3"/>
+<rect width="52" height="52" rx="12" transform="matrix(-1 0 0 1 131 79)" fill="white"/>
+<rect width="52" height="52" rx="12" transform="matrix(-1 0 0 1 243 79)" fill="white"/>
+<rect width="52" height="52" rx="12" transform="matrix(-1 0 0 1 187 79)" fill="white"/>
+<rect width="52" height="52" rx="12" transform="matrix(-1 0 0 1 131 135)" fill="white"/>
+<rect width="52" height="52" rx="12" transform="matrix(-1 0 0 1 243 135)" fill="white"/>
+<rect width="52" height="52" rx="12" transform="matrix(-1 0 0 1 187 135)" fill="white"/>
+<rect width="52" height="52" rx="12" transform="matrix(-1 0 0 1 131 191)" fill="white"/>
+<rect width="52" height="52" rx="12" transform="matrix(-1 0 0 1 243 191)" fill="white"/>
+<rect width="52" height="52" rx="12" transform="matrix(-1 0 0 1 187 191)" fill="white"/>
+<circle cx="161" cy="105" r="15" fill="#0092DF"/>
+<circle cx="217" cy="105" r="15" fill="#0092DF"/>
+<circle cx="161" cy="161" r="15" fill="#0092DF"/>
+<circle cx="161" cy="217" r="15" fill="#0092DF"/>
+<circle cx="105" cy="217" r="15" fill="#0092DF"/>
+</svg>
+''';

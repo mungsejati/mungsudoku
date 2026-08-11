@@ -15,15 +15,17 @@ class SettingsPage extends ConsumerWidget {
     final gameTheme = ref.watch(gameThemeProvider);
 
     return Scaffold(
+      backgroundColor: gameTheme.background,
       appBar: AppBar(
+        backgroundColor: gameTheme.background,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new),
+          icon: Icon(Icons.arrow_back_ios_new, color: gameTheme.topBarTextColor),
           onPressed: () => context.pop(),
         ),
-        title: const Text(
+        title: Text(
           'Settings',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold, color: gameTheme.topBarTextColor),
         ),
         centerTitle: true,
       ),
@@ -40,9 +42,10 @@ class SettingsPage extends ConsumerWidget {
               // Font Size Selector
               Text(
                 'Font Size',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
+                  color: gameTheme.topBarTextColor,
                 ),
               ),
               const SizedBox(height: 16),
@@ -66,17 +69,25 @@ class SettingsPage extends ConsumerWidget {
                   notifier.setFontSizeFactor(newSelection.first);
                 },
                 style: ButtonStyle(
+                  foregroundColor: WidgetStateProperty.resolveWith<Color>(
+                    (Set<WidgetState> states) {
+                      if (states.contains(WidgetState.selected)) {
+                        return gameTheme.inputTextColor;
+                      }
+                      return gameTheme.topBarTextColor;
+                    },
+                  ),
                   side: WidgetStateProperty.resolveWith<BorderSide>(
                     (Set<WidgetState> states) => BorderSide(
                       color: states.contains(WidgetState.selected)
-                          ? Theme.of(context).colorScheme.primary
-                          : Theme.of(context).colorScheme.outline,
+                          ? gameTheme.selectedCellColor
+                          : gameTheme.topBarTextColor.withValues(alpha: 0.3),
                     ),
                   ),
                   backgroundColor: WidgetStateProperty.resolveWith<Color>(
                     (Set<WidgetState> states) {
                       if (states.contains(WidgetState.selected)) {
-                        return Theme.of(context).colorScheme.primaryContainer;
+                        return gameTheme.selectedCellColor;
                       }
                       return Colors.transparent;
                     },
@@ -89,9 +100,10 @@ class SettingsPage extends ConsumerWidget {
               // Game Theme Selector
               Text(
                 'Game Theme',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
+                  color: gameTheme.topBarTextColor,
                 ),
               ),
               const SizedBox(height: 16),
@@ -230,6 +242,7 @@ class _GameThemeSwatch extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final activeTheme = ref.watch(settingsNotifierProvider.select((state) => state.gameThemePreset));
+    final gameTheme = ref.watch(gameThemeProvider);
     final isSelected = activeTheme == preset || (activeTheme == 'dark' && preset == 'black');
 
     return GestureDetector(
@@ -246,8 +259,8 @@ class _GameThemeSwatch extends ConsumerWidget {
               shape: BoxShape.circle,
               border: Border.all(
                 color: isSelected
-                    ? Theme.of(context).colorScheme.primary
-                    : Colors.grey.withValues(alpha: 0.3),
+                    ? gameTheme.topBarTextColor
+                    : gameTheme.topBarTextColor.withValues(alpha: 0.3),
                 width: isSelected ? 3 : 1,
               ),
               boxShadow: [
@@ -272,6 +285,7 @@ class _GameThemeSwatch extends ConsumerWidget {
             style: TextStyle(
               fontSize: 12,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              color: gameTheme.topBarTextColor,
             ),
           ),
         ],
