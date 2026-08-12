@@ -17,19 +17,21 @@ class CustomSudokuRepository {
   Future<void> saveCustomPuzzle(SudokuBoard board) async {
     final prefs = await SharedPreferences.getInstance();
     final List<String> currentSaved = prefs.getStringList(_storageKey) ?? [];
-    
+
     // Generate ID and createdAt if null
     var boardToSave = board;
     if (boardToSave.id == null || boardToSave.createdAt == null) {
       boardToSave = boardToSave.copyWith(
-        id: boardToSave.id ?? DateTime.now().millisecondsSinceEpoch.toRadixString(36),
+        id:
+            boardToSave.id ??
+            DateTime.now().millisecondsSinceEpoch.toRadixString(36),
         createdAt: boardToSave.createdAt ?? DateTime.now(),
       );
     }
-    
+
     // Add the new board at the beginning of the list
     currentSaved.insert(0, jsonEncode(boardToSave.toJson()));
-    
+
     await prefs.setStringList(_storageKey, currentSaved);
   }
 
@@ -37,7 +39,7 @@ class CustomSudokuRepository {
   Future<List<SudokuBoard>> getCustomPuzzles() async {
     final prefs = await SharedPreferences.getInstance();
     final List<String> currentSaved = prefs.getStringList(_storageKey) ?? [];
-    
+
     final List<SudokuBoard> boards = [];
     for (final boardStr in currentSaved) {
       try {
@@ -47,7 +49,7 @@ class CustomSudokuRepository {
         // Skip corrupted entries
       }
     }
-    
+
     return boards;
   }
 
@@ -55,10 +57,12 @@ class CustomSudokuRepository {
   Future<void> deleteCustomPuzzle(String id) async {
     final prefs = await SharedPreferences.getInstance();
     final boards = await getCustomPuzzles();
-    
+
     boards.removeWhere((b) => b.id == id);
-    
-    final List<String> newSaved = boards.map((b) => jsonEncode(b.toJson())).toList();
+
+    final List<String> newSaved = boards
+        .map((b) => jsonEncode(b.toJson()))
+        .toList();
     await prefs.setStringList(_storageKey, newSaved);
   }
 }

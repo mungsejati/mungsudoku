@@ -3,9 +3,10 @@ import '../../game/domain/services/sudoku_validator.dart';
 import '../../game/data/services/sudoku_generator.dart';
 import 'custom_sudoku_state.dart';
 
-final customSudokuNotifierProvider = NotifierProvider<CustomSudokuNotifier, CustomSudokuState>(() {
-  return CustomSudokuNotifier();
-});
+final customSudokuNotifierProvider =
+    NotifierProvider<CustomSudokuNotifier, CustomSudokuState>(() {
+      return CustomSudokuNotifier();
+    });
 
 class CustomSudokuNotifier extends Notifier<CustomSudokuState> {
   @override
@@ -29,14 +30,22 @@ class CustomSudokuNotifier extends Notifier<CustomSudokuState> {
     final c = state.selectedCol;
 
     final currentCell = state.board.cellAt(r, c);
-    
+
     // We store the input as value and solutionValue. We treat them as given/original.
-    final updatedCell = value == 0 
-        ? currentCell.copyWith(clearValue: true, solutionValue: 1, isOriginal: false)
-        : currentCell.copyWith(value: value, solutionValue: value, isOriginal: true);
+    final updatedCell = value == 0
+        ? currentCell.copyWith(
+            clearValue: true,
+            solutionValue: 1,
+            isOriginal: false,
+          )
+        : currentCell.copyWith(
+            value: value,
+            solutionValue: value,
+            isOriginal: true,
+          );
 
     final updatedBoard = state.board.updateCell(r, c, updatedCell);
-    
+
     // Re-check basic conflicts immediately for visual feedback
     final conflicts = SudokuValidator.findConflicts(updatedBoard);
 
@@ -47,7 +56,7 @@ class CustomSudokuNotifier extends Notifier<CustomSudokuState> {
       nextCol = 0;
       nextRow++;
     }
-    
+
     if (nextRow >= updatedBoard.gridSize) {
       // Reached the end, wrap to beginning or stay? Let's just clear selection or wrap to 0,0
       nextRow = 0;
@@ -70,7 +79,10 @@ class CustomSudokuNotifier extends Notifier<CustomSudokuState> {
       // 1. Check basic constraint conflicts
       final conflicts = SudokuValidator.findConflicts(state.board);
       if (conflicts.isNotEmpty) {
-        state = state.copyWith(conflictPositions: conflicts, isValidating: false);
+        state = state.copyWith(
+          conflictPositions: conflicts,
+          isValidating: false,
+        );
         return false;
       }
 
@@ -81,7 +93,7 @@ class CustomSudokuNotifier extends Notifier<CustomSudokuState> {
           if (state.board.cellAt(r, c).value != null) filled++;
         }
       }
-      
+
       if (state.board.gridSize == 9 && filled < 17) {
         state = state.copyWith(isValidating: false);
         return false; // Impossible to be unique
@@ -89,14 +101,23 @@ class CustomSudokuNotifier extends Notifier<CustomSudokuState> {
 
       // Extract raw grid for the solver
       final grid = List.generate(state.board.gridSize, (r) {
-        return List.generate(state.board.gridSize, (c) => state.board.cellAt(r, c).value ?? 0);
+        return List.generate(
+          state.board.gridSize,
+          (c) => state.board.cellAt(r, c).value ?? 0,
+        );
       });
 
       // 3. Offload to isolate if needed, but for uniqueness limit 2 it might be fast enough
       // To prevent UI freeze, we can use a microtask or compute
-      final isUnique = await Future.microtask(() => 
-          SudokuGenerator.hasUniqueSolution(grid, state.board.gridSize, state.board.subGridRows, state.board.subGridCols));
-      
+      final isUnique = await Future.microtask(
+        () => SudokuGenerator.hasUniqueSolution(
+          grid,
+          state.board.gridSize,
+          state.board.subGridRows,
+          state.board.subGridCols,
+        ),
+      );
+
       if (!isUnique) {
         state = state.copyWith(isValidating: false);
         return false;
@@ -112,8 +133,16 @@ class CustomSudokuNotifier extends Notifier<CustomSudokuState> {
   /// Returns the fully solved grid as a flat list if valid, otherwise null.
   List<int>? getSolvedGrid() {
     final grid = List.generate(state.board.gridSize, (r) {
-      return List.generate(state.board.gridSize, (c) => state.board.cellAt(r, c).value ?? 0);
+      return List.generate(
+        state.board.gridSize,
+        (c) => state.board.cellAt(r, c).value ?? 0,
+      );
     });
-    return SudokuGenerator.solveGrid(grid, state.board.gridSize, state.board.subGridRows, state.board.subGridCols);
+    return SudokuGenerator.solveGrid(
+      grid,
+      state.board.gridSize,
+      state.board.subGridRows,
+      state.board.subGridCols,
+    );
   }
 }

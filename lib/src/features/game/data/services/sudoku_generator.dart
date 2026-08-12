@@ -10,26 +10,36 @@ abstract final class SudokuGenerator {
   static final Random _random = Random();
 
   /// Returns a fully initialised [SudokuBoard] at the requested [difficulty].
-  static SudokuBoard generate(Difficulty difficulty, {int subGridRows = 3, int subGridCols = 3}) {
+  static SudokuBoard generate(
+    Difficulty difficulty, {
+    int subGridRows = 3,
+    int subGridCols = 3,
+  }) {
     final size = subGridRows * subGridCols;
     final totalCells = size * size;
-    
-// Fast path for expert (22 clues) and extreme (17 clues) on 9x9
-    if (size == 9 && (difficulty == Difficulty.extreme || difficulty == Difficulty.expert)) {
-      final seed = difficulty == Difficulty.extreme 
-          ? SudokuSeedBank.getExtremeSeed() 
+
+    // Fast path for expert (22 clues) and extreme (17 clues) on 9x9
+    if (size == 9 &&
+        (difficulty == Difficulty.extreme || difficulty == Difficulty.expert)) {
+      final seed = difficulty == Difficulty.extreme
+          ? SudokuSeedBank.getExtremeSeed()
           : SudokuSeedBank.getExpertSeed();
       final given = _transformSeed(seed, size);
-      
+
       // We need the full solution for the board. We can solve the generated seed.
       final solution = solveGrid(
-        List.generate(size, (r) => List.generate(size, (c) => given[r * size + c])), 
-        size, subGridRows, subGridCols
+        List.generate(
+          size,
+          (r) => List.generate(size, (c) => given[r * size + c]),
+        ),
+        size,
+        subGridRows,
+        subGridCols,
       )!;
-      
+
       return SudokuBoard.fromValues(
-        given: given, 
-        solution: solution, 
+        given: given,
+        solution: solution,
         subGridRows: subGridRows,
         subGridCols: subGridCols,
       );
@@ -41,7 +51,7 @@ abstract final class SudokuGenerator {
     List<int> given = [];
     List<int> solution = [];
     bool targetReached = false;
-    
+
     int attempts = 0;
     const int maxAttempts = 100;
 
@@ -49,24 +59,36 @@ abstract final class SudokuGenerator {
     while (!targetReached && attempts < maxAttempts) {
       attempts++;
       solution = _generateSolution(size, subGridRows, subGridCols);
-      given = _maskCells(solution, targetGivenCount, totalCells, size, subGridRows, subGridCols);
-      
+      given = _maskCells(
+        solution,
+        targetGivenCount,
+        totalCells,
+        size,
+        subGridRows,
+        subGridCols,
+      );
+
       final currentGivenCount = given.where((val) => val != 0).length;
       if (currentGivenCount <= targetGivenCount) {
-          targetReached = true;
-          
-          // Evaluator: For expert, ensure puzzle requires advanced logic
-          if (difficulty == Difficulty.expert) {
-            if (_isSolvableWithBasicLogic(given, size, subGridRows, subGridCols)) {
-              targetReached = false; // "Too easy", try again
-            }
+        targetReached = true;
+
+        // Evaluator: For expert, ensure puzzle requires advanced logic
+        if (difficulty == Difficulty.expert) {
+          if (_isSolvableWithBasicLogic(
+            given,
+            size,
+            subGridRows,
+            subGridCols,
+          )) {
+            targetReached = false; // "Too easy", try again
           }
+        }
       }
     }
 
     return SudokuBoard.fromValues(
-      given: given, 
-      solution: solution, 
+      given: given,
+      solution: solution,
       subGridRows: subGridRows,
       subGridCols: subGridCols,
     );
@@ -80,29 +102,29 @@ abstract final class SudokuGenerator {
 
   static List<int> _transformSeed(List<int> seed, int size) {
     List<int> result = List.from(seed);
-    
+
     // 1. Permute values (1-9 mapped to a random permutation)
     final values = List.generate(size, (i) => i + 1)..shuffle(_random);
     final map = <int, int>{};
     for (int i = 0; i < size; i++) {
       map[i + 1] = values[i];
     }
-    
+
     for (int i = 0; i < result.length; i++) {
       if (result[i] != 0) {
         result[i] = map[result[i]]!;
       }
     }
-    
+
     // 2. Rotate grid randomly (0, 90, 180, 270 degrees)
     int rotations = _random.nextInt(4);
     for (int i = 0; i < rotations; i++) {
       result = _rotate90(result, size);
     }
-    
+
     return result;
   }
-  
+
   static List<int> _rotate90(List<int> grid, int size) {
     final result = List.filled(size * size, 0);
     for (int r = 0; r < size; r++) {
@@ -116,20 +138,38 @@ abstract final class SudokuGenerator {
   // Private: solution generation
   // ---------------------------------------------------------------------------
 
-  static List<int> _generateSolution(int size, int subGridRows, int subGridCols) {
+  static List<int> _generateSolution(
+    int size,
+    int subGridRows,
+    int subGridCols,
+  ) {
     final grid = List.generate(size, (_) => List.filled(size, 0));
     _solve(grid, size, subGridRows, subGridCols);
     return [for (final row in grid) ...row];
   }
 
-  static bool _solve(List<List<int>> grid, int size, int subGridRows, int subGridCols) {
+  static bool _solve(
+    List<List<int>> grid,
+    int size,
+    int subGridRows,
+    int subGridCols,
+  ) {
     for (var row = 0; row < size; row++) {
       for (var col = 0; col < size; col++) {
         if (grid[row][col] != 0) continue;
 
         final candidates = List.generate(size, (i) => i + 1)..shuffle(_random);
         for (final digit in candidates) {
-          if (!_isValidPlacement(grid, row, col, digit, size, subGridRows, subGridCols)) continue;
+          if (!_isValidPlacement(
+            grid,
+            row,
+            col,
+            digit,
+            size,
+            subGridRows,
+            subGridCols,
+          ))
+            continue;
           grid[row][col] = digit;
           if (_solve(grid, size, subGridRows, subGridCols)) return true;
           grid[row][col] = 0; // backtrack
@@ -172,7 +212,14 @@ abstract final class SudokuGenerator {
   // Private: masking
   // ---------------------------------------------------------------------------
 
-  static List<int> _maskCells(List<int> solution, int givenCount, int totalCells, int size, int subGridRows, int subGridCols) {
+  static List<int> _maskCells(
+    List<int> solution,
+    int givenCount,
+    int totalCells,
+    int size,
+    int subGridRows,
+    int subGridCols,
+  ) {
     final given = List<int>.from(solution);
     final positions = List.generate(totalCells, (i) => i)..shuffle(_random);
     int currentGivenCount = totalCells;
@@ -193,7 +240,7 @@ abstract final class SudokuGenerator {
 
       given[pos] = 0;
       int removedCount = 1;
-      
+
       if (given[symPos] != 0 && pos != symPos) {
         given[symPos] = 0;
         removedCount = 2;
@@ -204,7 +251,13 @@ abstract final class SudokuGenerator {
         return List.generate(size, (c) => given[r * size + c]);
       });
 
-      final solutionCount = _countSolutions(grid, size, subGridRows, subGridCols, limit: 2);
+      final solutionCount = _countSolutions(
+        grid,
+        size,
+        subGridRows,
+        subGridCols,
+        limit: 2,
+      );
       if (solutionCount > 1) {
         // Multiple solutions found, this removal breaks uniqueness. Revert both.
         given[pos] = backup;
@@ -218,7 +271,13 @@ abstract final class SudokuGenerator {
     return given;
   }
 
-  static int _countSolutions(List<List<int>> grid, int size, int subGridRows, int subGridCols, {int limit = 2}) {
+  static int _countSolutions(
+    List<List<int>> grid,
+    int size,
+    int subGridRows,
+    int subGridCols, {
+    int limit = 2,
+  }) {
     int count = 0;
 
     bool solve(int row, int col) {
@@ -235,10 +294,19 @@ abstract final class SudokuGenerator {
       }
 
       for (int digit = 1; digit <= size; digit++) {
-        if (_isValidPlacement(grid, row, col, digit, size, subGridRows, subGridCols)) {
+        if (_isValidPlacement(
+          grid,
+          row,
+          col,
+          digit,
+          size,
+          subGridRows,
+          subGridCols,
+        )) {
           grid[row][col] = digit;
           if (solve(nextRow, nextCol)) {
-            grid[row][col] = 0; // backtrack to leave grid clean, though we return true
+            grid[row][col] =
+                0; // backtrack to leave grid clean, though we return true
             return true;
           }
           grid[row][col] = 0;
@@ -252,13 +320,23 @@ abstract final class SudokuGenerator {
   }
 
   /// Checks if the given grid has exactly one unique solution.
-  static bool hasUniqueSolution(List<List<int>> grid, int size, int subGridRows, int subGridCols) {
+  static bool hasUniqueSolution(
+    List<List<int>> grid,
+    int size,
+    int subGridRows,
+    int subGridCols,
+  ) {
     return _countSolutions(grid, size, subGridRows, subGridCols, limit: 2) == 1;
   }
 
   /// Attempts to solve the grid and returns the flat 1D solution list.
   /// Returns null if no solution exists.
-  static List<int>? solveGrid(List<List<int>> grid, int size, int subGridRows, int subGridCols) {
+  static List<int>? solveGrid(
+    List<List<int>> grid,
+    int size,
+    int subGridRows,
+    int subGridCols,
+  ) {
     // Create a deep copy to avoid mutating the input
     final gridCopy = List.generate(size, (r) => List<int>.from(grid[r]));
     if (_solve(gridCopy, size, subGridRows, subGridCols)) {
@@ -269,19 +347,35 @@ abstract final class SudokuGenerator {
 
   /// Evaluator logic: tries to solve the grid using ONLY basic naked/hidden singles.
   /// If it succeeds completely, the puzzle is "too easy" for expert/extreme.
-  static bool _isSolvableWithBasicLogic(List<int> given, int size, int subGridRows, int subGridCols) {
-    final grid = List.generate(size, (r) => List.generate(size, (c) => given[r * size + c]));
+  static bool _isSolvableWithBasicLogic(
+    List<int> given,
+    int size,
+    int subGridRows,
+    int subGridCols,
+  ) {
+    final grid = List.generate(
+      size,
+      (r) => List.generate(size, (c) => given[r * size + c]),
+    );
     bool changed = true;
     while (changed) {
       changed = false;
       for (int r = 0; r < size; r++) {
         for (int c = 0; c < size; c++) {
           if (grid[r][c] != 0) continue;
-          
+
           int possibleCount = 0;
           int lastPossible = 0;
           for (int digit = 1; digit <= size; digit++) {
-            if (_isValidPlacement(grid, r, c, digit, size, subGridRows, subGridCols)) {
+            if (_isValidPlacement(
+              grid,
+              r,
+              c,
+              digit,
+              size,
+              subGridRows,
+              subGridCols,
+            )) {
               possibleCount++;
               lastPossible = digit;
             }
@@ -293,7 +387,7 @@ abstract final class SudokuGenerator {
         }
       }
     }
-    
+
     // Check if fully solved
     for (int r = 0; r < size; r++) {
       for (int c = 0; c < size; c++) {

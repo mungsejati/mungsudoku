@@ -182,24 +182,24 @@ class GameState {
 
   /// Creates the default state before any game has been loaded.
   factory GameState.initial() => GameState(
-        board: SudokuBoard.empty(),
-        difficulty: Difficulty.easy,
-        selectedBoardConfig: BoardConfig.standard,
-        symbolType: SymbolType.standard,
-        gameDuration: Duration.zero,
-        isPaused: false,
-        hintQuota: 3,
-        fastNoteQuota: 3,
-        activeThemePreset: 'blue',
-        isNoteMode: false,
-        cumulativeMistakeCount: 0,
-        undoStack: const [],
-        redoStack: const [],
-        conflictPositions: const <(int, int)>{},
-        superHighlightPositions: const <(int, int)>{},
-        isAutoCompleteRunning: false,
-        isLoading: false,
-      );
+    board: SudokuBoard.empty(),
+    difficulty: Difficulty.easy,
+    selectedBoardConfig: BoardConfig.standard,
+    symbolType: SymbolType.standard,
+    gameDuration: Duration.zero,
+    isPaused: false,
+    hintQuota: 3,
+    fastNoteQuota: 3,
+    activeThemePreset: 'blue',
+    isNoteMode: false,
+    cumulativeMistakeCount: 0,
+    undoStack: const [],
+    redoStack: const [],
+    conflictPositions: const <(int, int)>{},
+    superHighlightPositions: const <(int, int)>{},
+    isAutoCompleteRunning: false,
+    isLoading: false,
+  );
 
   // --- Immutable copy ---
 
@@ -232,65 +232,70 @@ class GameState {
     bool? isLoading,
     bool? isGameOver,
     bool? isVictory,
-  }) =>
-      GameState(
-        board: board ?? this.board,
-        difficulty: difficulty ?? this.difficulty,
-        selectedBoardConfig: selectedBoardConfig ?? this.selectedBoardConfig,
-        symbolType: symbolType ?? this.symbolType,
-        gameDuration: gameDuration ?? this.gameDuration,
-        isPaused: isPaused ?? this.isPaused,
-        hintQuota: hintQuota ?? this.hintQuota,
-        fastNoteQuota: fastNoteQuota ?? this.fastNoteQuota,
-        activeThemePreset: activeThemePreset ?? this.activeThemePreset,
-        isNoteMode: isNoteMode ?? this.isNoteMode,
-        cumulativeMistakeCount: cumulativeMistakeCount ?? this.cumulativeMistakeCount,
-        selectedRow:
-            clearSelectedCell ? null : (selectedRow ?? this.selectedRow),
-        selectedCol:
-            clearSelectedCell ? null : (selectedCol ?? this.selectedCol),
-        activeValue:
-            clearActiveValue ? null : (activeValue ?? this.activeValue),
-        undoStack: undoStack ?? this.undoStack,
-        redoStack: redoStack ?? this.redoStack,
-        conflictPositions: conflictPositions ?? this.conflictPositions,
-        superHighlightPositions: superHighlightPositions ?? this.superHighlightPositions,
-        isAutoCompleteRunning: isAutoCompleteRunning ?? this.isAutoCompleteRunning,
-        isLoading: isLoading ?? this.isLoading,
-        isGameOver: isGameOver ?? this.isGameOver,
-        isVictory: isVictory ?? this.isVictory,
-      );
+  }) => GameState(
+    board: board ?? this.board,
+    difficulty: difficulty ?? this.difficulty,
+    selectedBoardConfig: selectedBoardConfig ?? this.selectedBoardConfig,
+    symbolType: symbolType ?? this.symbolType,
+    gameDuration: gameDuration ?? this.gameDuration,
+    isPaused: isPaused ?? this.isPaused,
+    hintQuota: hintQuota ?? this.hintQuota,
+    fastNoteQuota: fastNoteQuota ?? this.fastNoteQuota,
+    activeThemePreset: activeThemePreset ?? this.activeThemePreset,
+    isNoteMode: isNoteMode ?? this.isNoteMode,
+    cumulativeMistakeCount:
+        cumulativeMistakeCount ?? this.cumulativeMistakeCount,
+    selectedRow: clearSelectedCell ? null : (selectedRow ?? this.selectedRow),
+    selectedCol: clearSelectedCell ? null : (selectedCol ?? this.selectedCol),
+    activeValue: clearActiveValue ? null : (activeValue ?? this.activeValue),
+    undoStack: undoStack ?? this.undoStack,
+    redoStack: redoStack ?? this.redoStack,
+    conflictPositions: conflictPositions ?? this.conflictPositions,
+    superHighlightPositions:
+        superHighlightPositions ?? this.superHighlightPositions,
+    isAutoCompleteRunning: isAutoCompleteRunning ?? this.isAutoCompleteRunning,
+    isLoading: isLoading ?? this.isLoading,
+    isGameOver: isGameOver ?? this.isGameOver,
+    isVictory: isVictory ?? this.isVictory,
+  );
 
   // --- Serialization ---
 
   Map<String, dynamic> toJson() => {
-        'board': board.toJson(),
-        'difficulty': difficulty.name,
-        'selectedBoardConfig': {'r': selectedBoardConfig.subGridRows, 'c': selectedBoardConfig.subGridCols},
-        'symbolType': symbolType.name,
-        'gameDurationSeconds': gameDuration.inSeconds,
-        'isPaused': isPaused,
-        'hintQuota': hintQuota,
-        'fastNoteQuota': fastNoteQuota,
-        'activeThemePreset': activeThemePreset,
-        'isNoteMode': isNoteMode,
-        'cumulativeMistakeCount': cumulativeMistakeCount,
-        'selectedRow': selectedRow,
-        'selectedCol': selectedCol,
-        'activeValue': activeValue,
-        'undoStack': undoStack.map((b) => b.toJson()).toList(),
-        'redoStack': redoStack.map((b) => b.toJson()).toList(),
-        'conflictPositions': conflictPositions.map((p) => {'row': p.$1, 'col': p.$2}).toList(),
-        // Note: superHighlightPositions, isAutoCompleteRunning, & isLoading are ephemeral, no need to persist.
-        'isGameOver': isGameOver,
-        'isVictory': isVictory,
-      };
+    'board': board.toJson(),
+    'difficulty': difficulty.name,
+    'selectedBoardConfig': {
+      'r': selectedBoardConfig.subGridRows,
+      'c': selectedBoardConfig.subGridCols,
+    },
+    'symbolType': symbolType.name,
+    'gameDurationSeconds': gameDuration.inSeconds,
+    'isPaused': isPaused,
+    'hintQuota': hintQuota,
+    'fastNoteQuota': fastNoteQuota,
+    'activeThemePreset': activeThemePreset,
+    'isNoteMode': isNoteMode,
+    'cumulativeMistakeCount': cumulativeMistakeCount,
+    'selectedRow': selectedRow,
+    'selectedCol': selectedCol,
+    'activeValue': activeValue,
+    'undoStack': undoStack.map((b) => b.toJson()).toList(),
+    'redoStack': redoStack.map((b) => b.toJson()).toList(),
+    'conflictPositions': conflictPositions
+        .map((p) => {'row': p.$1, 'col': p.$2})
+        .toList(),
+    // Note: superHighlightPositions, isAutoCompleteRunning, & isLoading are ephemeral, no need to persist.
+    'isGameOver': isGameOver,
+    'isVictory': isVictory,
+  };
 
   factory GameState.fromJson(Map<String, dynamic> json) {
     return GameState(
       board: SudokuBoard.fromJson(json['board'] as Map<String, dynamic>),
-      difficulty: Difficulty.values.firstWhere((e) => e.name == json['difficulty']),
-      selectedBoardConfig: json['selectedBoardConfig'] is Map 
+      difficulty: Difficulty.values.firstWhere(
+        (e) => e.name == json['difficulty'],
+      ),
+      selectedBoardConfig: json['selectedBoardConfig'] is Map
           ? BoardConfig(
               subGridRows: json['selectedBoardConfig']['r'] as int,
               subGridCols: json['selectedBoardConfig']['c'] as int,
@@ -299,7 +304,9 @@ class GameState {
               subGridRows: json['selectedSubGridSize'] as int? ?? 3,
               subGridCols: json['selectedSubGridSize'] as int? ?? 3,
             ),
-      symbolType: SymbolType.values.firstWhere((e) => e.name == json['symbolType']),
+      symbolType: SymbolType.values.firstWhere(
+        (e) => e.name == json['symbolType'],
+      ),
       gameDuration: Duration(seconds: json['gameDurationSeconds'] as int),
       isPaused: json['isPaused'] as bool,
       hintQuota: json['hintQuota'] as int,

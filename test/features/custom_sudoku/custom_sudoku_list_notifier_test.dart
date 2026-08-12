@@ -20,11 +20,13 @@ void main() {
     test('initial state is loaded from repository', () async {
       final container = makeProviderContainer();
       final repo = container.read(customSudokuRepositoryProvider);
-      
+
       final board = SudokuBoard.empty();
       await repo.saveCustomPuzzle(board);
 
-      final notifier = container.read(customSudokuListNotifierProvider.notifier);
+      final notifier = container.read(
+        customSudokuListNotifierProvider.notifier,
+      );
       final list = await notifier.future;
       expect(list.length, 1);
     });
@@ -32,14 +34,16 @@ void main() {
     test('deletePuzzle removes item and updates state', () async {
       final container = makeProviderContainer();
       final repo = container.read(customSudokuRepositoryProvider);
-      
+
       final board1 = SudokuBoard.empty().copyWith(id: 'delete-1');
       await repo.saveCustomPuzzle(board1);
-      
-      final notifier = container.read(customSudokuListNotifierProvider.notifier);
+
+      final notifier = container.read(
+        customSudokuListNotifierProvider.notifier,
+      );
       var list = await notifier.future;
       expect(list.length, 1);
-      
+
       await notifier.deletePuzzle('delete-1');
       list = await notifier.future;
       expect(list, isEmpty);

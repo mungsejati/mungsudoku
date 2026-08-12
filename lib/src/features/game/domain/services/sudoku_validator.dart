@@ -49,8 +49,7 @@ abstract final class SudokuValidator {
     int row,
     int col,
     int value,
-  ) =>
-      !_hasConflict(board, row, col, value, excludeSelf: true);
+  ) => !_hasConflict(board, row, col, value, excludeSelf: true);
 
   // ---------------------------------------------------------------------------
   // Private helpers
@@ -58,7 +57,7 @@ abstract final class SudokuValidator {
 
   /// Returns the set of `(row, col)` positions of cells that already contain
   /// [value] in the same row, column, or sub-grid as the cell at ([row], [col]).
-  /// 
+  ///
   /// Used for validating Note inputs.
   static Set<(int, int)> findConflictPositionsForValue(
     SudokuBoard board,
@@ -108,24 +107,26 @@ abstract final class SudokuValidator {
     // we can just check if any peer has it by looping, or we can use the Sets but
     // be careful about the current cell's value.
     // Let's optimize isValidPlacement which tests new values.
-    
+
     // For general conflict finding (findConflicts), the cell HAS the value, so the Set
     // definitely contains it. We must loop to see if there's a *duplicate*.
-    // Wait, if the Set has it, we just need to know if there's more than one. 
+    // Wait, if the Set has it, we just need to know if there's more than one.
     // Since the Set only stores unique values, it doesn't store counts!
     // So for findConflicts we still have to scan or we could maintain counts.
     // However, since we just need isValidPlacement to be O(1):
-    
+
     if (!excludeSelf) {
-      final sgIndex = (row ~/ board.subGridRows) * (board.gridSize ~/ board.subGridCols) + (col ~/ board.subGridCols);
+      final sgIndex =
+          (row ~/ board.subGridRows) * (board.gridSize ~/ board.subGridCols) +
+          (col ~/ board.subGridCols);
       return board.rowNumbers[row]!.contains(value) ||
-             board.colNumbers[col]!.contains(value) ||
-             board.subGridNumbers[sgIndex]!.contains(value);
+          board.colNumbers[col]!.contains(value) ||
+          board.subGridNumbers[sgIndex]!.contains(value);
     }
 
     return _conflictsInRow(board, row, col, value, excludeSelf) ||
-           _conflictsInColumn(board, row, col, value, excludeSelf) ||
-           _conflictsInSubGrid(board, row, col, value, excludeSelf);
+        _conflictsInColumn(board, row, col, value, excludeSelf) ||
+        _conflictsInSubGrid(board, row, col, value, excludeSelf);
   }
 
   static bool _conflictsInRow(
@@ -165,7 +166,9 @@ abstract final class SudokuValidator {
     int value,
     bool excludeSelf,
   ) {
-    final sgIndex = (row ~/ board.subGridRows) * (board.gridSize ~/ board.subGridCols) + (col ~/ board.subGridCols);
+    final sgIndex =
+        (row ~/ board.subGridRows) * (board.gridSize ~/ board.subGridCols) +
+        (col ~/ board.subGridCols);
     if (!excludeSelf) return board.subGridNumbers[sgIndex]!.contains(value);
 
     final startRow = (row ~/ board.subGridRows) * board.subGridRows;

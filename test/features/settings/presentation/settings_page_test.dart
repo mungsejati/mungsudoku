@@ -4,13 +4,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mungsudoku/src/features/settings/presentation/settings_page.dart';
 
 void main() {
-  testWidgets('SettingsPage renders and handles state changes', (WidgetTester tester) async {
+  testWidgets('SettingsPage renders and handles state changes', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
-      const ProviderScope(
-        child: MaterialApp(
-          home: SettingsPage(),
-        ),
-      ),
+      const ProviderScope(child: MaterialApp(home: SettingsPage())),
     );
 
     // Verify initial render
@@ -19,7 +17,9 @@ void main() {
     expect(find.text('Font Size'), findsOneWidget);
 
     // Initial state check - default should be Medium (1.0)
-    final mediumButton = tester.widget<SegmentedButton<double>>(find.byType(SegmentedButton<double>).first);
+    final mediumButton = tester.widget<SegmentedButton<double>>(
+      find.byType(SegmentedButton<double>).first,
+    );
     expect(mediumButton.selected.contains(1.0), isTrue);
 
     // Tap on Red Game Theme
@@ -30,7 +30,9 @@ void main() {
     await tester.tap(find.text('Big'));
     await tester.pumpAndSettle();
 
-    final bigButton = tester.widget<SegmentedButton<double>>(find.byType(SegmentedButton<double>).first);
+    final bigButton = tester.widget<SegmentedButton<double>>(
+      find.byType(SegmentedButton<double>).first,
+    );
     expect(bigButton.selected.contains(1.2), isTrue);
   });
 }

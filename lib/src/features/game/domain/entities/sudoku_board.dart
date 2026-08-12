@@ -44,16 +44,19 @@ class SudokuBoard {
     required this.subGridNumbers,
     this.id,
     this.createdAt,
-  })  : assert(subGridRows >= 2 && subGridCols >= 2, 'subGridRows and subGridCols must be at least 2.'),
-        assert(
-          cells.length == subGridRows * subGridCols &&
-              cells.every((row) => row.length == subGridRows * subGridCols),
-          'cells must be a ${subGridRows * subGridCols}x${subGridRows * subGridCols} '
-          'grid for subGrid: ${subGridRows}x$subGridCols.',
-        ),
-        cells = List.unmodifiable(
-          cells.map((row) => List<SudokuCell>.unmodifiable(row)).toList(),
-        );
+  }) : assert(
+         subGridRows >= 2 && subGridCols >= 2,
+         'subGridRows and subGridCols must be at least 2.',
+       ),
+       assert(
+         cells.length == subGridRows * subGridCols &&
+             cells.every((row) => row.length == subGridRows * subGridCols),
+         'cells must be a ${subGridRows * subGridCols}x${subGridRows * subGridCols} '
+         'grid for subGrid: ${subGridRows}x$subGridCols.',
+       ),
+       cells = List.unmodifiable(
+         cells.map((row) => List<SudokuCell>.unmodifiable(row)).toList(),
+       );
 
   /// Deeply unmodifiable two-dimensional grid of cells.
   ///
@@ -101,9 +104,9 @@ class SudokuBoard {
   /// before exposing the board to the player.
   factory SudokuBoard.empty({int subGridRows = 3, int subGridCols = 3}) {
     final size = subGridRows * subGridCols;
-    final emptySets = Map<int, Set<int>>.unmodifiable(
-      <int, Set<int>>{for (var i = 0; i < size; i++) i: const <int>{}},
-    );
+    final emptySets = Map<int, Set<int>>.unmodifiable(<int, Set<int>>{
+      for (var i = 0; i < size; i++) i: const <int>{},
+    });
     return SudokuBoard(
       subGridRows: subGridRows,
       subGridCols: subGridCols,
@@ -124,7 +127,7 @@ class SudokuBoard {
     );
   }
 
-  /// Returns a new board resetting all user inputs and notes, 
+  /// Returns a new board resetting all user inputs and notes,
   /// restoring the board to its initial state.
   SudokuBoard reset() {
     final rowNums = <int, Set<int>>{for (var i = 0; i < gridSize; i++) i: {}};
@@ -137,10 +140,12 @@ class SudokuBoard {
         final newCell = cell.isOriginal
             ? cell
             : cell.copyWith(clearValue: true, notes: const {});
-            
+
         final val = newCell.value;
         if (val != null && val != 0) {
-          final sgIndex = (r ~/ subGridRows) * (gridSize ~/ subGridCols) + (c ~/ subGridCols);
+          final sgIndex =
+              (r ~/ subGridRows) * (gridSize ~/ subGridCols) +
+              (c ~/ subGridCols);
           rowNums[r]!.add(val);
           colNums[c]!.add(val);
           sgNums[sgIndex]!.add(val);
@@ -192,7 +197,9 @@ class SudokuBoard {
         if (givenValue != 0) {
           rowNums[row]!.add(givenValue);
           colNums[col]!.add(givenValue);
-          final sgIndex = (row ~/ subGridRows) * (size ~/ subGridCols) + (col ~/ subGridCols);
+          final sgIndex =
+              (row ~/ subGridRows) * (size ~/ subGridCols) +
+              (col ~/ subGridCols);
           sgNums[sgIndex]!.add(givenValue);
         }
         return SudokuCell(
@@ -209,9 +216,15 @@ class SudokuBoard {
       subGridRows: subGridRows,
       subGridCols: subGridCols,
       cells: cells,
-      rowNumbers: Map.unmodifiable(rowNums.map((k, v) => MapEntry(k, Set.unmodifiable(v)))),
-      colNumbers: Map.unmodifiable(colNums.map((k, v) => MapEntry(k, Set.unmodifiable(v)))),
-      subGridNumbers: Map.unmodifiable(sgNums.map((k, v) => MapEntry(k, Set.unmodifiable(v)))),
+      rowNumbers: Map.unmodifiable(
+        rowNums.map((k, v) => MapEntry(k, Set.unmodifiable(v))),
+      ),
+      colNumbers: Map.unmodifiable(
+        colNums.map((k, v) => MapEntry(k, Set.unmodifiable(v))),
+      ),
+      subGridNumbers: Map.unmodifiable(
+        sgNums.map((k, v) => MapEntry(k, Set.unmodifiable(v))),
+      ),
     );
   }
 
@@ -235,8 +248,7 @@ class SudokuBoard {
     final startCol = (col ~/ subGridCols) * subGridCols;
     return [
       for (var r = startRow; r < startRow + subGridRows; r++)
-        for (var c = startCol; c < startCol + subGridCols; c++)
-          cells[r][c],
+        for (var c = startCol; c < startCol + subGridCols; c++) cells[r][c],
     ];
   }
 
@@ -261,7 +273,9 @@ class SudokuBoard {
     Map<int, Set<int>> newSgNums = subGridNumbers;
 
     if (oldCell.value != cell.value) {
-      final sgIndex = (row ~/ subGridRows) * (gridSize ~/ subGridCols) + (col ~/ subGridCols);
+      final sgIndex =
+          (row ~/ subGridRows) * (gridSize ~/ subGridCols) +
+          (col ~/ subGridCols);
 
       newRowNums = Map.of(rowNumbers);
       newRowNums[row] = Set.of(newRowNums[row]!);
@@ -286,7 +300,7 @@ class SudokuBoard {
       newRowNums[row] = Set.unmodifiable(newRowNums[row]!);
       newColNums[col] = Set.unmodifiable(newColNums[col]!);
       newSgNums[sgIndex] = Set.unmodifiable(newSgNums[sgIndex]!);
-      
+
       newRowNums = Map.unmodifiable(newRowNums);
       newColNums = Map.unmodifiable(newColNums);
       newSgNums = Map.unmodifiable(newSgNums);
@@ -314,17 +328,16 @@ class SudokuBoard {
     Map<int, Set<int>>? subGridNumbers,
     String? id,
     DateTime? createdAt,
-  }) =>
-      SudokuBoard(
-        cells: cells ?? this.cells,
-        subGridRows: subGridRows ?? this.subGridRows,
-        subGridCols: subGridCols ?? this.subGridCols,
-        rowNumbers: rowNumbers ?? this.rowNumbers,
-        colNumbers: colNumbers ?? this.colNumbers,
-        subGridNumbers: subGridNumbers ?? this.subGridNumbers,
-        id: id ?? this.id,
-        createdAt: createdAt ?? this.createdAt,
-      );
+  }) => SudokuBoard(
+    cells: cells ?? this.cells,
+    subGridRows: subGridRows ?? this.subGridRows,
+    subGridCols: subGridCols ?? this.subGridCols,
+    rowNumbers: rowNumbers ?? this.rowNumbers,
+    colNumbers: colNumbers ?? this.colNumbers,
+    subGridNumbers: subGridNumbers ?? this.subGridNumbers,
+    id: id ?? this.id,
+    createdAt: createdAt ?? this.createdAt,
+  );
 
   /// Returns a new board with [value] removed from the [SudokuCell.notes] of
   /// every peer cell at ([row], [col]).
@@ -372,7 +385,6 @@ class SudokuBoard {
     return board;
   }
 
-
   // --- Board state queries ---
 
   /// `true` when every cell's [SudokuCell.value] equals its
@@ -390,24 +402,24 @@ class SudokuBoard {
       cells.fold(0, (sum, row) => sum + row.where((c) => c.isIncorrect).length);
 
   /// Number of cells that currently have any value (original + user-entered).
-  int get filledCellCount => cells.fold(
-        0,
-        (sum, row) => sum + row.where((c) => c.isFilled).length,
-      );
+  int get filledCellCount =>
+      cells.fold(0, (sum, row) => sum + row.where((c) => c.isFilled).length);
 
   /// Number of cells the player has filled in (excludes original cells).
   int get userFilledCellCount => cells.fold(
-        0,
-        (sum, row) =>
-            sum + row.where((c) => c.isFilled && !c.isOriginal).length,
-      );
+    0,
+    (sum, row) => sum + row.where((c) => c.isFilled && !c.isOriginal).length,
+  );
 
   // --- Equality & hashing ---
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    if (other is! SudokuBoard || other.subGridRows != subGridRows || other.subGridCols != subGridCols) return false;
+    if (other is! SudokuBoard ||
+        other.subGridRows != subGridRows ||
+        other.subGridCols != subGridCols)
+      return false;
     for (var r = 0; r < gridSize; r++) {
       for (var c = 0; c < gridSize; c++) {
         if (other.cells[r][c] != cells[r][c]) return false;
@@ -418,10 +430,10 @@ class SudokuBoard {
 
   @override
   int get hashCode => Object.hash(
-        subGridRows,
-        subGridCols,
-        Object.hashAll([for (final row in cells) Object.hashAll(row)]),
-      );
+    subGridRows,
+    subGridCols,
+    Object.hashAll([for (final row in cells) Object.hashAll(row)]),
+  );
 
   @override
   String toString() =>
@@ -432,18 +444,22 @@ class SudokuBoard {
   // --- Serialization ---
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'createdAt': createdAt?.toIso8601String(),
-        'subGridRows': subGridRows,
-        'subGridCols': subGridCols,
-        'cells': cells.expand((row) => row).map((c) => c.toJson()).toList(),
-      };
+    'id': id,
+    'createdAt': createdAt?.toIso8601String(),
+    'subGridRows': subGridRows,
+    'subGridCols': subGridCols,
+    'cells': cells.expand((row) => row).map((c) => c.toJson()).toList(),
+  };
 
   factory SudokuBoard.fromJson(Map<String, dynamic> json) {
     final id = json['id'] as String?;
-    final createdAt = json['createdAt'] != null ? DateTime.parse(json['createdAt'] as String) : null;
-    final subGridRows = json['subGridRows'] as int? ?? json['subGridSize'] as int;
-    final subGridCols = json['subGridCols'] as int? ?? json['subGridSize'] as int;
+    final createdAt = json['createdAt'] != null
+        ? DateTime.parse(json['createdAt'] as String)
+        : null;
+    final subGridRows =
+        json['subGridRows'] as int? ?? json['subGridSize'] as int;
+    final subGridCols =
+        json['subGridCols'] as int? ?? json['subGridSize'] as int;
     final flatCells = (json['cells'] as List<dynamic>)
         .map((e) => SudokuCell.fromJson(e as Map<String, dynamic>))
         .toList();
@@ -462,7 +478,9 @@ class SudokuBoard {
       if (cell.value != null) {
         rowNums[cell.row]!.add(cell.value!);
         colNums[cell.col]!.add(cell.value!);
-        final sgIndex = (cell.row ~/ subGridRows) * (size ~/ subGridCols) + (cell.col ~/ subGridCols);
+        final sgIndex =
+            (cell.row ~/ subGridRows) * (size ~/ subGridCols) +
+            (cell.col ~/ subGridCols);
         sgNums[sgIndex]!.add(cell.value!);
       }
     }
@@ -471,9 +489,15 @@ class SudokuBoard {
       subGridRows: subGridRows,
       subGridCols: subGridCols,
       cells: grid,
-      rowNumbers: Map.unmodifiable(rowNums.map((k, v) => MapEntry(k, Set.unmodifiable(v)))),
-      colNumbers: Map.unmodifiable(colNums.map((k, v) => MapEntry(k, Set.unmodifiable(v)))),
-      subGridNumbers: Map.unmodifiable(sgNums.map((k, v) => MapEntry(k, Set.unmodifiable(v)))),
+      rowNumbers: Map.unmodifiable(
+        rowNums.map((k, v) => MapEntry(k, Set.unmodifiable(v))),
+      ),
+      colNumbers: Map.unmodifiable(
+        colNums.map((k, v) => MapEntry(k, Set.unmodifiable(v))),
+      ),
+      subGridNumbers: Map.unmodifiable(
+        sgNums.map((k, v) => MapEntry(k, Set.unmodifiable(v))),
+      ),
       id: id,
       createdAt: createdAt,
     );

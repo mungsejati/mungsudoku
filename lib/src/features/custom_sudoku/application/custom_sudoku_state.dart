@@ -15,10 +15,10 @@ class CustomSudokuState {
   final SudokuBoard board;
   final int selectedRow;
   final int selectedCol;
-  
+
   /// Cells that conflict with the rules (duplicate in row/col/subgrid)
   final Set<(int, int)> conflictPositions;
-  
+
   /// True if currently running validation/solving
   final bool isValidating;
 
@@ -58,7 +58,8 @@ class CustomSudokuState {
     return CustomSudokuState(
       board: SudokuBoard(
         cells: cells,
-        subGridRows: 3, subGridCols: 3,
+        subGridRows: 3,
+        subGridCols: 3,
         rowNumbers: {for (var i = 0; i < gridSize; i++) i: <int>{}},
         colNumbers: {for (var i = 0; i < gridSize; i++) i: <int>{}},
         subGridNumbers: {for (var i = 0; i < gridSize; i++) i: <int>{}},

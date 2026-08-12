@@ -33,9 +33,9 @@ class MungSudokuApp extends ConsumerWidget {
       routerConfig: AppRouter.router,
       builder: (context, child) {
         return MediaQuery(
-          data: MediaQuery.of(context).copyWith(
-            textScaler: TextScaler.linear(settings.fontSizeFactor),
-          ),
+          data: MediaQuery.of(
+            context,
+          ).copyWith(textScaler: TextScaler.linear(settings.fontSizeFactor)),
           child: child!,
         );
       },

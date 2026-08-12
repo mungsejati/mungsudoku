@@ -225,11 +225,15 @@ class _CustomSudokuCard extends StatelessWidget {
         ? '#SDK-${puzzle.id!.length > 8 ? puzzle.id!.substring(0, 8).toUpperCase() : puzzle.id!.toUpperCase()}'
         : '#SDK-UNKNOWN';
     final dateStr = puzzle.createdAt?.toString().substring(0, 10) ?? '-';
-    
+
     final primaryColor = Theme.of(context).colorScheme.primary;
     final isBlackTheme = primaryColor == const Color(0xFF5A5A5A);
-    final cardThemeColor = isBlackTheme ? primaryColor : _getCardThemeColor(gameTheme);
-    final shadowColor = isBlackTheme ? const Color(0xFF3E3E3E) : Colors.black.withValues(alpha: 0.15);
+    final cardThemeColor = isBlackTheme
+        ? primaryColor
+        : _getCardThemeColor(gameTheme);
+    final shadowColor = isBlackTheme
+        ? const Color(0xFF3E3E3E)
+        : Colors.black.withValues(alpha: 0.15);
 
     return GestureDetector(
       onTap: onTap,
@@ -255,9 +259,11 @@ class _CustomSudokuCard extends StatelessWidget {
                   Text(
                     'Sudoku $puzzleIdStr',
                     style: TextStyle(
-                      fontSize: 16, 
+                      fontSize: 16,
                       color: isBlackTheme ? primaryColor : cardThemeColor,
-                      fontWeight: isBlackTheme ? FontWeight.bold : FontWeight.normal,
+                      fontWeight: isBlackTheme
+                          ? FontWeight.bold
+                          : FontWeight.normal,
                     ),
                   ),
                   const SizedBox(height: 4),

@@ -44,6 +44,9 @@ import 'game_state.dart';
 class GameNotifier extends Notifier<GameState> {
   static final _log = Logger('GameNotifier');
 
+  @visibleForTesting
+  static bool disableTimerForTest = false;
+
   Timer? _timer;
 
   bool _mounted = true;
@@ -70,7 +73,9 @@ class GameNotifier extends Notifier<GameState> {
     Difficulty difficulty, {
     SymbolType symbolType = SymbolType.standard,
   }) async {
-    final boardConfig = difficulty == Difficulty.fast ? BoardConfig.fast : BoardConfig.standard;
+    final boardConfig = difficulty == Difficulty.fast
+        ? BoardConfig.fast
+        : BoardConfig.standard;
     final subGridRows = boardConfig.subGridRows;
     final subGridCols = boardConfig.subGridCols;
 
@@ -80,7 +85,10 @@ class GameNotifier extends Notifier<GameState> {
     _cancelTimer();
 
     state = state.copyWith(
-      board: SudokuBoard.empty(subGridRows: subGridRows, subGridCols: subGridCols),
+      board: SudokuBoard.empty(
+        subGridRows: subGridRows,
+        subGridCols: subGridCols,
+      ),
       difficulty: difficulty,
       selectedBoardConfig: boardConfig,
       symbolType: symbolType,
@@ -132,7 +140,10 @@ class GameNotifier extends Notifier<GameState> {
     state = GameState(
       board: board,
       difficulty: Difficulty.hard, // Custom games can be considered 'hard'
-      selectedBoardConfig: BoardConfig(subGridRows: board.subGridRows, subGridCols: board.subGridCols),
+      selectedBoardConfig: BoardConfig(
+        subGridRows: board.subGridRows,
+        subGridCols: board.subGridCols,
+      ),
       symbolType: SymbolType.standard,
       gameDuration: Duration.zero,
       isPaused: false,
@@ -155,10 +166,10 @@ class GameNotifier extends Notifier<GameState> {
   /// Restarts the current puzzle from the beginning without generating a new one.
   void restartPuzzle() {
     _cancelTimer();
-    
+
     // We recreate the board from initial state
     final initialBoard = state.board.reset();
-    
+
     state = state.copyWith(
       board: initialBoard,
       gameDuration: Duration.zero,
@@ -175,7 +186,7 @@ class GameNotifier extends Notifier<GameState> {
       clearSelectedCell: true,
       clearActiveValue: true,
     );
-    
+
     _startTimer();
     _autoSave();
     _log.info('Puzzle restarted.');
@@ -257,7 +268,12 @@ class GameNotifier extends Notifier<GameState> {
     if (state.isNoteMode) {
       if (!cell.notes.contains(value)) {
         // Validation: Prevent adding a note if the value already exists in row, col, or sub-grid
-        final conflicts = SudokuValidator.findConflictPositionsForValue(state.board, row, col, value);
+        final conflicts = SudokuValidator.findConflictPositionsForValue(
+          state.board,
+          row,
+          col,
+          value,
+        );
         if (conflicts.isNotEmpty) {
           state = state.copyWith(conflictPositions: conflicts);
           Future.delayed(const Duration(milliseconds: 600), () {
@@ -286,7 +302,9 @@ class GameNotifier extends Notifier<GameState> {
       // Count as a mistake only when placing a wrong answer (not when toggling off)
       if (newValue != null && newValue != cell.solutionValue) {
         newMistakeCount++;
-        _log.warning('Mistake at ($row,$col): entered $newValue, expected ${cell.solutionValue}.');
+        _log.warning(
+          'Mistake at ($row,$col): entered $newValue, expected ${cell.solutionValue}.',
+        );
       }
 
       // Check for sweep animation
@@ -294,8 +312,9 @@ class GameNotifier extends Notifier<GameState> {
         final int gridSize = state.board.gridSize;
         final int sgRows = state.board.subGridRows;
         final int sgCols = state.board.subGridCols;
-        final int sgIndex = (row ~/ sgRows) * (gridSize ~/ sgCols) + (col ~/ sgCols);
-        
+        final int sgIndex =
+            (row ~/ sgRows) * (gridSize ~/ sgCols) + (col ~/ sgCols);
+
         if (updatedBoard.rowNumbers[row]!.length == gridSize) {
           for (int c = 0; c < gridSize; c++) {
             superHighlights.add((row, c));
@@ -326,8 +345,10 @@ class GameNotifier extends Notifier<GameState> {
     );
 
     // Auto-complete trigger when 9 empty cells remain
-    if (!isAuto && updatedBoard.totalCells - updatedBoard.filledCellCount == 9) {
-      if (SudokuValidator.findConflicts(updatedBoard).isEmpty && newMistakeCount < GameState.maxMistakes) {
+    if (!isAuto &&
+        updatedBoard.totalCells - updatedBoard.filledCellCount == 9) {
+      if (SudokuValidator.findConflicts(updatedBoard).isEmpty &&
+          newMistakeCount < GameState.maxMistakes) {
         Future.delayed(const Duration(milliseconds: 300), () {
           triggerAutoComplete();
         });
@@ -369,7 +390,7 @@ class GameNotifier extends Notifier<GameState> {
   /// Existing notes and filled cells are left untouched.
   void fastFillNotes() {
     if (_isBlocked) return;
-    
+
     if (state.fastNoteQuota <= 0) {
       _log.info('[MOCK] Fast Notes exhausted — show "Watch Ad" dialog.');
       // TODO(phase1-ui): emit event / trigger dialog
@@ -385,7 +406,9 @@ class GameNotifier extends Notifier<GameState> {
         final cell = board.cellAt(r, c);
         if (!cell.isEditable || cell.isFilled) continue;
 
-        final sgIndex = (r ~/ board.subGridRows) * (size ~/ board.subGridCols) + (c ~/ board.subGridCols);
+        final sgIndex =
+            (r ~/ board.subGridRows) * (size ~/ board.subGridCols) +
+            (c ~/ board.subGridCols);
         final used = <int>{
           ...board.rowNumbers[r]!,
           ...board.colNumbers[c]!,
@@ -497,12 +520,9 @@ class GameNotifier extends Notifier<GameState> {
 
     // Allow time for the final sweep animation to complete its 500ms cycle
     await Future.delayed(const Duration(milliseconds: 400));
-    
+
     if (_mounted) {
-      state = state.copyWith(
-        isAutoCompleteRunning: false,
-        isVictory: true,
-      );
+      state = state.copyWith(isAutoCompleteRunning: false, isVictory: true);
       _clearSave();
     }
   }
@@ -564,7 +584,10 @@ class GameNotifier extends Notifier<GameState> {
 
   /// Determines if user input should be ignored (e.g. paused, game over, or auto-complete running).
   bool get _isBlocked =>
-      state.isPaused || state.isGameOver || state.isVictory || state.isAutoCompleteRunning;
+      state.isPaused ||
+      state.isGameOver ||
+      state.isVictory ||
+      state.isAutoCompleteRunning;
 
   // ---------------------------------------------------------------------------
   // Timer (private)
@@ -572,6 +595,7 @@ class GameNotifier extends Notifier<GameState> {
 
   void _startTimer() {
     _cancelTimer();
+    if (disableTimerForTest) return;
     _timer = Timer.periodic(const Duration(seconds: 1), (_) => _tick());
   }
 
@@ -653,7 +677,7 @@ class GameNotifier extends Notifier<GameState> {
 
     try {
       final prefs = await SharedPreferences.getInstance();
-      
+
       await prefs.setString('current_game', jsonEncode(state.toJson()));
       _log.fine(
         'Auto-save — filled: ${state.board.filledCellCount}/'
@@ -695,7 +719,11 @@ class GameNotifier extends Notifier<GameState> {
 /// Must NOT be a lambda or an instance method — [compute] serialises the
 /// function reference to pass it to a background isolate.
 SudokuBoard _generatePuzzle((Difficulty, BoardConfig) args) =>
-    SudokuGenerator.generate(args.$1, subGridRows: args.$2.subGridRows, subGridCols: args.$2.subGridCols);
+    SudokuGenerator.generate(
+      args.$1,
+      subGridRows: args.$2.subGridRows,
+      subGridCols: args.$2.subGridCols,
+    );
 
 // ---------------------------------------------------------------------------
 // Provider

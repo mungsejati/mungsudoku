@@ -3,14 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 
-
 class ShopPage extends ConsumerWidget {
   const ShopPage({super.key});
 
   void _handlePurchase(BuildContext context, String itemName) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Pembelian $itemName berhasil ditambahkan ke akun (Mock)'),
+        content: Text(
+          'Pembelian $itemName berhasil ditambahkan ke akun (Mock)',
+        ),
         duration: const Duration(seconds: 2),
       ),
     );
@@ -20,7 +21,7 @@ class ShopPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final primaryColor = Theme.of(context).colorScheme.primary;
     const topBarTextColor = Colors.white;
-    
+
     return Scaffold(
       backgroundColor: primaryColor,
       appBar: AppBar(
@@ -31,16 +32,16 @@ class ShopPage extends ConsumerWidget {
             'assets/arrow-left.svg',
             width: 24,
             height: 24,
-            colorFilter: const ColorFilter.mode(topBarTextColor, BlendMode.srcIn),
+            colorFilter: const ColorFilter.mode(
+              topBarTextColor,
+              BlendMode.srcIn,
+            ),
           ),
           onPressed: () => context.pop(),
         ),
         title: const Text(
           'Shop',
-          style: TextStyle(
-            color: topBarTextColor,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(color: topBarTextColor, fontWeight: FontWeight.bold),
         ),
       ),
       body: ListView(
@@ -103,7 +104,9 @@ class _ProductCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final primaryColor = Theme.of(context).colorScheme.primary;
     final isBlackTheme = primaryColor == const Color(0xFF5A5A5A);
-    final shadowColor = isBlackTheme ? const Color(0xFF3E3E3E) : Colors.black.withValues(alpha: 0.15);
+    final shadowColor = isBlackTheme
+        ? const Color(0xFF3E3E3E)
+        : Colors.black.withValues(alpha: 0.15);
 
     return GestureDetector(
       onTap: onTap,
@@ -155,7 +158,11 @@ class _ProductCard extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right_rounded, color: Colors.grey, size: 32),
+            const Icon(
+              Icons.chevron_right_rounded,
+              color: Colors.grey,
+              size: 32,
+            ),
           ],
         ),
       ),

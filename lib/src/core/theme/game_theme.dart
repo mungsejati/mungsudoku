@@ -311,7 +311,9 @@ class GameTheme {
 ///
 /// Watches the SettingsNotifier's state to determine the active theme.
 final gameThemeProvider = Provider<GameTheme>((ref) {
-  final activeThemePreset = ref.watch(settingsNotifierProvider.select((state) => state.gameThemePreset));
+  final activeThemePreset = ref.watch(
+    settingsNotifierProvider.select((state) => state.gameThemePreset),
+  );
   switch (activeThemePreset) {
     case 'red':
       return GameTheme.red;

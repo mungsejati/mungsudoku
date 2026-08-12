@@ -1,12 +1,12 @@
 import 'dart:math';
 
 /// Provides a collection of pre-computed Sudoku seeds (e.g. 17-clue puzzles).
-/// 
-/// Generating a 17-clue puzzle dynamically requires immense computation that 
+///
+/// Generating a 17-clue puzzle dynamically requires immense computation that
 /// freezes mobile devices. This class provides a fast-path for Extreme mode by
 /// returning one of these pre-computed valid seeds.
 ///
-/// The returned seed should be passed through transformations (rotations, 
+/// The returned seed should be passed through transformations (rotations,
 /// value permutations) to yield millions of variations from a small seed list.
 abstract final class SudokuSeedBank {
   static final Random _random = Random();

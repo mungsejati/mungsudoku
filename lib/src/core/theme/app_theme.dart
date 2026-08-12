@@ -26,7 +26,8 @@ abstract final class AppTheme {
       colorScheme: ColorScheme.fromSeed(
         seedColor: seed,
         brightness: isDark ? Brightness.dark : Brightness.light,
-        primary: seed, // Ensures the exact solid color is used instead of a faded variant
+        primary:
+            seed, // Ensures the exact solid color is used instead of a faded variant
       ),
     );
   }

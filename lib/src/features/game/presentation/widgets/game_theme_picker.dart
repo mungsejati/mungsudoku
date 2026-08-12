@@ -19,7 +19,10 @@ class GameThemePopupMenu extends ConsumerWidget {
             'assets/theme.svg',
             width: 24,
             height: 24,
-            colorFilter: ColorFilter.mode(gameTheme.topBarTextColor, BlendMode.srcIn),
+            colorFilter: ColorFilter.mode(
+              gameTheme.topBarTextColor,
+              BlendMode.srcIn,
+            ),
           ),
           tooltip: 'Theme',
           onPressed: () {
@@ -46,15 +49,35 @@ class GameThemePopupMenu extends ConsumerWidget {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: const [
-                  _ThemeSwatch(name: 'Blue', preset: 'blue', color: Color(0xFF1E9BED)),
+                  _ThemeSwatch(
+                    name: 'Blue',
+                    preset: 'blue',
+                    color: Color(0xFF1E9BED),
+                  ),
                   SizedBox(width: 8),
-                  _ThemeSwatch(name: 'Red', preset: 'red', color: Color(0xFFE53935)),
+                  _ThemeSwatch(
+                    name: 'Red',
+                    preset: 'red',
+                    color: Color(0xFFE53935),
+                  ),
                   SizedBox(width: 8),
-                  _ThemeSwatch(name: 'Green', preset: 'green', color: Color(0xFF43A047)),
+                  _ThemeSwatch(
+                    name: 'Green',
+                    preset: 'green',
+                    color: Color(0xFF43A047),
+                  ),
                   SizedBox(width: 8),
-                  _ThemeSwatch(name: 'White', preset: 'white', color: Color(0xFFF5F5F5)),
+                  _ThemeSwatch(
+                    name: 'White',
+                    preset: 'white',
+                    color: Color(0xFFF5F5F5),
+                  ),
                   SizedBox(width: 8),
-                  _ThemeSwatch(name: 'Black', preset: 'black', color: Color(0xFF121212)),
+                  _ThemeSwatch(
+                    name: 'Black',
+                    preset: 'black',
+                    color: Color(0xFF121212),
+                  ),
                 ],
               ),
             ],
@@ -78,8 +101,11 @@ class _ThemeSwatch extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final activeTheme = ref.watch(settingsNotifierProvider.select((state) => state.gameThemePreset));
-    final isSelected = activeTheme == preset || (activeTheme == 'dark' && preset == 'black');
+    final activeTheme = ref.watch(
+      settingsNotifierProvider.select((state) => state.gameThemePreset),
+    );
+    final isSelected =
+        activeTheme == preset || (activeTheme == 'dark' && preset == 'black');
 
     return GestureDetector(
       onTap: () {
@@ -92,7 +118,9 @@ class _ThemeSwatch extends ConsumerWidget {
           color: color,
           shape: BoxShape.circle,
           border: Border.all(
-            color: isSelected ? Colors.white : Colors.grey.withValues(alpha: 0.3),
+            color: isSelected
+                ? Colors.white
+                : Colors.grey.withValues(alpha: 0.3),
             width: isSelected ? 3 : 1,
           ),
           boxShadow: [

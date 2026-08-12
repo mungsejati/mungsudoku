@@ -21,7 +21,10 @@ class ProfilePage extends ConsumerWidget {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new, color: Theme.of(context).colorScheme.primary),
+          icon: Icon(
+            Icons.arrow_back_ios_new,
+            color: Theme.of(context).colorScheme.primary,
+          ),
           onPressed: () => context.pop(),
         ),
         title: Text(
@@ -46,7 +49,7 @@ class ProfilePage extends ConsumerWidget {
                 avatarAsset: profile.avatarAsset,
               ),
               const SizedBox(height: 40),
-              
+
               // Productivity Metrics
               Text(
                 'Productivity Metrics',
@@ -57,7 +60,7 @@ class ProfilePage extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              
+
               // Metrics Grid
               GridView.count(
                 crossAxisCount: 2,
@@ -128,7 +131,9 @@ class _ProfileHeader extends StatelessWidget {
             ),
             boxShadow: [
               BoxShadow(
-                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+                color: Theme.of(
+                  context,
+                ).colorScheme.primary.withValues(alpha: 0.2),
                 blurRadius: 12,
                 offset: const Offset(0, 6),
               ),
@@ -234,10 +239,7 @@ class _MetricCard extends StatelessWidget {
           Text(
             subtitle,
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 12,
-              color: Color(0xFF888888),
-            ),
+            style: const TextStyle(fontSize: 12, color: Color(0xFF888888)),
           ),
         ],
       ),

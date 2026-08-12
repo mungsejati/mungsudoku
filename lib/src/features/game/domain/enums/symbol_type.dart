@@ -4,7 +4,7 @@ enum SymbolType {
   roman('Angka Romawi');
 
   const SymbolType(this.displayName);
-  
+
   /// Human-readable label for the UI selector.
   final String displayName;
 }

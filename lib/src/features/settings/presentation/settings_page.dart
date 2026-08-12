@@ -20,12 +20,18 @@ class SettingsPage extends ConsumerWidget {
         backgroundColor: gameTheme.background,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new, color: gameTheme.topBarTextColor),
+          icon: Icon(
+            Icons.arrow_back_ios_new,
+            color: gameTheme.topBarTextColor,
+          ),
           onPressed: () => context.pop(),
         ),
         title: Text(
           'Settings',
-          style: TextStyle(fontWeight: FontWeight.bold, color: gameTheme.topBarTextColor),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: gameTheme.topBarTextColor,
+          ),
         ),
         centerTitle: true,
       ),
@@ -51,32 +57,23 @@ class SettingsPage extends ConsumerWidget {
               const SizedBox(height: 16),
               SegmentedButton<double>(
                 segments: const [
-                  ButtonSegment(
-                    value: 0.8,
-                    label: Text('Small'),
-                  ),
-                  ButtonSegment(
-                    value: 1.0,
-                    label: Text('Medium'),
-                  ),
-                  ButtonSegment(
-                    value: 1.2,
-                    label: Text('Big'),
-                  ),
+                  ButtonSegment(value: 0.8, label: Text('Small')),
+                  ButtonSegment(value: 1.0, label: Text('Medium')),
+                  ButtonSegment(value: 1.2, label: Text('Big')),
                 ],
                 selected: {settings.fontSizeFactor},
                 onSelectionChanged: (Set<double> newSelection) {
                   notifier.setFontSizeFactor(newSelection.first);
                 },
                 style: ButtonStyle(
-                  foregroundColor: WidgetStateProperty.resolveWith<Color>(
-                    (Set<WidgetState> states) {
-                      if (states.contains(WidgetState.selected)) {
-                        return gameTheme.inputTextColor;
-                      }
-                      return gameTheme.topBarTextColor;
-                    },
-                  ),
+                  foregroundColor: WidgetStateProperty.resolveWith<Color>((
+                    Set<WidgetState> states,
+                  ) {
+                    if (states.contains(WidgetState.selected)) {
+                      return gameTheme.inputTextColor;
+                    }
+                    return gameTheme.topBarTextColor;
+                  }),
                   side: WidgetStateProperty.resolveWith<BorderSide>(
                     (Set<WidgetState> states) => BorderSide(
                       color: states.contains(WidgetState.selected)
@@ -84,14 +81,14 @@ class SettingsPage extends ConsumerWidget {
                           : gameTheme.topBarTextColor.withValues(alpha: 0.3),
                     ),
                   ),
-                  backgroundColor: WidgetStateProperty.resolveWith<Color>(
-                    (Set<WidgetState> states) {
-                      if (states.contains(WidgetState.selected)) {
-                        return gameTheme.selectedCellColor;
-                      }
-                      return Colors.transparent;
-                    },
-                  ),
+                  backgroundColor: WidgetStateProperty.resolveWith<Color>((
+                    Set<WidgetState> states,
+                  ) {
+                    if (states.contains(WidgetState.selected)) {
+                      return gameTheme.selectedCellColor;
+                    }
+                    return Colors.transparent;
+                  }),
                 ),
               ), // End SegmentedButton
 
@@ -110,11 +107,31 @@ class SettingsPage extends ConsumerWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: const [
-                  _GameThemeSwatch(name: 'Blue', preset: 'blue', color: Color(0xFF1E9BED)),
-                  _GameThemeSwatch(name: 'Red', preset: 'red', color: Color(0xFFE53935)),
-                  _GameThemeSwatch(name: 'Green', preset: 'green', color: Color(0xFF43A047)),
-                  _GameThemeSwatch(name: 'White', preset: 'white', color: Color(0xFFF5F5F5)),
-                  _GameThemeSwatch(name: 'Black', preset: 'black', color: Color(0xFF121212)),
+                  _GameThemeSwatch(
+                    name: 'Blue',
+                    preset: 'blue',
+                    color: Color(0xFF1E9BED),
+                  ),
+                  _GameThemeSwatch(
+                    name: 'Red',
+                    preset: 'red',
+                    color: Color(0xFFE53935),
+                  ),
+                  _GameThemeSwatch(
+                    name: 'Green',
+                    preset: 'green',
+                    color: Color(0xFF43A047),
+                  ),
+                  _GameThemeSwatch(
+                    name: 'White',
+                    preset: 'white',
+                    color: Color(0xFFF5F5F5),
+                  ),
+                  _GameThemeSwatch(
+                    name: 'Black',
+                    preset: 'black',
+                    color: Color(0xFF121212),
+                  ),
                 ],
               ),
             ],
@@ -168,7 +185,9 @@ class _LivePreviewCard extends StatelessWidget {
               height: 150,
               decoration: BoxDecoration(
                 color: gameTheme.subGridBackground,
-                borderRadius: BorderRadius.circular(gameTheme.subGridBorderRadius),
+                borderRadius: BorderRadius.circular(
+                  gameTheme.subGridBorderRadius,
+                ),
                 boxShadow: gameTheme.subGridShadow,
               ),
               child: GridView.count(
@@ -179,11 +198,11 @@ class _LivePreviewCard extends StatelessWidget {
                   final isSelected = index == 4;
                   final isConflict = index == 2;
                   final isSameVal = index == 0;
-                  
+
                   Color bg = Colors.transparent;
                   Color txt = gameTheme.inputTextColor;
                   String val = "";
-                  
+
                   if (isSelected) {
                     bg = gameTheme.selectedCellColor;
                     val = "5";
@@ -204,7 +223,10 @@ class _LivePreviewCard extends StatelessWidget {
                     margin: const EdgeInsets.all(1.0),
                     decoration: BoxDecoration(
                       color: bg,
-                      border: Border.all(color: gameTheme.cellBorderColor, width: 0.5),
+                      border: Border.all(
+                        color: gameTheme.cellBorderColor,
+                        width: 0.5,
+                      ),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Center(
@@ -212,7 +234,9 @@ class _LivePreviewCard extends StatelessWidget {
                         val,
                         style: TextStyle(
                           fontSize: 24,
-                          fontWeight: (index == 1 || isSameVal) ? FontWeight.bold : FontWeight.w500,
+                          fontWeight: (index == 1 || isSameVal)
+                              ? FontWeight.bold
+                              : FontWeight.w500,
                           color: txt,
                         ),
                       ),
@@ -241,9 +265,12 @@ class _GameThemeSwatch extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final activeTheme = ref.watch(settingsNotifierProvider.select((state) => state.gameThemePreset));
+    final activeTheme = ref.watch(
+      settingsNotifierProvider.select((state) => state.gameThemePreset),
+    );
     final gameTheme = ref.watch(gameThemeProvider);
-    final isSelected = activeTheme == preset || (activeTheme == 'dark' && preset == 'black');
+    final isSelected =
+        activeTheme == preset || (activeTheme == 'dark' && preset == 'black');
 
     return GestureDetector(
       onTap: () {

@@ -16,11 +16,9 @@ import 'package:flutter/foundation.dart';
 /// | `large`   | 4 × 4   | 16 × 16| 1 – 16 |
 @immutable
 class BoardConfig {
-  const BoardConfig({
-    required this.subGridRows,
-    required this.subGridCols,
-  })  : assert(subGridRows > 1, 'subGridRows must be greater than 1.'),
-        assert(subGridCols > 1, 'subGridCols must be greater than 1.');
+  const BoardConfig({required this.subGridRows, required this.subGridCols})
+    : assert(subGridRows > 1, 'subGridRows must be greater than 1.'),
+      assert(subGridCols > 1, 'subGridCols must be greater than 1.');
 
   /// Number of rows inside a single sub-grid region.
   final int subGridRows;
@@ -44,22 +42,13 @@ class BoardConfig {
   );
 
   /// Fast 6x6 Sudoku with 2x3 sub-grids.
-  static const BoardConfig fast = BoardConfig(
-    subGridRows: 2,
-    subGridCols: 3,
-  );
+  static const BoardConfig fast = BoardConfig(subGridRows: 2, subGridCols: 3);
 
   /// Mini 4×4 Sudoku with 2×2 sub-grids (Phase 2).
-  static const BoardConfig mini = BoardConfig(
-    subGridRows: 2,
-    subGridCols: 2,
-  );
+  static const BoardConfig mini = BoardConfig(subGridRows: 2, subGridCols: 2);
 
   /// Large 16×16 Sudoku with 4×4 sub-grids (Phase 2).
-  static const BoardConfig large = BoardConfig(
-    subGridRows: 4,
-    subGridCols: 4,
-  );
+  static const BoardConfig large = BoardConfig(subGridRows: 4, subGridCols: 4);
 
   @override
   bool operator ==(Object other) =>

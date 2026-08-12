@@ -34,13 +34,13 @@ class SudokuCell {
     this.value,
     this.isOriginal = false,
     this.notes = const {},
-  })  : assert(row >= 0, 'row must be non-negative.'),
-        assert(col >= 0, 'col must be non-negative.'),
-        assert(solutionValue >= 1, 'solutionValue must be at least 1.'),
-        assert(
-          !isOriginal || value != null,
-          'An original (pre-filled) cell must have a non-null value.',
-        );
+  }) : assert(row >= 0, 'row must be non-negative.'),
+       assert(col >= 0, 'col must be non-negative.'),
+       assert(solutionValue >= 1, 'solutionValue must be at least 1.'),
+       assert(
+         !isOriginal || value != null,
+         'An original (pre-filled) cell must have a non-null value.',
+       );
 
   /// Zero-indexed row position of this cell on the board.
   final int row;
@@ -178,13 +178,13 @@ class SudokuCell {
   // --- Serialization ---
 
   Map<String, dynamic> toJson() => {
-        'row': row,
-        'col': col,
-        'value': value,
-        'solutionValue': solutionValue,
-        'isOriginal': isOriginal,
-        'notes': notes.toList(),
-      };
+    'row': row,
+    'col': col,
+    'value': value,
+    'solutionValue': solutionValue,
+    'isOriginal': isOriginal,
+    'notes': notes.toList(),
+  };
 
   factory SudokuCell.fromJson(Map<String, dynamic> json) {
     return SudokuCell(
@@ -193,7 +193,9 @@ class SudokuCell {
       solutionValue: json['solutionValue'] as int,
       value: json['value'] as int?,
       isOriginal: json['isOriginal'] as bool? ?? false,
-      notes: (json['notes'] as List<dynamic>?)?.map((e) => e as int).toSet() ?? const {},
+      notes:
+          (json['notes'] as List<dynamic>?)?.map((e) => e as int).toSet() ??
+          const {},
     );
   }
 }

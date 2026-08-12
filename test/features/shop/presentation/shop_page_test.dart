@@ -5,11 +5,7 @@ import 'package:mungsudoku/src/features/shop/presentation/shop_page.dart';
 
 void main() {
   Widget createWidgetUnderTest() {
-    return const ProviderScope(
-      child: MaterialApp(
-        home: ShopPage(),
-      ),
-    );
+    return const ProviderScope(child: MaterialApp(home: ShopPage()));
   }
 
   testWidgets('ShopPage renders correctly', (WidgetTester tester) async {
@@ -32,9 +28,14 @@ void main() {
     // Tap on an item
     await tester.tap(find.text('Remove Ads'));
     await tester.pump(); // Start animation
-    await tester.pump(const Duration(milliseconds: 100)); // Advance animation a bit
+    await tester.pump(
+      const Duration(milliseconds: 100),
+    ); // Advance animation a bit
 
     // Verify snackbar is displayed
-    expect(find.text('Pembelian Remove Ads berhasil ditambahkan ke akun (Mock)'), findsOneWidget);
+    expect(
+      find.text('Pembelian Remove Ads berhasil ditambahkan ke akun (Mock)'),
+      findsOneWidget,
+    );
   });
 }

@@ -5,16 +5,14 @@ import 'package:mungsudoku/src/features/profile/data/mock_profile_repository.dar
 import 'package:mungsudoku/src/features/profile/presentation/profile_page.dart';
 
 void main() {
-  testWidgets('ProfilePage renders mock data correctly', (WidgetTester tester) async {
+  testWidgets('ProfilePage renders mock data correctly', (
+    WidgetTester tester,
+  ) async {
     final mockRepo = MockProfileRepository();
     final profile = mockRepo.getProfile();
 
     await tester.pumpWidget(
-      const ProviderScope(
-        child: MaterialApp(
-          home: ProfilePage(),
-        ),
-      ),
+      const ProviderScope(child: MaterialApp(home: ProfilePage())),
     );
 
     // Verify header information
@@ -33,7 +31,7 @@ void main() {
     expect(find.text('${profile.deepWorkSessions}'), findsOneWidget);
 
     expect(find.text('Silent Time'), findsOneWidget);
-    
+
     // There shouldn't be any layout overflows ideally, test will pass if it renders.
     // By finding all these widgets, we verify it rendered successfully.
   });

@@ -63,28 +63,36 @@ class _GamePageState extends ConsumerState<GamePage> {
   Widget build(BuildContext context) {
     ref.listen<GameState>(gameNotifierProvider, (prev, next) {
       if (prev?.isVictory != true && next.isVictory) {
-        context.go('/result', extra: GameResultArgs(
-          isVictory: true,
-          difficulty: next.difficulty,
-          time: next.gameDuration,
-          mistakes: next.cumulativeMistakeCount,
-          maxMistakes: GameState.maxMistakes,
-        ));
+        context.go(
+          '/result',
+          extra: GameResultArgs(
+            isVictory: true,
+            difficulty: next.difficulty,
+            time: next.gameDuration,
+            mistakes: next.cumulativeMistakeCount,
+            maxMistakes: GameState.maxMistakes,
+          ),
+        );
       }
       if (prev?.isGameOver != true && next.isGameOver) {
-        context.go('/result', extra: GameResultArgs(
-          isVictory: false,
-          difficulty: next.difficulty,
-          time: next.gameDuration,
-          mistakes: next.cumulativeMistakeCount,
-          maxMistakes: GameState.maxMistakes,
-        ));
+        context.go(
+          '/result',
+          extra: GameResultArgs(
+            isVictory: false,
+            difficulty: next.difficulty,
+            time: next.gameDuration,
+            mistakes: next.cumulativeMistakeCount,
+            maxMistakes: GameState.maxMistakes,
+          ),
+        );
       }
     });
 
     final gameTheme = ref.watch(gameThemeProvider);
-    
-    final isLoading = ref.watch(gameNotifierProvider.select((s) => s.isLoading));
+
+    final isLoading = ref.watch(
+      gameNotifierProvider.select((s) => s.isLoading),
+    );
 
     return Scaffold(
       body: Stack(
@@ -123,7 +131,10 @@ class _GamePageState extends ConsumerState<GamePage> {
                               'assets/arrow-left.svg',
                               width: 24,
                               height: 24,
-                              colorFilter: ColorFilter.mode(gameTheme.topBarTextColor, BlendMode.srcIn),
+                              colorFilter: ColorFilter.mode(
+                                gameTheme.topBarTextColor,
+                                BlendMode.srcIn,
+                              ),
                             ),
                             onPressed: () => context.go('/'),
                           ),
@@ -163,7 +174,9 @@ class _GamePageState extends ConsumerState<GamePage> {
                           if (isLoading)
                             Container(
                               decoration: BoxDecoration(
-                                color: gameTheme.background.withValues(alpha: 0.6),
+                                color: gameTheme.background.withValues(
+                                  alpha: 0.6,
+                                ),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               width: 80,
@@ -173,11 +186,17 @@ class _GamePageState extends ConsumerState<GamePage> {
                                 color: Colors.white,
                               ),
                             ),
-                          if (ref.watch(gameNotifierProvider.select((s) => s.isAutoCompleteRunning)))
+                          if (ref.watch(
+                            gameNotifierProvider.select(
+                              (s) => s.isAutoCompleteRunning,
+                            ),
+                          ))
                             Positioned.fill(
                               child: Container(
                                 decoration: BoxDecoration(
-                                  color: gameTheme.background.withValues(alpha: 0.8),
+                                  color: gameTheme.background.withValues(
+                                    alpha: 0.8,
+                                  ),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 alignment: Alignment.center,
@@ -194,8 +213,6 @@ class _GamePageState extends ConsumerState<GamePage> {
                         ],
                       ),
                     ),
-
-
 
                     // ---- Toolbar overlapping numpad (Stack overlap) ----
                     SizedBox(
@@ -225,4 +242,3 @@ class _GamePageState extends ConsumerState<GamePage> {
     );
   }
 }
-

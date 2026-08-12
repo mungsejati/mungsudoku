@@ -1,4 +1,3 @@
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'settings_state.dart';
@@ -26,5 +25,5 @@ class SettingsNotifier extends Notifier<SettingsState> {
 /// Provider to expose the SettingsNotifier and its state.
 final settingsNotifierProvider =
     NotifierProvider<SettingsNotifier, SettingsState>(() {
-  return SettingsNotifier();
-});
+      return SettingsNotifier();
+    });

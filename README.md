@@ -73,7 +73,7 @@ Folder ini berisi seluruh *source code* (kode sumber) dari aplikasi MungSudoku. 
 - *Konfigurasi routing navigasi layar dalam aplikasi menggunakan `go_router`.*
 
 ### 📄 `lib/src/features/home/presentation/home_page.dart`
-- **Class/Widget `HomePage`**: Halaman utama aplikasi (Main Menu) yang kini mengusung gaya desain *Clean & Minimalist*. Berisi logo, tombol navigasi permainan, dan baris aksi (action row) dengan palet dasar biru `#0092DF`.
+- **Class/Widget `HomePage`**: Halaman utama aplikasi (Main Menu) yang kini mengusung gaya desain *Clean & Minimalist*. Berisi logo, tombol navigasi permainan, dan baris aksi (action row) dengan palet dasar biru `#0092DF`. Diimplementasikan juga pencegahan penutupan aplikasi otomatis menggunakan `PopScope` (intersep tombol *back*) dengan Dialog Konfirmasi Keluar bergaya *pill-shape*.
 - **Class/Widget `_HomePageState`**: Mengelola state awal dari halaman utama (termasuk mendeteksi adanya *save game*).
 - **Class/Widget `_OutlinedPillButton`**: Desain tombol sekunder/lanjutan (seperti tombol "Continue") berbentuk kapsul dengan garis batas tepi berwarna biru `#0092DF`. Menampilkan teks dinamis sisa waktu dan tingkat kesulitan (contoh: "Medium • 02:30"). Jika tidak ada save data, tombol ini akan disembunyikan.
 - **Class/Widget `_FilledPillButton`**: Desain tombol utama (seperti tombol "New Game") berbentuk kapsul dengan warna latar biru tebal dan *drop shadow*.
@@ -264,6 +264,14 @@ Folder ini berisi kode pengujian (tests) untuk memastikan kualitas dan keandalan
   - Menguji apakah kerangka utama aplikasi (`MungSudokuApp`) dapat diluncurkan (launch) tanpa *crash*.
   - Memverifikasi halaman utama (Home Page) muncul dengan benar dan mendeteksi keberadaan teks kunci, seperti "Player 1" dan tombol "NEW GAME".
 
+### 📄 `test/features/home/presentation/home_page_test.dart`
+- **Tujuan Pengujian**: Validasi interaksi dan render antarmuka pengguna pada layer presentasi (Presentation Layer) untuk halaman utama `HomePage`.
+- **Detail**:
+  - Memverifikasi tata letak (layout) seperti kemunculan tombol "New Game" dan 4 menu ikon navigasi bawah.
+  - Memastikan transisi state tombol "Continue" dimunculkan secara dinamis jika terdeteksi adanya penyimpanan status sesi permainan (save game).
+  - Melakukan simulasi tap pada seluruh elemen navigasi (aksi New Game, Me, Create, Shop, dan Settings) untuk memastikan perutean `GoRouter` berjalan dengan semestinya.
+  - Mensimulasikan pemanggilan sistem kemudi (back navigation) Android dan memastikan komponen `PopScope` berfungsi dengan benar untuk menampilkan Dialog Konfirmasi Keluar tanpa mengakhiri proses aplikasi secara langsung.
+
 ### ⚡ Performance Optimizations (UI Jank & Infinite Loading Failsafe)
 
 To guarantee a smooth, jank-free gaming experience on mobile, we've implemented strict performance constraints:
@@ -271,3 +279,11 @@ To guarantee a smooth, jank-free gaming experience on mobile, we've implemented 
    Instead of rebuilding the entire numpad (and its buttons) every time the 1-second timer ticks or the board changes, we decoupled `_SmartDigitButton`. Each button now uses Riverpod's `.select()` to precisely watch only the specific conditions it cares about (e.g. `activeValue == digit` and `placedCount`). This guarantees instant response for Fast Input mode without triggering heavy whole-tree widget rebuilds.
 2. **Infinite Loading Failsafe (`SudokuGenerator`)**:
    Procedurally generating high-difficulty standard puzzles involves randomized trial-and-error which can sometimes loop indefinitely if the generator enters a difficult configuration space. A hard `maxAttempts = 100` failsafe is now enforced. If the procedural backtracking fails to find a valid masking solution within 100 attempts, the generator gracefully falls back to the current best-effort board, ensuring the UI thread never freezes.
+
+### 📄 `test/features/game/presentation/game_page_test.dart`
+- **Tujuan Pengujian**: Validasi seluruh interaksi, rendering UI, dan flow logika permainan di layer presentasi (Presentation Layer) untuk `GamePage`.
+- **Detail**:
+  - **Test Case 1-5 (UI & Top Bar)**: Verifikasi rendering UI Top Bar (Judul, Tema, Back, Difficulty, Timer), interaksi *pop-up* tema warna, iterasi navigasi Pause/Resume, dan perenderan board.
+  - **Test Case 6-9 (Logika Board)**: Verifikasi penyesuaian teks warna, simulasi input standar, auto-prune highlight, auto-complete text loading.
+  - **Test Case 10-14 (Mode Input & Win Condition)**: Verifikasi mode *Standard Input*, *Fast Input* (long press numpad), pembatasan maksimal kesalahan, dan trigger perpindahan ke halaman `/result` saat pemain memenangkan permainan.
+  - **Test Case 15-17 (Tools In-Game)**: Simulasi alat bantu bermain seperti *Undo*, *Erase*, *Fast Note*, *Note Toggle*, dan *Hint*. Menjamin tidak ada timer yang berjalan (memory leak) saat state aplikasi dibongkar.

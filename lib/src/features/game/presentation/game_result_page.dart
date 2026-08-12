@@ -39,7 +39,10 @@ class GameResultPage extends ConsumerWidget {
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 500),
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 48.0),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24.0,
+                    vertical: 48.0,
+                  ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -55,17 +58,19 @@ class GameResultPage extends ConsumerWidget {
                       const SizedBox(height: 16),
                       // Message
                       Text(
-                        args.isVictory 
-                          ? 'Congratulations on solving the puzzle!' 
-                          : 'You have reached the maximum number of mistakes.',
+                        args.isVictory
+                            ? 'Congratulations on solving the puzzle!'
+                            : 'You have reached the maximum number of mistakes.',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 18,
-                          color: gameTheme.topBarTextColor.withValues(alpha: 0.8),
+                          color: gameTheme.topBarTextColor.withValues(
+                            alpha: 0.8,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 48),
-                      
+
                       // Stats Card
                       Container(
                         padding: const EdgeInsets.all(24),
@@ -102,9 +107,9 @@ class GameResultPage extends ConsumerWidget {
                           ],
                         ),
                       ),
-                      
+
                       const SizedBox(height: 48),
-                      
+
                       // Actions
                       _FilledPillButton(
                         label: args.isVictory ? 'Play Again' : 'Try Again',
@@ -112,9 +117,13 @@ class GameResultPage extends ConsumerWidget {
                         textColor: gameTheme.inputTextColor,
                         onTap: () {
                           if (args.isVictory) {
-                            ref.read(gameNotifierProvider.notifier).initNewGame(args.difficulty);
+                            ref
+                                .read(gameNotifierProvider.notifier)
+                                .initNewGame(args.difficulty);
                           } else {
-                            ref.read(gameNotifierProvider.notifier).restartPuzzle();
+                            ref
+                                .read(gameNotifierProvider.notifier)
+                                .restartPuzzle();
                           }
                           context.go('/game');
                         },

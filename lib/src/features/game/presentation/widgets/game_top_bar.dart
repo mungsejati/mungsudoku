@@ -31,19 +31,19 @@ class GameTopBar extends ConsumerWidget {
               Text(
                 state.difficulty.displayName,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: gameTheme.topBarTextColor,
-                    ),
+                  fontWeight: FontWeight.bold,
+                  color: gameTheme.topBarTextColor,
+                ),
               ),
               const SizedBox(height: 4),
               Text(
                 'Mistakes: ${state.cumulativeMistakeCount}/${GameState.maxMistakes}',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: state.cumulativeMistakeCount > 0
-                          ? gameTheme.topBarMistakeColor
-                          : gameTheme.topBarTextColor,
-                      fontWeight: FontWeight.w600,
-                    ),
+                  color: state.cumulativeMistakeCount > 0
+                      ? gameTheme.topBarMistakeColor
+                      : gameTheme.topBarTextColor,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ],
           ),
@@ -51,15 +51,19 @@ class GameTopBar extends ConsumerWidget {
           // Timer & Pause
           Row(
             children: [
-              Icon(Icons.timer_outlined, size: 20, color: gameTheme.topBarTextColor),
+              Icon(
+                Icons.timer_outlined,
+                size: 20,
+                color: gameTheme.topBarTextColor,
+              ),
               const SizedBox(width: 4),
               Text(
                 _formatDuration(state.gameDuration),
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontFeatures: const [FontFeature.tabularFigures()],
-                      color: gameTheme.topBarTextColor,
-                      fontWeight: FontWeight.w600,
-                    ),
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                  color: gameTheme.topBarTextColor,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               const SizedBox(width: 8),
               IconButton(

@@ -3,9 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../game/domain/entities/sudoku_board.dart';
 import '../data/custom_sudoku_repository.dart';
 
-final customSudokuListNotifierProvider = AsyncNotifierProvider<CustomSudokuListNotifier, List<SudokuBoard>>(() {
-  return CustomSudokuListNotifier();
-});
+final customSudokuListNotifierProvider =
+    AsyncNotifierProvider<CustomSudokuListNotifier, List<SudokuBoard>>(() {
+      return CustomSudokuListNotifier();
+    });
 
 class CustomSudokuListNotifier extends AsyncNotifier<List<SudokuBoard>> {
   @override

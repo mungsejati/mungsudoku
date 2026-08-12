@@ -11,12 +11,14 @@ class GameNumberPad extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Only watch what doesn't change frequently during a game, or what needs a full numpad structural rebuild.
-    final gridSize = ref.watch(gameNotifierProvider.select((s) => s.board.gridSize));
+    final gridSize = ref.watch(
+      gameNotifierProvider.select((s) => s.board.gridSize),
+    );
     final gameTheme = ref.watch(gameThemeProvider);
 
     final screenWidth = MediaQuery.of(context).size.width;
     final isSmallScreen = screenWidth <= 375;
-    
+
     final bool useSingleRow = gridSize <= 9;
     final double spacing = 4.0;
 
@@ -34,12 +36,14 @@ class GameNumberPad extends ConsumerWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         if (useSingleRow)
-          ...digitButtons.map((btn) => Expanded(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: spacing / 2),
-                  child: btn,
-                ),
-              ))
+          ...digitButtons.map(
+            (btn) => Expanded(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: spacing / 2),
+                child: btn,
+              ),
+            ),
+          )
         else
           Expanded(
             child: Wrap(
@@ -85,22 +89,28 @@ class _SmartDigitButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notifier = ref.read(gameNotifierProvider.notifier);
-    
+
     // Specifically select only what this button needs to avoid UI Jank (timer rebuilds)
-    final isActive = ref.watch(gameNotifierProvider.select((s) => s.activeValue == digit));
-    final symbolType = ref.watch(gameNotifierProvider.select((s) => s.symbolType));
-    
+    final isActive = ref.watch(
+      gameNotifierProvider.select((s) => s.activeValue == digit),
+    );
+    final symbolType = ref.watch(
+      gameNotifierProvider.select((s) => s.symbolType),
+    );
+
     // Watch placedCount directly to only rebuild when THIS number is placed/removed
-    final placedCount = ref.watch(gameNotifierProvider.select((s) {
-      int count = 0;
-      final board = s.board;
-      for (var r = 0; r < board.gridSize; r++) {
-        for (var c = 0; c < board.gridSize; c++) {
-          if (board.cellAt(r, c).value == digit) count++;
+    final placedCount = ref.watch(
+      gameNotifierProvider.select((s) {
+        int count = 0;
+        final board = s.board;
+        for (var r = 0; r < board.gridSize; r++) {
+          for (var c = 0; c < board.gridSize; c++) {
+            if (board.cellAt(r, c).value == digit) count++;
+          }
         }
-      }
-      return count;
-    }));
+        return count;
+      }),
+    );
 
     final remaining = gridSize - placedCount;
     final isComplete = remaining <= 0;
@@ -178,7 +188,9 @@ class _NumpadDigitButton extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       onLongPress: onLongPress,
       child: Padding(
-        padding: const EdgeInsets.only(bottom: 10.0), // Reserve space for the overlapping badge
+        padding: const EdgeInsets.only(
+          bottom: 10.0,
+        ), // Reserve space for the overlapping badge
         child: Stack(
           clipBehavior: Clip.none,
           alignment: Alignment.topCenter,
@@ -188,37 +200,37 @@ class _NumpadDigitButton extends StatelessWidget {
               aspectRatio: 1.0, // Perfect square
               child: Container(
                 decoration: BoxDecoration(
-                color: bg,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: isComplete ? null : gameTheme.numpadButtonShadow,
-                border: isActive
-                    ? Border.all(
-                        color: gameTheme.selectedCellBorderColor,
-                        width: 2,
-                      )
-                    : null,
-              ),
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: onPressed,
+                  color: bg,
                   borderRadius: BorderRadius.circular(10),
-                  child: Center(
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        label,
-                        style: TextStyle(
-                          fontSize: fontSize,
-                          fontWeight: FontWeight.w800,
-                          color: textColor,
-                          height: 1.0,
+                  boxShadow: isComplete ? null : gameTheme.numpadButtonShadow,
+                  border: isActive
+                      ? Border.all(
+                          color: gameTheme.selectedCellBorderColor,
+                          width: 2,
+                        )
+                      : null,
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: onPressed,
+                    borderRadius: BorderRadius.circular(10),
+                    child: Center(
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          label,
+                          style: TextStyle(
+                            fontSize: fontSize,
+                            fontWeight: FontWeight.w800,
+                            color: textColor,
+                            height: 1.0,
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
               ),
             ),
 

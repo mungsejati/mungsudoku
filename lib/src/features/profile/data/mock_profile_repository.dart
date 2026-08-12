@@ -28,7 +28,8 @@ class MockProfileRepository {
   /// The hardcoded data that developers can easily modify to test different UI states.
   final ProfileEntity mockData = const ProfileEntity(
     userName: 'Sudoku Ninja',
-    avatarAsset: 'assets/person.svg', // Reusing an existing icon for dummy avatar
+    avatarAsset:
+        'assets/person.svg', // Reusing an existing icon for dummy avatar
     title: 'Sudoku Master',
     gamesPlayed: 142,
     winRate: 85.5,

@@ -1,0 +1,50 @@
+00:00 +0: loading /Users/macbookair/Projects/mungsudoku/test/features/game/presentation/game_page_test.dart
+00:00 +0: GamePage Integration & Widget Tests Test 1: Top Bar rendering
+00:00 +1: GamePage Integration & Widget Tests Test 2: Theme popup interaction
+00:00 +2: GamePage Integration & Widget Tests Test 3: Pause interaction
+00:01 +3: GamePage Integration & Widget Tests Test 4: Board rendering
+00:01 +4: GamePage Integration & Widget Tests Test 5: Highlight logic
+00:01 +5: GamePage Integration & Widget Tests Test 6: Text colors based on state
+00:01 +6: GamePage Integration & Widget Tests Test 7: Toggle cell
+00:01 +7: GamePage Integration & Widget Tests Test 8: Auto-prune
+00:01 +8: GamePage Integration & Widget Tests Test 9: Auto-complete
+canAutoComplete: false
+filledCellCount: 81
+conflicts: {}
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: exactly one matching candidate
+  Actual: _TextWidgetFinder:<Found 0 widgets with text "Auto completing...": []>
+   Which: means none were found but one was expected
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure>.<anonymous closure> (file:///Users/macbookair/Projects/mungsudoku/test/features/game/presentation/game_page_test.dart:286:7)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1952:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///Users/macbookair/Projects/mungsudoku/test/features/game/presentation/game_page_test.dart line 286
+The test description was:
+  Test 9: Auto-complete
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:02 +8 -1: GamePage Integration & Widget Tests Test 9: Auto-complete [E]
+  Test failed. See exception logs above.
+  The test description was: Test 9: Auto-complete
+  
+00:02 +8 -1: GamePage Integration & Widget Tests Test 10: Standard Input Mode
+00:02 +9 -1: GamePage Integration & Widget Tests Test 11: Fast Input Mode
+00:03 +10 -1: GamePage Integration & Widget Tests Test 12: Fast Input changing numpad digit
+00:03 +11 -1: GamePage Integration & Widget Tests Test 13: Mistakes limit
+00:03 +12 -1: GamePage Integration & Widget Tests Test 14: Win condition
+00:04 +13 -1: GamePage Integration & Widget Tests Test 15: Undo
+00:04 +14 -1: GamePage Integration & Widget Tests Test 16: Erase
+00:04 +15 -1: GamePage Integration & Widget Tests Test 17: Fast Notes, Notes Toggle, Hint
+00:04 +16 -1: Some tests failed.
+
+Failing tests:
+  /Users/macbookair/Projects/mungsudoku/test/features/game/presentation/game_page_test.dart: GamePage Integration & Widget Tests Test 9: Auto-complete

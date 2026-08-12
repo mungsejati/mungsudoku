@@ -8,13 +8,13 @@ import 'package:mungsudoku/src/features/game/presentation/game_result_page.dart'
 void main() {
   Widget createWidgetUnderTest(GameResultArgs args) {
     return ProviderScope(
-      child: MaterialApp(
-        home: GameResultPage(args: args),
-      ),
+      child: MaterialApp(home: GameResultPage(args: args)),
     );
   }
 
-  testWidgets('renders Victory page with correct stats', (WidgetTester tester) async {
+  testWidgets('renders Victory page with correct stats', (
+    WidgetTester tester,
+  ) async {
     const args = GameResultArgs(
       isVictory: true,
       difficulty: Difficulty.medium,
@@ -39,7 +39,9 @@ void main() {
     expect(find.text('Main Menu'), findsOneWidget);
   });
 
-  testWidgets('renders Game Over page with correct message', (WidgetTester tester) async {
+  testWidgets('renders Game Over page with correct message', (
+    WidgetTester tester,
+  ) async {
     const args = GameResultArgs(
       isVictory: false,
       difficulty: Difficulty.hard,
@@ -52,7 +54,10 @@ void main() {
 
     // Verify title and message
     expect(find.text('Game Over'), findsOneWidget);
-    expect(find.text('You have reached the maximum number of mistakes.'), findsOneWidget);
+    expect(
+      find.text('You have reached the maximum number of mistakes.'),
+      findsOneWidget,
+    );
 
     // Verify stats
     expect(find.text('Hard'), findsOneWidget);

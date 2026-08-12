@@ -1,5 +1,3 @@
-
-
 /// Immutable state class holding global application settings.
 class SettingsState {
   final double fontSizeFactor;
@@ -10,10 +8,7 @@ class SettingsState {
     this.gameThemePreset = 'blue',
   });
 
-  SettingsState copyWith({
-    double? fontSizeFactor,
-    String? gameThemePreset,
-  }) {
+  SettingsState copyWith({double? fontSizeFactor, String? gameThemePreset}) {
     return SettingsState(
       fontSizeFactor: fontSizeFactor ?? this.fontSizeFactor,
       gameThemePreset: gameThemePreset ?? this.gameThemePreset,

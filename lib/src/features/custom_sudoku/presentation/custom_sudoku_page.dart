@@ -30,7 +30,10 @@ class CustomSudokuPage extends ConsumerWidget {
             'assets/arrow-left.svg',
             width: 24,
             height: 24,
-            colorFilter: ColorFilter.mode(gameTheme.topBarTextColor, BlendMode.srcIn),
+            colorFilter: ColorFilter.mode(
+              gameTheme.topBarTextColor,
+              BlendMode.srcIn,
+            ),
           ),
           onPressed: () => Navigator.pop(context),
         ),
@@ -45,15 +48,18 @@ class CustomSudokuPage extends ConsumerWidget {
         actions: [
           const GameThemePopupMenu(),
           IconButton(
-            icon: state.isValidating 
+            icon: state.isValidating
                 ? SizedBox(
-                    width: 20, 
-                    height: 20, 
-                    child: CircularProgressIndicator(color: gameTheme.topBarTextColor, strokeWidth: 2)
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      color: gameTheme.topBarTextColor,
+                      strokeWidth: 2,
+                    ),
                   )
                 : Icon(Icons.save_outlined, color: gameTheme.topBarTextColor),
-            onPressed: state.isValidating 
-                ? null 
+            onPressed: state.isValidating
+                ? null
                 : () async {
                     final isValid = await notifier.validateAndPreparePlay();
                     if (!context.mounted) return;
@@ -63,27 +69,32 @@ class CustomSudokuPage extends ConsumerWidget {
                         const SnackBar(
                           content: Text('Puzzle valid! Saving...'),
                           backgroundColor: Colors.green,
-                        )
+                        ),
                       );
-                      
+
                       final solution = notifier.getSolvedGrid();
-                      final boardState = ref.read(customSudokuNotifierProvider).board;
-                      
+                      final boardState = ref
+                          .read(customSudokuNotifierProvider)
+                          .board;
+
                       if (solution != null) {
                         // Create a board with given + solved
                         final finalBoard = SudokuBoard.fromValues(
-                          given: [for (var r = 0; r < boardState.gridSize; r++) 
-                                    for (var c = 0; c < boardState.gridSize; c++) 
-                                      boardState.cellAt(r, c).value ?? 0],
+                          given: [
+                            for (var r = 0; r < boardState.gridSize; r++)
+                              for (var c = 0; c < boardState.gridSize; c++)
+                                boardState.cellAt(r, c).value ?? 0,
+                          ],
                           solution: solution,
                           subGridRows: boardState.subGridRows,
                           subGridCols: boardState.subGridCols,
                         );
-                        
-                        
+
                         // Save puzzle to local storage
-                        ref.read(customSudokuListNotifierProvider.notifier).savePuzzle(finalBoard);
-                        
+                        ref
+                            .read(customSudokuListNotifierProvider.notifier)
+                            .savePuzzle(finalBoard);
+
                         context.pop(); // Go back to the List page
                       }
                     } else {
@@ -92,7 +103,7 @@ class CustomSudokuPage extends ConsumerWidget {
                         builder: (context) => AlertDialog(
                           title: const Text('Invalid Puzzle'),
                           content: const Text(
-                            'Soal tidak valid atau memiliki lebih dari satu kemungkinan solusi. Silakan periksa kembali!'
+                            'Soal tidak valid atau memiliki lebih dari satu kemungkinan solusi. Silakan periksa kembali!',
                           ),
                           actions: [
                             TextButton(
@@ -149,19 +160,23 @@ class _CustomSudokuBoardWidget extends ConsumerWidget {
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: board.gridSize ~/ board.subGridCols,
-                      childAspectRatio: board.subGridCols / board.subGridRows,
+              childAspectRatio: board.subGridCols / board.subGridRows,
               mainAxisSpacing: gameTheme.subGridSpacing,
               crossAxisSpacing: gameTheme.subGridSpacing,
             ),
-            itemCount: (board.gridSize ~/ board.subGridRows) * (board.gridSize ~/ board.subGridCols),
+            itemCount:
+                (board.gridSize ~/ board.subGridRows) *
+                (board.gridSize ~/ board.subGridCols),
             itemBuilder: (context, sgIndex) {
               final int numCols = board.gridSize ~/ board.subGridCols;
-                      final sgRow = sgIndex ~/ numCols;
+              final sgRow = sgIndex ~/ numCols;
               final sgCol = sgIndex % numCols;
               return Container(
                 decoration: BoxDecoration(
                   color: gameTheme.subGridBackground,
-                  borderRadius: BorderRadius.circular(gameTheme.subGridBorderRadius),
+                  borderRadius: BorderRadius.circular(
+                    gameTheme.subGridBorderRadius,
+                  ),
                   boxShadow: gameTheme.subGridShadow,
                 ),
                 clipBehavior: Clip.antiAlias,
@@ -169,9 +184,11 @@ class _CustomSudokuBoardWidget extends ConsumerWidget {
                   physics: const NeverScrollableScrollPhysics(),
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: board.gridSize ~/ board.subGridCols,
-                      childAspectRatio: board.subGridCols / board.subGridRows,
+                    childAspectRatio: board.subGridCols / board.subGridRows,
                   ),
-                  itemCount: (board.gridSize ~/ board.subGridRows) * (board.gridSize ~/ board.subGridCols),
+                  itemCount:
+                      (board.gridSize ~/ board.subGridRows) *
+                      (board.gridSize ~/ board.subGridCols),
                   itemBuilder: (context, index) {
                     final localRow = index ~/ board.subGridCols;
                     final localCol = index % board.subGridCols;
@@ -179,21 +196,34 @@ class _CustomSudokuBoardWidget extends ConsumerWidget {
                     final col = sgCol * board.subGridCols + localCol;
                     final cell = board.cellAt(row, col);
 
-                    final isSelected = state.selectedRow == row && state.selectedCol == col;
-                    final isConflict = state.conflictPositions.contains((row, col));
-                    
+                    final isSelected =
+                        state.selectedRow == row && state.selectedCol == col;
+                    final isConflict = state.conflictPositions.contains((
+                      row,
+                      col,
+                    ));
+
                     bool isCrosshair = false;
                     if (state.hasSelection && !isSelected) {
                       final sameRow = row == state.selectedRow;
                       final sameCol = col == state.selectedCol;
-                      final sameSg = (row ~/ board.subGridRows) == (state.selectedRow ~/ board.subGridRows) &&
-                                     (col ~/ board.subGridCols) == (state.selectedCol ~/ board.subGridCols);
+                      final sameSg =
+                          (row ~/ board.subGridRows) ==
+                              (state.selectedRow ~/ board.subGridRows) &&
+                          (col ~/ board.subGridCols) ==
+                              (state.selectedCol ~/ board.subGridCols);
                       isCrosshair = sameRow || sameCol || sameSg;
                     }
 
                     bool isIdenticalValue = false;
-                    if (state.hasSelection && !isSelected && cell.value != null && cell.value != 0) {
-                      final selectedCell = board.cellAt(state.selectedRow, state.selectedCol);
+                    if (state.hasSelection &&
+                        !isSelected &&
+                        cell.value != null &&
+                        cell.value != 0) {
+                      final selectedCell = board.cellAt(
+                        state.selectedRow,
+                        state.selectedCol,
+                      );
                       if (selectedCell.value == cell.value) {
                         isIdenticalValue = true;
                       }
@@ -207,14 +237,16 @@ class _CustomSudokuBoardWidget extends ConsumerWidget {
                       isCrosshair: isCrosshair,
                       isIdentical: isIdenticalValue,
                       isHighlightedNote: false, // Not used here
-                      highlightedValue: null,   // Not used here
+                      highlightedValue: null, // Not used here
                       gridSize: board.gridSize,
                       subGridRows: board.subGridRows,
-                          subGridCols: board.subGridCols,
+                      subGridCols: board.subGridCols,
                       symbolType: SymbolType.standard,
                       gameTheme: gameTheme,
                       onTap: () {
-                        ref.read(customSudokuNotifierProvider.notifier).selectCell(row, col);
+                        ref
+                            .read(customSudokuNotifierProvider.notifier)
+                            .selectCell(row, col);
                       },
                     );
                   },
@@ -232,7 +264,7 @@ class _CustomNumpad extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final gameTheme = ref.watch(gameThemeProvider);
-    
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Container(
@@ -251,7 +283,11 @@ class _CustomNumpad extends ConsumerWidget {
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 2.0),
-                      child: _NumpadButton(value: i, label: '$i', theme: gameTheme),
+                      child: _NumpadButton(
+                        value: i,
+                        label: '$i',
+                        theme: gameTheme,
+                      ),
                     ),
                   ),
               ],
@@ -264,13 +300,22 @@ class _CustomNumpad extends ConsumerWidget {
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 2.0),
-                      child: _NumpadButton(value: i, label: '$i', theme: gameTheme),
+                      child: _NumpadButton(
+                        value: i,
+                        label: '$i',
+                        theme: gameTheme,
+                      ),
                     ),
                   ),
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 2.0),
-                    child: _NumpadButton(value: 0, label: 'X', theme: gameTheme, isDelete: true),
+                    child: _NumpadButton(
+                      value: 0,
+                      label: 'X',
+                      theme: gameTheme,
+                      isDelete: true,
+                    ),
                   ),
                 ),
               ],
@@ -298,8 +343,10 @@ class _NumpadButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // For consistency with main game numpad
-    final textColor = isDelete ? theme.topBarMistakeColor : theme.originalTextColor;
-    
+    final textColor = isDelete
+        ? theme.topBarMistakeColor
+        : theme.originalTextColor;
+
     return AspectRatio(
       aspectRatio: 1.0, // Make it perfectly square like game_number_pad
       child: InkWell(
@@ -311,10 +358,7 @@ class _NumpadButton extends ConsumerWidget {
           decoration: BoxDecoration(
             color: theme.numpadButtonBackground,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: theme.cellBorderColor,
-              width: 1,
-            ),
+            border: Border.all(color: theme.cellBorderColor, width: 1),
             boxShadow: theme.numpadButtonShadow,
           ),
           child: Center(

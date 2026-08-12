@@ -120,7 +120,10 @@ class _ToolButton extends StatelessWidget {
                     right: -10,
                     top: -6,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 4,
+                        vertical: 0,
+                      ),
                       decoration: BoxDecoration(
                         color: color,
                         borderRadius: BorderRadius.circular(8),

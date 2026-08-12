@@ -21,9 +21,15 @@ void main() {
       var board = SudokuBoard.empty();
       // Place two 5s in the first row
       board = board.updateCell(
-          0, 0, const SudokuCell(row: 0, col: 0, solutionValue: 5, value: 5));
+        0,
+        0,
+        const SudokuCell(row: 0, col: 0, solutionValue: 5, value: 5),
+      );
       board = board.updateCell(
-          0, 8, const SudokuCell(row: 0, col: 8, solutionValue: 5, value: 5));
+        0,
+        8,
+        const SudokuCell(row: 0, col: 8, solutionValue: 5, value: 5),
+      );
 
       final conflicts = SudokuValidator.findConflicts(board);
       expect(conflicts, containsAll([(0, 0), (0, 8)]));
@@ -33,9 +39,15 @@ void main() {
       var board = SudokuBoard.empty();
       // Place two 7s in the first column
       board = board.updateCell(
-          0, 0, const SudokuCell(row: 0, col: 0, solutionValue: 7, value: 7));
+        0,
+        0,
+        const SudokuCell(row: 0, col: 0, solutionValue: 7, value: 7),
+      );
       board = board.updateCell(
-          8, 0, const SudokuCell(row: 8, col: 0, solutionValue: 7, value: 7));
+        8,
+        0,
+        const SudokuCell(row: 8, col: 0, solutionValue: 7, value: 7),
+      );
 
       final conflicts = SudokuValidator.findConflicts(board);
       expect(conflicts, containsAll([(0, 0), (8, 0)]));
@@ -45,9 +57,15 @@ void main() {
       var board = SudokuBoard.empty();
       // Place two 9s in the top-left sub-grid (rows 0-2, cols 0-2)
       board = board.updateCell(
-          0, 0, const SudokuCell(row: 0, col: 0, solutionValue: 9, value: 9));
+        0,
+        0,
+        const SudokuCell(row: 0, col: 0, solutionValue: 9, value: 9),
+      );
       board = board.updateCell(
-          2, 2, const SudokuCell(row: 2, col: 2, solutionValue: 9, value: 9));
+        2,
+        2,
+        const SudokuCell(row: 2, col: 2, solutionValue: 9, value: 9),
+      );
 
       final conflicts = SudokuValidator.findConflicts(board);
       expect(conflicts, containsAll([(0, 0), (2, 2)]));
@@ -56,26 +74,41 @@ void main() {
     test('Generated boards use rotational symmetry', () {
       final easyBoard = SudokuGenerator.generate(Difficulty.easy);
       final size = easyBoard.gridSize;
-      
+
       for (var r = 0; r < size; r++) {
         for (var c = 0; c < size; c++) {
           final isGiven = easyBoard.cellAt(r, c).isOriginal;
-          final symIsGiven = easyBoard.cellAt(size - 1 - r, size - 1 - c).isOriginal;
-          expect(isGiven, equals(symIsGiven), 
-            reason: 'Cells at ($r, $c) and symmetric counterpart should both be given or both empty');
+          final symIsGiven = easyBoard
+              .cellAt(size - 1 - r, size - 1 - c)
+              .isOriginal;
+          expect(
+            isGiven,
+            equals(symIsGiven),
+            reason:
+                'Cells at ($r, $c) and symmetric counterpart should both be given or both empty',
+          );
         }
       }
     });
 
-    test('Expert yields exactly 22 clues and Extreme yields exactly 17 clues', () {
-      final expertBoard = SudokuGenerator.generate(Difficulty.expert);
-      expect(expertBoard.filledCellCount, equals(22), 
-        reason: 'Expert mode must enforce strictly 22 clues');
+    test(
+      'Expert yields exactly 22 clues and Extreme yields exactly 17 clues',
+      () {
+        final expertBoard = SudokuGenerator.generate(Difficulty.expert);
+        expect(
+          expertBoard.filledCellCount,
+          equals(22),
+          reason: 'Expert mode must enforce strictly 22 clues',
+        );
 
-      final extremeBoard = SudokuGenerator.generate(Difficulty.extreme);
-      expect(extremeBoard.filledCellCount, equals(17), 
-        reason: 'Extreme mode must enforce strictly 17 clues from seed bank');
-    });
+        final extremeBoard = SudokuGenerator.generate(Difficulty.extreme);
+        expect(
+          extremeBoard.filledCellCount,
+          equals(17),
+          reason: 'Extreme mode must enforce strictly 17 clues from seed bank',
+        );
+      },
+    );
   });
 
   group('SudokuGenerator Tests', () {
@@ -89,55 +122,103 @@ void main() {
         for (var c = 0; c < board.gridSize; c++) {
           final cell = board.cellAt(r, c);
           if (cell.isEmpty) {
-             fullBoard = fullBoard.updateCell(r, c, cell.copyWith(value: cell.solutionValue));
+            fullBoard = fullBoard.updateCell(
+              r,
+              c,
+              cell.copyWith(value: cell.solutionValue),
+            );
           }
         }
       }
 
       final conflicts = SudokuValidator.findConflicts(fullBoard);
-      expect(conflicts, isEmpty, reason: 'Full solution board should have no conflicts.');
-      expect(fullBoard.isCompleted, isTrue, reason: 'Board should be marked as completed.');
+      expect(
+        conflicts,
+        isEmpty,
+        reason: 'Full solution board should have no conflicts.',
+      );
+      expect(
+        fullBoard.isCompleted,
+        isTrue,
+        reason: 'Board should be marked as completed.',
+      );
     });
 
-    test('Given cells count matches difficulty (Fast, Easy, Medium, Hard, Expert, Extreme)', () {
-      final fastBoard = SudokuGenerator.generate(Difficulty.fast);
-      final easyBoard = SudokuGenerator.generate(Difficulty.easy);
-      final mediumBoard = SudokuGenerator.generate(Difficulty.medium);
-      final hardBoard = SudokuGenerator.generate(Difficulty.hard);
-      final expertBoard = SudokuGenerator.generate(Difficulty.expert);
-      final extremeBoard = SudokuGenerator.generate(Difficulty.extreme);
+    test(
+      'Given cells count matches difficulty (Fast, Easy, Medium, Hard, Expert, Extreme)',
+      () {
+        final fastBoard = SudokuGenerator.generate(Difficulty.fast);
+        final easyBoard = SudokuGenerator.generate(Difficulty.easy);
+        final mediumBoard = SudokuGenerator.generate(Difficulty.medium);
+        final hardBoard = SudokuGenerator.generate(Difficulty.hard);
+        final expertBoard = SudokuGenerator.generate(Difficulty.expert);
+        final extremeBoard = SudokuGenerator.generate(Difficulty.extreme);
 
-      expect(fastBoard.filledCellCount, greaterThanOrEqualTo(Difficulty.fast.givenCellCount - 2));
-      expect(easyBoard.filledCellCount, greaterThanOrEqualTo(Difficulty.easy.givenCellCount - 2));
-      expect(mediumBoard.filledCellCount, greaterThanOrEqualTo(Difficulty.medium.givenCellCount - 2));
-      expect(hardBoard.filledCellCount, greaterThanOrEqualTo(Difficulty.hard.givenCellCount - 2));
-      expect(expertBoard.filledCellCount, greaterThanOrEqualTo(Difficulty.expert.givenCellCount - 2));
-      expect(extremeBoard.filledCellCount, greaterThanOrEqualTo(Difficulty.extreme.givenCellCount - 2));
-    });
+        expect(
+          fastBoard.filledCellCount,
+          greaterThanOrEqualTo(Difficulty.fast.givenCellCount - 2),
+        );
+        expect(
+          easyBoard.filledCellCount,
+          greaterThanOrEqualTo(Difficulty.easy.givenCellCount - 2),
+        );
+        expect(
+          mediumBoard.filledCellCount,
+          greaterThanOrEqualTo(Difficulty.medium.givenCellCount - 2),
+        );
+        expect(
+          hardBoard.filledCellCount,
+          greaterThanOrEqualTo(Difficulty.hard.givenCellCount - 2),
+        );
+        expect(
+          expertBoard.filledCellCount,
+          greaterThanOrEqualTo(Difficulty.expert.givenCellCount - 2),
+        );
+        expect(
+          extremeBoard.filledCellCount,
+          greaterThanOrEqualTo(Difficulty.extreme.givenCellCount - 2),
+        );
+      },
+    );
 
     test('Generated boards use rotational symmetry', () {
       final easyBoard = SudokuGenerator.generate(Difficulty.easy);
       final size = easyBoard.gridSize;
-      
+
       for (var r = 0; r < size; r++) {
         for (var c = 0; c < size; c++) {
           final isGiven = easyBoard.cellAt(r, c).isOriginal;
-          final symIsGiven = easyBoard.cellAt(size - 1 - r, size - 1 - c).isOriginal;
-          expect(isGiven, equals(symIsGiven), 
-            reason: 'Cells at ($r, $c) and symmetric counterpart should both be given or both empty');
+          final symIsGiven = easyBoard
+              .cellAt(size - 1 - r, size - 1 - c)
+              .isOriginal;
+          expect(
+            isGiven,
+            equals(symIsGiven),
+            reason:
+                'Cells at ($r, $c) and symmetric counterpart should both be given or both empty',
+          );
         }
       }
     });
 
-    test('Expert yields exactly 22 clues and Extreme yields exactly 17 clues', () {
-      final expertBoard = SudokuGenerator.generate(Difficulty.expert);
-      expect(expertBoard.filledCellCount, equals(22), 
-        reason: 'Expert mode must enforce strictly 22 clues');
+    test(
+      'Expert yields exactly 22 clues and Extreme yields exactly 17 clues',
+      () {
+        final expertBoard = SudokuGenerator.generate(Difficulty.expert);
+        expect(
+          expertBoard.filledCellCount,
+          equals(22),
+          reason: 'Expert mode must enforce strictly 22 clues',
+        );
 
-      final extremeBoard = SudokuGenerator.generate(Difficulty.extreme);
-      expect(extremeBoard.filledCellCount, equals(17), 
-        reason: 'Extreme mode must enforce strictly 17 clues from seed bank');
-    });
+        final extremeBoard = SudokuGenerator.generate(Difficulty.extreme);
+        expect(
+          extremeBoard.filledCellCount,
+          equals(17),
+          reason: 'Extreme mode must enforce strictly 17 clues from seed bank',
+        );
+      },
+    );
   });
 
   group('GameNotifier Tests', () {
@@ -153,10 +234,10 @@ void main() {
 
     test('selectCell updates selected row and col', () {
       final notifier = container.read(gameNotifierProvider.notifier);
-      
+
       notifier.selectCell(3, 4);
       var state = container.read(gameNotifierProvider);
-      
+
       expect(state.selectedRow, equals(3));
       expect(state.selectedCol, equals(4));
 
@@ -167,60 +248,76 @@ void main() {
       expect(state.selectedCol, isNull);
     });
 
-    test('inputNumber updates board immutably and handles notes correctly', () async {
-      final notifier = container.read(gameNotifierProvider.notifier);
-      await notifier.initNewGame(Difficulty.easy);
-      
-      var state = container.read(gameNotifierProvider);
-      // Find an empty, editable cell
-      int? targetRow;
-      int? targetCol;
-      for (var r = 0; r < state.board.gridSize; r++) {
-        for (var c = 0; c < state.board.gridSize; c++) {
-          if (state.board.cellAt(r, c).isEditable) {
-            targetRow = r;
-            targetCol = c;
-            break;
+    test(
+      'inputNumber updates board immutably and handles notes correctly',
+      () async {
+        final notifier = container.read(gameNotifierProvider.notifier);
+        await notifier.initNewGame(Difficulty.easy);
+
+        var state = container.read(gameNotifierProvider);
+        // Find an empty, editable cell
+        int? targetRow;
+        int? targetCol;
+        for (var r = 0; r < state.board.gridSize; r++) {
+          for (var c = 0; c < state.board.gridSize; c++) {
+            if (state.board.cellAt(r, c).isEditable) {
+              targetRow = r;
+              targetCol = c;
+              break;
+            }
           }
+          if (targetRow != null) break;
         }
-        if (targetRow != null) break;
-      }
-      
-      expect(targetRow, isNotNull);
-      final initialBoard = state.board;
 
-      // Input value 5
-      notifier.inputNumber(targetRow!, targetCol!, 5);
-      state = container.read(gameNotifierProvider);
-      
-      expect(state.board, isNot(equals(initialBoard)), reason: 'Board should be a new instance');
-      expect(state.board.cellAt(targetRow, targetCol).value, equals(5));
+        expect(targetRow, isNotNull);
+        final initialBoard = state.board;
 
-      // Toggle Note Mode and input a note (e.g., 7)
-      notifier.toggleNoteMode();
-      notifier.inputNumber(targetRow, targetCol, 7);
-      state = container.read(gameNotifierProvider);
-      
-      // Since cell had value 5, writing a note doesn't work if value is present according to current impl?
-      // Wait, let's test note on a clear cell.
-      notifier.toggleNoteMode(); // Turn off note mode
-      notifier.inputNumber(targetRow, targetCol, 5); // Toggles value 5 off (clears it)
-      state = container.read(gameNotifierProvider);
-      expect(state.board.cellAt(targetRow, targetCol).isEmpty, isTrue);
+        // Input value 5
+        notifier.inputNumber(targetRow!, targetCol!, 5);
+        state = container.read(gameNotifierProvider);
 
-      notifier.toggleNoteMode(); // Turn note mode ON
-      final validNote = state.board.cellAt(targetRow, targetCol).solutionValue;
-      notifier.inputNumber(targetRow, targetCol, validNote); // add valid note
-      state = container.read(gameNotifierProvider);
-      expect(state.board.cellAt(targetRow, targetCol).notes, contains(validNote));
-    });
+        expect(
+          state.board,
+          isNot(equals(initialBoard)),
+          reason: 'Board should be a new instance',
+        );
+        expect(state.board.cellAt(targetRow, targetCol).value, equals(5));
+
+        // Toggle Note Mode and input a note (e.g., 7)
+        notifier.toggleNoteMode();
+        notifier.inputNumber(targetRow, targetCol, 7);
+        state = container.read(gameNotifierProvider);
+
+        // Since cell had value 5, writing a note doesn't work if value is present according to current impl?
+        // Wait, let's test note on a clear cell.
+        notifier.toggleNoteMode(); // Turn off note mode
+        notifier.inputNumber(
+          targetRow,
+          targetCol,
+          5,
+        ); // Toggles value 5 off (clears it)
+        state = container.read(gameNotifierProvider);
+        expect(state.board.cellAt(targetRow, targetCol).isEmpty, isTrue);
+
+        notifier.toggleNoteMode(); // Turn note mode ON
+        final validNote = state.board
+            .cellAt(targetRow, targetCol)
+            .solutionValue;
+        notifier.inputNumber(targetRow, targetCol, validNote); // add valid note
+        state = container.read(gameNotifierProvider);
+        expect(
+          state.board.cellAt(targetRow, targetCol).notes,
+          contains(validNote),
+        );
+      },
+    );
 
     test('undo and redo restore board states accurately', () async {
       final notifier = container.read(gameNotifierProvider.notifier);
       await notifier.initNewGame(Difficulty.easy);
-      
+
       var state = container.read(gameNotifierProvider);
-      
+
       // Find an empty cell
       int? tr, tc;
       for (var r = 0; r < state.board.gridSize; r++) {
@@ -233,18 +330,18 @@ void main() {
         }
         if (tr != null) break;
       }
-      
+
       final boardState1 = state.board;
-      
+
       // Action 1: input 1
       notifier.inputNumber(tr!, tc!, 1);
       final boardState2 = container.read(gameNotifierProvider).board;
-      
+
       // Undo
       notifier.undo();
       state = container.read(gameNotifierProvider);
       expect(state.board, equals(boardState1));
-      
+
       // Redo
       notifier.redo();
       state = container.read(gameNotifierProvider);
@@ -254,9 +351,9 @@ void main() {
     test('useHint decreases hint quota and fills correct cell', () async {
       final notifier = container.read(gameNotifierProvider.notifier);
       await notifier.initNewGame(Difficulty.easy);
-      
+
       var state = container.read(gameNotifierProvider);
-      
+
       // Find an empty cell
       int? tr, tc;
       for (var r = 0; r < state.board.gridSize; r++) {
@@ -269,62 +366,74 @@ void main() {
         }
         if (tr != null) break;
       }
-      
+
       final cellBefore = state.board.cellAt(tr!, tc!);
       final solution = cellBefore.solutionValue;
       final initialHints = state.hintQuota;
-      
+
       notifier.selectCell(tr, tc);
       notifier.useHint();
-      
+
       state = container.read(gameNotifierProvider);
       final cellAfter = state.board.cellAt(tr, tc);
-      
+
       expect(state.hintQuota, equals(initialHints - 1));
       expect(cellAfter.value, equals(solution));
       expect(cellAfter.isCorrect, isTrue);
     });
 
-    test('wrong input increments cumulativeMistakeCount, correct input does not', () async {
-      final notifier = container.read(gameNotifierProvider.notifier);
-      await notifier.initNewGame(Difficulty.easy);
+    test(
+      'wrong input increments cumulativeMistakeCount, correct input does not',
+      () async {
+        final notifier = container.read(gameNotifierProvider.notifier);
+        await notifier.initNewGame(Difficulty.easy);
 
-      var state = container.read(gameNotifierProvider);
+        var state = container.read(gameNotifierProvider);
 
-      // Find an editable cell and its solution
-      int? tr, tc;
-      for (var r = 0; r < state.board.gridSize; r++) {
-        for (var c = 0; c < state.board.gridSize; c++) {
-          if (state.board.cellAt(r, c).isEditable) {
-            tr = r;
-            tc = c;
-            break;
+        // Find an editable cell and its solution
+        int? tr, tc;
+        for (var r = 0; r < state.board.gridSize; r++) {
+          for (var c = 0; c < state.board.gridSize; c++) {
+            if (state.board.cellAt(r, c).isEditable) {
+              tr = r;
+              tc = c;
+              break;
+            }
           }
+          if (tr != null) break;
         }
-        if (tr != null) break;
-      }
 
-      final solution = state.board.cellAt(tr!, tc!).solutionValue;
+        final solution = state.board.cellAt(tr!, tc!).solutionValue;
 
-      // Enter a wrong value (pick something that is definitely not the solution)
-      final wrongValue = solution == 1 ? 2 : 1;
-      notifier.inputNumber(tr, tc, wrongValue);
-      state = container.read(gameNotifierProvider);
-      expect(state.cumulativeMistakeCount, equals(1),
-          reason: 'One wrong input should increment mistake count to 1.');
+        // Enter a wrong value (pick something that is definitely not the solution)
+        final wrongValue = solution == 1 ? 2 : 1;
+        notifier.inputNumber(tr, tc, wrongValue);
+        state = container.read(gameNotifierProvider);
+        expect(
+          state.cumulativeMistakeCount,
+          equals(1),
+          reason: 'One wrong input should increment mistake count to 1.',
+        );
 
-      // Erase the wrong value — mistake count must NOT decrease
-      notifier.clearCell(tr, tc);
-      state = container.read(gameNotifierProvider);
-      expect(state.cumulativeMistakeCount, equals(1),
-          reason: 'Erasing a wrong answer must not reduce the mistake count.');
+        // Erase the wrong value — mistake count must NOT decrease
+        notifier.clearCell(tr, tc);
+        state = container.read(gameNotifierProvider);
+        expect(
+          state.cumulativeMistakeCount,
+          equals(1),
+          reason: 'Erasing a wrong answer must not reduce the mistake count.',
+        );
 
-      // Enter the correct value — must not increment mistake count
-      notifier.inputNumber(tr, tc, solution);
-      state = container.read(gameNotifierProvider);
-      expect(state.cumulativeMistakeCount, equals(1),
-          reason: 'A correct input must not increment the mistake count.');
-    });
+        // Enter the correct value — must not increment mistake count
+        notifier.inputNumber(tr, tc, solution);
+        state = container.read(gameNotifierProvider);
+        expect(
+          state.cumulativeMistakeCount,
+          equals(1),
+          reason: 'A correct input must not increment the mistake count.',
+        );
+      },
+    );
 
     test('game over triggers after maxMistakes wrong inputs', () async {
       final notifier = container.read(gameNotifierProvider.notifier);
@@ -346,8 +455,11 @@ void main() {
         }
       }
 
-      expect(targets.length, equals(GameState.maxMistakes),
-          reason: 'Need at least maxMistakes editable cells.');
+      expect(
+        targets.length,
+        equals(GameState.maxMistakes),
+        reason: 'Need at least maxMistakes editable cells.',
+      );
 
       for (final (r, c, wrong) in targets) {
         state = container.read(gameNotifierProvider);
@@ -357,8 +469,15 @@ void main() {
       }
 
       state = container.read(gameNotifierProvider);
-      expect(state.cumulativeMistakeCount, greaterThanOrEqualTo(GameState.maxMistakes));
-      expect(state.isGameOver, isTrue, reason: 'Game Over must be triggered after maxMistakes.');
+      expect(
+        state.cumulativeMistakeCount,
+        greaterThanOrEqualTo(GameState.maxMistakes),
+      );
+      expect(
+        state.isGameOver,
+        isTrue,
+        reason: 'Game Over must be triggered after maxMistakes.',
+      );
     });
 
     test('fastFillNotes fills valid candidates on empty cells', () async {
@@ -374,8 +493,12 @@ void main() {
         for (var c = 0; c < board.gridSize; c++) {
           final cell = board.cellAt(r, c);
           if (cell.isEditable && cell.isEmpty) {
-            expect(cell.notes.isNotEmpty, isTrue,
-                reason: 'Cell ($r,$c) should have candidate notes after fastFillNotes.');
+            expect(
+              cell.notes.isNotEmpty,
+              isTrue,
+              reason:
+                  'Cell ($r,$c) should have candidate notes after fastFillNotes.',
+            );
           }
         }
       }
@@ -398,26 +521,40 @@ void main() {
     test('Generated boards use rotational symmetry', () {
       final easyBoard = SudokuGenerator.generate(Difficulty.easy);
       final size = easyBoard.gridSize;
-      
+
       for (var r = 0; r < size; r++) {
         for (var c = 0; c < size; c++) {
           final isGiven = easyBoard.cellAt(r, c).isOriginal;
-          final symIsGiven = easyBoard.cellAt(size - 1 - r, size - 1 - c).isOriginal;
-          expect(isGiven, equals(symIsGiven), 
-            reason: 'Cells at ($r, $c) and symmetric counterpart should both be given or both empty');
+          final symIsGiven = easyBoard
+              .cellAt(size - 1 - r, size - 1 - c)
+              .isOriginal;
+          expect(
+            isGiven,
+            equals(symIsGiven),
+            reason:
+                'Cells at ($r, $c) and symmetric counterpart should both be given or both empty',
+          );
         }
       }
     });
 
-    test('Expert yields exactly 22 clues and Extreme yields exactly 17 clues', () {
-      final expertBoard = SudokuGenerator.generate(Difficulty.expert);
-      expect(expertBoard.filledCellCount, equals(22), 
-        reason: 'Expert mode must enforce strictly 22 clues');
+    test(
+      'Expert yields exactly 22 clues and Extreme yields exactly 17 clues',
+      () {
+        final expertBoard = SudokuGenerator.generate(Difficulty.expert);
+        expect(
+          expertBoard.filledCellCount,
+          equals(22),
+          reason: 'Expert mode must enforce strictly 22 clues',
+        );
 
-      final extremeBoard = SudokuGenerator.generate(Difficulty.extreme);
-      expect(extremeBoard.filledCellCount, equals(17), 
-        reason: 'Extreme mode must enforce strictly 17 clues from seed bank');
-    });
+        final extremeBoard = SudokuGenerator.generate(Difficulty.extreme);
+        expect(
+          extremeBoard.filledCellCount,
+          equals(17),
+          reason: 'Extreme mode must enforce strictly 17 clues from seed bank',
+        );
+      },
+    );
   });
 }
-

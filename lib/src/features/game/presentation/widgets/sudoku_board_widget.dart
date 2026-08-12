@@ -43,7 +43,9 @@ class SudokuBoardWidget extends ConsumerWidget {
               mainAxisSpacing: gameTheme.subGridSpacing,
               crossAxisSpacing: gameTheme.subGridSpacing,
             ),
-            itemCount: (board.gridSize ~/ board.subGridRows) * (board.gridSize ~/ board.subGridCols),
+            itemCount:
+                (board.gridSize ~/ board.subGridRows) *
+                (board.gridSize ~/ board.subGridCols),
             itemBuilder: (context, sgIndex) {
               final int numCols = board.gridSize ~/ board.subGridCols;
               final sgRow = sgIndex ~/ numCols;
@@ -113,7 +115,9 @@ class SudokuBoardWidget extends ConsumerWidget {
                               side: const BorderSide(color: Colors.white54),
                             ),
                             onPressed: () {
-                              ref.read(gameNotifierProvider.notifier).restartPuzzle();
+                              ref
+                                  .read(gameNotifierProvider.notifier)
+                                  .restartPuzzle();
                             },
                             icon: const Icon(Icons.refresh),
                             label: const Text('Restart Puzzle'),
@@ -190,7 +194,7 @@ class _SubGridCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final sRows = board.subGridRows;
-      final sCols = board.subGridCols;
+    final sCols = board.subGridCols;
 
     return Container(
       decoration: BoxDecoration(
@@ -271,7 +275,8 @@ class _SubGridCard extends StatelessWidget {
               child: CustomPaint(
                 painter: _DashedGridPainter(
                   color: gameTheme.cellBorderColor,
-                  rows: sRows, cols: sCols,
+                  rows: sRows,
+                  cols: sCols,
                 ),
               ),
             ),
@@ -489,7 +494,11 @@ class _NotesGrid extends StatelessWidget {
 // ---------------------------------------------------------------------------
 
 class _DashedGridPainter extends CustomPainter {
-  const _DashedGridPainter({required this.color, required this.rows, required this.cols});
+  const _DashedGridPainter({
+    required this.color,
+    required this.rows,
+    required this.cols,
+  });
 
   final Color color;
   final int rows;

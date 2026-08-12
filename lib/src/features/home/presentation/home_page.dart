@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../core/router/app_router.dart';
@@ -59,75 +60,134 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-          child: Column(
-            children: [
-              const Spacer(flex: 2),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) {
+          return;
+        }
+        final bool shouldPop =
+            await _showExitConfirmationDialog(context) ?? false;
+        if (shouldPop) {
+          SystemNavigator.pop();
+        }
+      },
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+            child: Column(
+              children: [
+                const Spacer(flex: 2),
 
-              // Logo
-              Center(
-                child: ThemedLogo(size: 160),
-              ),
+                // Logo
+                Center(child: ThemedLogo(size: 160)),
 
-              const Spacer(flex: 3),
+                const Spacer(flex: 3),
 
-              // Menu Buttons
-              if (_hasSavedGame) ...[
-                _OutlinedPillButton(
-                  label: 'Continue',
-                  subLabel: _savedGameSubtitle,
-                  onTap: () {
-                    ref.read(gameNotifierProvider.notifier).loadSavedGame();
-                    context.go(AppRouter.gamePath);
-                  },
+                // Menu Buttons
+                if (_hasSavedGame) ...[
+                  _OutlinedPillButton(
+                    label: 'Continue',
+                    subLabel: _savedGameSubtitle,
+                    onTap: () {
+                      ref.read(gameNotifierProvider.notifier).loadSavedGame();
+                      context.go(AppRouter.gamePath);
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                ],
+
+                _FilledPillButton(
+                  label: 'New Game',
+                  onTap: () => _showNewGameBottomSheet(context),
+                ),
+
+                const Spacer(flex: 4),
+
+                // Bottom Action Row
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _ActionItem(
+                      iconPath: 'assets/person.svg',
+                      label: 'me',
+                      onTap: () => context.push(AppRouter.profilePath),
+                    ),
+                    _ActionItem(
+                      iconPath: 'assets/create.svg',
+                      label: 'create',
+                      onTap: () {
+                        context.push(AppRouter.customSudokuListPath);
+                      },
+                    ),
+                    _ActionItem(
+                      iconPath: 'assets/shop.svg',
+                      label: 'shop',
+                      onTap: () => context.push(AppRouter.shopPath),
+                    ),
+                    _ActionItem(
+                      iconPath: 'assets/setting.svg',
+                      label: 'settings',
+                      onTap: () => context.push(AppRouter.settingsPath),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
               ],
-
-              _FilledPillButton(
-                label: 'New Game',
-                onTap: () => _showNewGameBottomSheet(context),
-              ),
-
-              const Spacer(flex: 4),
-
-              // Bottom Action Row
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _ActionItem(
-                    iconPath: 'assets/person.svg',
-                    label: 'me',
-                    onTap: () => context.push(AppRouter.profilePath),
-                  ),
-                  _ActionItem(
-                    iconPath: 'assets/create.svg',
-                    label: 'create',
-                    onTap: () {
-                      context.push(AppRouter.customSudokuListPath);
-                    },
-                  ),
-                  _ActionItem(
-                    iconPath: 'assets/shop.svg',
-                    label: 'shop',
-                    onTap: () => context.push(AppRouter.shopPath),
-                  ),
-                  _ActionItem(
-                    iconPath: 'assets/setting.svg',
-                    label: 'settings',
-                    onTap: () => context.push(AppRouter.settingsPath),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-            ],
+            ),
           ),
         ),
       ),
+    );
+  }
+
+  Future<bool?> _showExitConfirmationDialog(BuildContext context) {
+    return showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
+          backgroundColor: Colors.white,
+          title: const Text(
+            'Keluar dari MungSudoku?',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF5A5A5A),
+            ),
+          ),
+          content: const Text(
+            'Apakah kamu yakin ingin keluar dari aplikasi?',
+            style: TextStyle(color: Color(0xFF5A5A5A)),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(
+                'Batal',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+              child: const Text('Keluar'),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -148,7 +208,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                 const Text(
                   'New Game',
                   style: TextStyle(
-                    fontSize: 20, 
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF5A5A5A),
                   ),
@@ -229,7 +289,10 @@ class _OutlinedPillButton extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white, // Solid white so shadow doesn't bleed through
             borderRadius: BorderRadius.circular(50),
-            border: Border.all(color: Theme.of(context).colorScheme.primary, width: 2),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.primary,
+              width: 2,
+            ),
             boxShadow: [
               BoxShadow(
                 color: Theme.of(context).colorScheme.primary,
@@ -275,8 +338,8 @@ class _FilledPillButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final primaryColor = Theme.of(context).colorScheme.primary;
     // For #5A5A5A, a lerp of 0.31 yields approx #3e3e3e. We'll use exactly #3e3e3e if it's #5a5a5a
-    final shadowColor = primaryColor == const Color(0xFF5A5A5A) 
-        ? const Color(0xFF3E3E3E) 
+    final shadowColor = primaryColor == const Color(0xFF5A5A5A)
+        ? const Color(0xFF3E3E3E)
         : Color.lerp(primaryColor, Colors.black, 0.2) ?? Colors.black;
 
     return GestureDetector(
@@ -372,7 +435,8 @@ class ThemedLogo extends StatelessWidget {
   Widget build(BuildContext context) {
     final primaryColor = Theme.of(context).colorScheme.primary;
     // Create a darker shade for the shadow slice (similar to what we did for the button)
-    final shadowColor = Color.lerp(primaryColor, Colors.black, 0.2) ?? Colors.black;
+    final shadowColor =
+        Color.lerp(primaryColor, Colors.black, 0.2) ?? Colors.black;
 
     final primaryHex = _colorToHex(primaryColor);
     final shadowHex = _colorToHex(shadowColor);
@@ -381,11 +445,7 @@ class ThemedLogo extends StatelessWidget {
         .replaceAll('#0092DF', primaryHex)
         .replaceAll('#0578B3', shadowHex);
 
-    return SvgPicture.string(
-      coloredSvg,
-      width: size,
-      height: size,
-    );
+    return SvgPicture.string(coloredSvg, width: size, height: size);
   }
 }
 
