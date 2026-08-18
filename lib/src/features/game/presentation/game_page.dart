@@ -10,7 +10,6 @@ import 'game_result_args.dart';
 import 'widgets/game_control_pad.dart';
 import 'widgets/game_number_pad.dart';
 import '../domain/enums/difficulty.dart';
-import 'widgets/game_theme_picker.dart';
 import 'widgets/game_top_bar.dart';
 import 'widgets/sudoku_board_widget.dart';
 
@@ -94,150 +93,171 @@ class _GamePageState extends ConsumerState<GamePage> {
       gameNotifierProvider.select((s) => s.isLoading),
     );
 
-    return Scaffold(
-      body: Stack(
-        children: [
-          // ---- Solid colour background ----
-          Container(color: gameTheme.background),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        final state = ref.read(gameNotifierProvider);
+        if (state.isGameOver || state.isVictory) {
+          context.go('/');
+          return;
+        }
+        if (state.isPaused) {
+          ref.read(gameNotifierProvider.notifier).resumeGame();
+        } else {
+          ref.read(gameNotifierProvider.notifier).pauseGame();
+        }
+      },
+      child: Scaffold(
+        body: Stack(
+          children: [
+            // ---- Solid colour background ----
+            Container(color: gameTheme.background),
 
-          // ---- Decorative arcs (bottom-right corner) ----
-          Positioned(
-            right: 0,
-            bottom: 0,
-            width: 240,
-            height: 240,
-            child: CustomPaint(
-              painter: DecorativeArcsPainter(color: gameTheme.arcColor),
+            // ---- Decorative arcs (bottom-right corner) ----
+            Positioned(
+              right: 0,
+              bottom: 0,
+              width: 240,
+              height: 240,
+              child: CustomPaint(
+                painter: DecorativeArcsPainter(color: gameTheme.arcColor),
+              ),
             ),
-          ),
 
-          // ---- Main content ----
-          SafeArea(
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 500),
-                child: Column(
-                  children: [
-                    // ---- AppBar row ----
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      child: Row(
-                        children: [
-                          IconButton(
-                            icon: SvgPicture.asset(
-                              'assets/arrow-left.svg',
-                              width: 24,
-                              height: 24,
-                              colorFilter: ColorFilter.mode(
-                                gameTheme.topBarTextColor,
-                                BlendMode.srcIn,
+            // ---- Main content ----
+            SafeArea(
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 500),
+                  child: Column(
+                    children: [
+                      // ---- AppBar row ----
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        child: Row(
+                          children: [
+                            IconButton(
+                              icon: SvgPicture.asset(
+                                'assets/arrow-left.svg',
+                                width: 24,
+                                height: 24,
+                                colorFilter: ColorFilter.mode(
+                                  gameTheme.topBarTextColor,
+                                  BlendMode.srcIn,
+                                ),
                               ),
+                              onPressed: () => context.go('/'),
                             ),
-                            onPressed: () => context.go('/'),
-                          ),
-                          Expanded(
-                            child: Center(
-                              child: Text(
-                                'Sudoku',
-                                style: TextStyle(
-                                  color: gameTheme.topBarTextColor,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
+                            Expanded(
+                              child: Center(
+                                child: Text(
+                                  'Sudoku',
+                                  style: TextStyle(
+                                    color: gameTheme.topBarTextColor,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                          const GameThemePopupMenu(),
-                        ],
+                            IconButton(
+                              icon: const Icon(Icons.settings_outlined),
+                              color: gameTheme.topBarTextColor,
+                              tooltip: 'Settings',
+                              onPressed: () => context.push('/settings'),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
 
-                    // ---- Stats row (timer, mistakes, hints) ----
-                    const GameTopBar(),
+                      // ---- Stats row (timer, mistakes, hints) ----
+                      const GameTopBar(),
 
-                    // ---- Board ----
-                    Expanded(
-                      child: Stack(
-                        clipBehavior: Clip.none,
-                        alignment: Alignment.center,
-                        children: [
-                          const Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 2.0,
-                              vertical: 12.0,
-                            ),
-                            child: Center(child: SudokuBoardWidget()),
-                          ),
-                          if (isLoading)
-                            Container(
-                              decoration: BoxDecoration(
-                                color: gameTheme.background.withValues(
-                                  alpha: 0.6,
-                                ),
-                                borderRadius: BorderRadius.circular(12),
+                      // ---- Board ----
+                      Expanded(
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          alignment: Alignment.center,
+                          children: [
+                            const Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 2.0,
+                                vertical: 12.0,
                               ),
-                              width: 80,
-                              height: 80,
-                              alignment: Alignment.center,
-                              child: const CircularProgressIndicator(
-                                color: Colors.white,
-                              ),
+                              child: Center(child: SudokuBoardWidget()),
                             ),
-                          if (ref.watch(
-                            gameNotifierProvider.select(
-                              (s) => s.isAutoCompleteRunning,
-                            ),
-                          ))
-                            Positioned.fill(
-                              child: Container(
+                            if (isLoading)
+                              Container(
                                 decoration: BoxDecoration(
                                   color: gameTheme.background.withValues(
-                                    alpha: 0.8,
+                                    alpha: 0.6,
                                   ),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
+                                width: 80,
+                                height: 80,
                                 alignment: Alignment.center,
-                                child: Text(
-                                  'Auto completing...',
-                                  style: TextStyle(
-                                    color: gameTheme.topBarTextColor,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 24,
+                                child: const CircularProgressIndicator(
+                                  color: Colors.white,
+                                ),
+                              ),
+                            if (ref.watch(
+                              gameNotifierProvider.select(
+                                (s) => s.isAutoCompleteRunning,
+                              ),
+                            ))
+                              Positioned.fill(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: gameTheme.background.withValues(
+                                      alpha: 0.8,
+                                    ),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    'Auto completing...',
+                                    style: TextStyle(
+                                      color: gameTheme.topBarTextColor,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 24,
+                                    ),
                                   ),
                                 ),
                               ),
+                          ],
+                        ),
+                      ),
+
+                      // ---- Toolbar overlapping numpad (Stack overlap) ----
+                      SizedBox(
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          alignment: Alignment.topCenter,
+                          children: [
+                            // Numpad sits behind with top padding for the overlap
+                            const Padding(
+                              padding: EdgeInsets.only(top: 42),
+                              child: GameNumberPad(),
                             ),
-                        ],
+                            // Control toolbar overlaps the top of the numpad
+                            const GameControlPad(),
+                          ],
+                        ),
                       ),
-                    ),
 
-                    // ---- Toolbar overlapping numpad (Stack overlap) ----
-                    SizedBox(
-                      child: Stack(
-                        clipBehavior: Clip.none,
-                        alignment: Alignment.topCenter,
-                        children: [
-                          // Numpad sits behind with top padding for the overlap
-                          const Padding(
-                            padding: EdgeInsets.only(top: 42),
-                            child: GameNumberPad(),
-                          ),
-                          // Control toolbar overlaps the top of the numpad
-                          const GameControlPad(),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 80),
-                  ],
+                      const SizedBox(height: 80),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

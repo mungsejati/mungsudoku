@@ -8,7 +8,6 @@ import '../../../core/router/app_router.dart';
 import '../../../core/theme/game_theme.dart';
 import '../../game/application/game_notifier.dart';
 import '../../game/domain/entities/sudoku_board.dart';
-import '../../game/presentation/widgets/game_theme_picker.dart';
 import '../application/custom_sudoku_list_notifier.dart';
 
 class CustomSudokuListPage extends ConsumerWidget {
@@ -43,7 +42,14 @@ class CustomSudokuListPage extends ConsumerWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        actions: const [GameThemePopupMenu()],
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings_outlined),
+            color: gameTheme.topBarTextColor,
+            tooltip: 'Settings',
+            onPressed: () => context.push('/settings'),
+          ),
+        ],
       ),
       body: Column(
         children: [

@@ -418,8 +418,9 @@ class SudokuBoard {
     if (identical(this, other)) return true;
     if (other is! SudokuBoard ||
         other.subGridRows != subGridRows ||
-        other.subGridCols != subGridCols)
+        other.subGridCols != subGridCols) {
       return false;
+    }
     for (var r = 0; r < gridSize; r++) {
       for (var c = 0; c < gridSize; c++) {
         if (other.cells[r][c] != cells[r][c]) return false;

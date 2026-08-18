@@ -7,7 +7,6 @@ import '../../../core/theme/game_theme.dart';
 import '../../game/domain/enums/symbol_type.dart';
 import '../../game/domain/entities/sudoku_board.dart';
 import '../../game/presentation/widgets/sudoku_board_widget.dart';
-import '../../game/presentation/widgets/game_theme_picker.dart';
 import '../application/custom_sudoku_notifier.dart';
 import '../application/custom_sudoku_list_notifier.dart';
 
@@ -46,7 +45,12 @@ class CustomSudokuPage extends ConsumerWidget {
           ),
         ),
         actions: [
-          const GameThemePopupMenu(),
+          IconButton(
+            icon: const Icon(Icons.settings_outlined),
+            color: gameTheme.topBarTextColor,
+            tooltip: 'Settings',
+            onPressed: () => context.push('/settings'),
+          ),
           IconButton(
             icon: state.isValidating
                 ? SizedBox(

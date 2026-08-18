@@ -73,7 +73,8 @@ Folder ini berisi seluruh *source code* (kode sumber) dari aplikasi MungSudoku. 
 - *Konfigurasi routing navigasi layar dalam aplikasi menggunakan `go_router`.*
 
 ### 📄 `lib/src/features/home/presentation/home_page.dart`
-- **Class/Widget `HomePage`**: Halaman utama aplikasi (Main Menu) yang kini mengusung gaya desain *Clean & Minimalist*. Berisi logo, tombol navigasi permainan, dan baris aksi (action row) dengan palet dasar biru `#0092DF`. Diimplementasikan juga pencegahan penutupan aplikasi otomatis menggunakan `PopScope` (intersep tombol *back*) dengan Dialog Konfirmasi Keluar bergaya *pill-shape*.
+- **Class/Widget `HomePage`**: Halaman utama aplikasi (Main Menu) dengan desain logo tematik SVG (`ThemedLogo`). Tombol "New Game" dirender sebagai *Filled Pill Button* sedangkan tombol "Continue" menggunakan `_OutlinedPillButton` untuk memperjelas hierarki aksi.
+- **`PopScope` (Native Back Button)**: Mengintersepsi tombol kembali fisik/gesture untuk menampilkan `AlertDialog` konfirmasi "Keluar dari MungSudoku?". Jika disetujui, menggunakan `SystemNavigator.pop()` untuk menutup aplikasi secara aman.
 - **Class/Widget `_HomePageState`**: Mengelola state awal dari halaman utama (termasuk mendeteksi adanya *save game*).
 - **Class/Widget `_OutlinedPillButton`**: Desain tombol sekunder/lanjutan (seperti tombol "Continue") berbentuk kapsul dengan garis batas tepi berwarna biru `#0092DF`. Menampilkan teks dinamis sisa waktu dan tingkat kesulitan (contoh: "Medium • 02:30"). Jika tidak ada save data, tombol ini akan disembunyikan.
 - **Class/Widget `_FilledPillButton`**: Desain tombol utama (seperti tombol "New Game") berbentuk kapsul dengan warna latar biru tebal dan *drop shadow*.
@@ -92,7 +93,9 @@ Folder ini berisi seluruh *source code* (kode sumber) dari aplikasi MungSudoku. 
 - **Class/Widget `MockProfileRepository`**: Menyediakan data metrik *hardcode* (`ProfileEntity`) untuk halaman profil. Data ini dirancang agar mudah dibaca dan diubah secara manual oleh developer untuk keperluan pengujian UI.
 
 ### 📄 `lib/src/features/settings/presentation/settings_page.dart`
-- **Class/Widget `SettingsPage`**: Halaman pengaturan aplikasi yang memungkinkan pengguna mengubah tema (Light/Dark/System) dan ukuran font secara dinamis. Perubahan langsung tercermin di seluruh aplikasi dan dapat dilihat secara langsung melalui bagian *Live Preview*.
+- **Class/Widget `SettingsPage`**: Halaman pengaturan global untuk aplikasi. Termasuk fitur *Live Preview* yang memiliki papan sel layaknya `_SubGridCard` lengkap dengan *dashed lines* (menggunakan custom painter) untuk mempratinjau efek tema secara langsung. Menangani propagasi global perubahan State (Font Size, Theme).
+- **Class/Widget `_LivePreviewCard`**: Menampilkan simulasi interaksi warna grid dan teks di permainan, bereaksi instan terhadap perubahan tema.
+- **Class/Widget `_DashedGridPainter`**: Digunakan ulang untuk konsistensi garis putus-putus sub-grid antara halaman Settings dan GameBoard.
 
 ### 📄 `lib/src/features/settings/application/settings_notifier.dart`
 - **Class/Widget `SettingsNotifier`**: Riverpod Notifier yang menyimpan *state* global (`SettingsState`) untuk tema dan ukuran font, menghubungkannya dengan konfigurasi `AppTheme` di `main.dart`.
@@ -121,11 +124,11 @@ Folder ini berisi seluruh *source code* (kode sumber) dari aplikasi MungSudoku. 
   - `function getCustomPuzzles()`: Retrieves the list of all saved custom boards.
 
 ### 📄 `lib/src/features/custom_sudoku/presentation/custom_sudoku_list_page.dart`
-- **Class/Widget `CustomSudokuListPage`**: Layar _List_ untuk menampilkan puzzle hasil buatan sendiri (Custom Sudoku). Layar ini kini dirombak mengikuti _Clean Architecture_ dan bergaya dinamis (merespons warna latar _primaryColor_ tema aktif). Dilengkapi AppBar dengan fungsi tema (`assets/theme.svg`) dan tombol *+ Create New* (pengganti *FloatingActionButton*) di area atas.
+- **Class/Widget `CustomSudokuListPage`**: Layar _List_ untuk menampilkan puzzle hasil buatan sendiri (Custom Sudoku). Layar ini kini dirombak mengikuti _Clean Architecture_ dan bergaya dinamis (merespons warna latar _primaryColor_ tema aktif). Dilengkapi AppBar dengan tombol navigasi Settings (`Icons.settings_outlined`) dan tombol *+ Create New* (pengganti *FloatingActionButton*) di area atas.
 - **Class/Widget `_CustomSudokuCard`**: Desain kartu list kini berbentuk _Pill / Rounded_ dengan _bottom drop shadow_ tebal dan latar putih. Berisi informasi tanggal (dihiasi aset `calendar.svg`), judul kode kustom puzzle, fungsi Hapus (`Delete`), fungsi Eksekusi Main (`Play`), serta fitur berbagi (Share). Fungsi _Share_ menggunakan modal yang memfasilitasi _Copy Code_ ke papan klip (menggunakan `flutter/services.dart` - `Clipboard`) dan rintisan pembagian _Share Link_ ke eksternal.
 
 ### 📄 `lib/src/features/custom_sudoku/presentation/custom_sudoku_page.dart`
-- **Class/Widget `CustomSudokuPage`**: Halaman editor (kanvas) untuk menyusun teka-teki Sudoku buatan sendiri dengan *numpad* 2-baris.
+- **Class/Widget `CustomSudokuPage`**: Halaman editor (Create Page) di mana pemain dapat membuat puzzle mereka sendiri dengan menginputkan angka-angka sebagai kunci jawaban (solution). Tombol tema di app bar telah diganti dengan tombol *Settings* yang mengarah ke halaman pengaturan global.
 - **Class/Widget `_CustomSudokuBoardWidget`**: Wadah papan (grid) khusus untuk layar pembuatan puzzle.
 - **Class/Widget `_CustomNumpad`**: Komponen tata letak tombol angka yang dirancang lebih padat khusus untuk editor.
 - **Class/Widget `_NumpadButton`**: Tombol individual angka/X pada _CustomNumpad.
@@ -205,13 +208,14 @@ Folder ini berisi seluruh *source code* (kode sumber) dari aplikasi MungSudoku. 
   - `function clearNotes()`: Returns a new cell with all pencil marks removed.
 
 ### 📄 `lib/src/features/game/presentation/game_page.dart`
-- **Class/Widget `GamePage`**: Halaman arena bermain Sudoku. Menghubungkan seluruh komponen UI papan, numpad, timer, dan alat. (Dialog in-game untuk status kemenangan atau kekalahan telah dihapus dan digantikan oleh `GameResultPage`).
+- **Class/Widget `GamePage`**: Halaman arena bermain Sudoku. Menghubungkan seluruh komponen UI papan, numpad, timer, dan alat. (Dialog in-game untuk status kemenangan atau kekalahan telah dihapus dan digantikan oleh `GameResultPage`. Popup tema juga telah diganti dengan ikon navigasi Settings).
+- **`PopScope` (Native Back Button)**: Mengintersepsi tombol kembali fisik/gesture. Jika game berjalan, game akan *Pause*. Jika game sedang di-pause, game akan *Resume*. Ini mencegah pengguna terlempar keluar dari game tanpa sengaja.
 - **Class/Widget `_GamePageState`**: Mengatur event daur hidup (lifecycle) `GamePage` dan mendengarkan status menang/kalah untuk memicu navigasi otomatis ke `/result`.
 - **Class/Widget `_PulseAutoCompleteButton`**: Tombol "Auto Complete" yang akan berdenyut memanggil pemain saat sisa sel kosong sangat sedikit.
 - **Class/Widget `_PulseAutoCompleteButtonState`**: Mengelola animasi denyut tak berujung (looping animation) dari tombol Auto Complete.
 
 ### 📄 `lib/src/features/game/presentation/game_result_page.dart`
-- **Class/Widget `GameResultPage`**: Halaman khusus untuk menampilkan hasil akhir dari sebuah permainan (Victory atau Game Over). Halaman ini menerima data statistik (Waktu, Kesulitan, Kesalahan) melalui argumen rute (`GameResultArgs`) dan menggunakan gaya tombol bergaya *pill* yang selaras dengan tema aplikasi.
+- **Class/Widget `GameResultPage`**: Halaman yang menampilkan statistik akhir (Victory / Game Over). Menggunakan desain *dashed line* pemisah untuk statistik dan tombol "Main Menu" kini menggunakan gaya *outlined/transparent* berbingkai tebal. Efek *bottom drop shadow* tebal dipertahankan pada bingkainya agar tetap selaras dengan *pill buttons* lain di aplikasi.
 
 ### 📄 `lib/src/features/game/presentation/utils/symbol_mapper.dart`
 - *Fungsi utilitas untuk menerjemahkan angka data internal (1-9) menjadi berbagai gaya simbol visual (angka biasa, Romawi, warna, dll) di antarmuka.*
@@ -224,10 +228,6 @@ Folder ini berisi seluruh *source code* (kode sumber) dari aplikasi MungSudoku. 
 - **Class/Widget `GameNumberPad`**: Komponen kumpulan tombol input angka 1-9 (berbentuk keypad) di bagian bawah papan bermain.
 - **Class/Widget `_NumpadDigitButton`**: A square numpad button with an overlapping circular badge showing how many of this digit remain to be placed.
 
-
-### 📄 `lib/src/features/game/presentation/widgets/game_theme_picker.dart`
-- **Class/Widget `GameThemePopupMenu`**: Antarmuka *dropdown/popup* untuk mengganti skema warna tema secara dinamis.
-- **Class/Widget `_ThemeSwatch`**: Elemen lingkaran kecil (swatch) penanda warna yang mewakili sebuah preset tema tertentu.
 
 ### 📄 `lib/src/features/game/presentation/widgets/game_top_bar.dart`
 - **Class/Widget `GameTopBar`**: Bar paling atas saat bermain; menampilkan tingkat kesulitan, timer (*stopwatch*), batas kesalahan (mistakes), dan tombol Pause.

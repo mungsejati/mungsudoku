@@ -190,59 +190,74 @@ class _LivePreviewCard extends StatelessWidget {
                 ),
                 boxShadow: gameTheme.subGridShadow,
               ),
-              child: GridView.count(
-                crossAxisCount: 3,
-                physics: const NeverScrollableScrollPhysics(),
-                padding: EdgeInsets.zero,
-                children: List.generate(9, (index) {
-                  final isSelected = index == 4;
-                  final isConflict = index == 2;
-                  final isSameVal = index == 0;
+              child: Stack(
+                children: [
+                  GridView.count(
+                    crossAxisCount: 3,
+                    physics: const NeverScrollableScrollPhysics(),
+                    padding: EdgeInsets.zero,
+                    children: List.generate(9, (index) {
+                      final isSelected = index == 4;
+                      final isConflict = index == 2;
+                      final isSameVal = index == 0;
 
-                  Color bg = Colors.transparent;
-                  Color txt = gameTheme.inputTextColor;
-                  String val = "";
+                      Color bg = Colors.transparent;
+                      Color txt = gameTheme.inputTextColor;
+                      String val = "";
 
-                  if (isSelected) {
-                    bg = gameTheme.selectedCellColor;
-                    val = "5";
-                  } else if (isConflict) {
-                    bg = gameTheme.conflictCellColor;
-                    txt = gameTheme.conflictTextColor;
-                    val = "5";
-                  } else if (isSameVal) {
-                    bg = gameTheme.identicalValueCellColor;
-                    txt = gameTheme.originalTextColor;
-                    val = "5";
-                  } else if (index == 1) {
-                    txt = gameTheme.originalTextColor;
-                    val = "1";
-                  }
+                      if (isSelected) {
+                        bg = gameTheme.selectedCellColor;
+                        val = "5";
+                      } else if (isConflict) {
+                        bg = gameTheme.conflictCellColor;
+                        txt = gameTheme.conflictTextColor;
+                        val = "5";
+                      } else if (isSameVal) {
+                        bg = gameTheme.identicalValueCellColor;
+                        txt = gameTheme.originalTextColor;
+                        val = "5";
+                      } else if (index == 1) {
+                        txt = gameTheme.originalTextColor;
+                        val = "1";
+                      }
 
-                  return Container(
-                    margin: const EdgeInsets.all(1.0),
-                    decoration: BoxDecoration(
-                      color: bg,
-                      border: Border.all(
-                        color: gameTheme.cellBorderColor,
-                        width: 0.5,
-                      ),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Center(
-                      child: Text(
-                        val,
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: (index == 1 || isSameVal)
-                              ? FontWeight.bold
-                              : FontWeight.w500,
-                          color: txt,
+                      return Container(
+                        margin: const EdgeInsets.all(1.0),
+                        decoration: BoxDecoration(
+                          color: bg,
+                          // border: Border.all(
+                          //   color: gameTheme.cellBorderColor,
+                          //   width: 0.5,
+                          // ),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Center(
+                          child: Text(
+                            val,
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: (index == 1 || isSameVal)
+                                  ? FontWeight.bold
+                                  : FontWeight.w500,
+                              color: txt,
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                  Positioned.fill(
+                    child: IgnorePointer(
+                      child: CustomPaint(
+                        painter: _DashedGridPainter(
+                          color: gameTheme.cellBorderColor,
+                          rows: 3,
+                          cols: 3,
                         ),
                       ),
                     ),
-                  );
-                }),
+                  ),
+                ],
               ),
             ),
           ),
@@ -319,4 +334,77 @@ class _GameThemeSwatch extends ConsumerWidget {
       ),
     );
   }
+}
+
+// ---------------------------------------------------------------------------
+// Dashed grid line painter (copied from game board for consistency)
+// ---------------------------------------------------------------------------
+
+class _DashedGridPainter extends CustomPainter {
+  const _DashedGridPainter({
+    required this.color,
+    required this.rows,
+    required this.cols,
+  });
+
+  final Color color;
+  final int rows;
+  final int cols;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 1.0
+      ..style = PaintingStyle.stroke;
+
+    const dashLen = 4.0;
+    const gapLen = 4.0;
+
+    for (var i = 1; i < cols; i++) {
+      final x = size.width * i / cols;
+      _dash(
+        canvas,
+        paint,
+        Offset(x, 0),
+        Offset(x, size.height),
+        dashLen,
+        gapLen,
+      );
+    }
+    for (var i = 1; i < rows; i++) {
+      final y = size.height * i / rows;
+      _dash(
+        canvas,
+        paint,
+        Offset(0, y),
+        Offset(size.width, y),
+        dashLen,
+        gapLen,
+      );
+    }
+  }
+
+  void _dash(
+    Canvas canvas,
+    Paint paint,
+    Offset from,
+    Offset to,
+    double dashLen,
+    double gapLen,
+  ) {
+    final delta = to - from;
+    final length = delta.distance;
+    final step = dashLen + gapLen;
+    final count = (length / step).floor();
+    for (var i = 0; i < count; i++) {
+      final t0 = i * step / length;
+      final t1 = (i * step + dashLen) / length;
+      canvas.drawLine(from + delta * t0, from + delta * t1, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(_DashedGridPainter old) =>
+      old.color != color || old.rows != rows || old.cols != cols;
 }

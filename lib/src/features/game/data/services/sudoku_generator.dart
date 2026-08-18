@@ -168,8 +168,9 @@ abstract final class SudokuGenerator {
             size,
             subGridRows,
             subGridCols,
-          ))
+          )) {
             continue;
+          }
           grid[row][col] = digit;
           if (_solve(grid, size, subGridRows, subGridCols)) return true;
           grid[row][col] = 0; // backtrack

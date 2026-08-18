@@ -79,9 +79,9 @@ class GameResultPage extends ConsumerWidget {
                           borderRadius: BorderRadius.circular(24),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.05),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
+                              color: Colors.black.withValues(alpha: 0.15),
+                              blurRadius: 0,
+                              offset: const Offset(0, 6),
                             ),
                           ],
                         ),
@@ -92,13 +92,17 @@ class GameResultPage extends ConsumerWidget {
                               value: args.difficulty.displayName,
                               textColor: gameTheme.originalTextColor,
                             ),
-                            const Divider(height: 32),
+                            _DashedHorizontalDivider(
+                              color: gameTheme.originalTextColor.withValues(alpha: 0.3),
+                            ),
                             _StatRow(
                               label: 'Time',
                               value: _formatDuration(args.time),
                               textColor: gameTheme.originalTextColor,
                             ),
-                            const Divider(height: 32),
+                            _DashedHorizontalDivider(
+                              color: gameTheme.originalTextColor.withValues(alpha: 0.3),
+                            ),
                             _StatRow(
                               label: 'Mistakes',
                               value: '${args.mistakes}/${args.maxMistakes}',
@@ -208,8 +212,8 @@ class _FilledPillButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(100),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
-              blurRadius: 12,
+              color: Colors.black.withValues(alpha: 0.15),
+              blurRadius: 0,
               offset: const Offset(0, 6),
             ),
           ],
@@ -245,25 +249,80 @@ class _OutlinedPillButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 18),
-        decoration: BoxDecoration(
-          color: Colors.transparent,
-          borderRadius: BorderRadius.circular(100),
-          border: Border.all(color: color, width: 2),
-        ),
-        child: Center(
-          child: Text(
-            label,
-            style: TextStyle(
-              color: color,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.2,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          // Shadow layer on border
+          Positioned.fill(
+            child: Transform.translate(
+              offset: const Offset(0, 6),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(100),
+                  border: Border.all(
+                    color: Colors.black.withValues(alpha: 0.15),
+                    width: 2,
+                  ),
+                ),
+              ),
             ),
           ),
-        ),
+          // Main layer
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 18),
+            decoration: BoxDecoration(
+              color: Colors.transparent,
+              borderRadius: BorderRadius.circular(100),
+              border: Border.all(color: color, width: 2),
+            ),
+            child: Center(
+              child: Text(
+                label,
+                style: TextStyle(
+                  color: color,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.2,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DashedHorizontalDivider extends StatelessWidget {
+  final Color color;
+
+  const _DashedHorizontalDivider({required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16.0),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final boxWidth = constraints.constrainWidth();
+          const dashWidth = 6.0;
+          const dashHeight = 1.0;
+          final dashCount = (boxWidth / (2 * dashWidth)).floor();
+          return Flex(
+            direction: Axis.horizontal,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: List.generate(dashCount, (_) {
+              return SizedBox(
+                width: dashWidth,
+                height: dashHeight,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(color: color),
+                ),
+              );
+            }),
+          );
+        },
       ),
     );
   }

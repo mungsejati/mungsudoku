@@ -76,6 +76,11 @@ void main() {
           builder: (context, state) =>
               const Scaffold(body: Text('Result Page')),
         ),
+        GoRoute(
+          path: '/settings',
+          builder: (context, state) =>
+              const Scaffold(body: Text('Settings Page')),
+        ),
       ],
     );
 
@@ -104,7 +109,7 @@ void main() {
       expect(find.byIcon(Icons.pause), findsOneWidget); // Timer pause button
     });
 
-    testWidgets('Test 2: Theme popup interaction', (tester) async {
+    testWidgets('Test 2: Settings navigation', (tester) async {
       final container = createTestContainer();
 
       final board = createTestBoard();
@@ -113,18 +118,12 @@ void main() {
       await tester.pumpWidget(createWidgetUnderTest(container));
       await tester.pumpAndSettle();
 
-      // Tap theme button (Find theme button by tooltip instead of icon, as it uses an SVG)
-      await tester.tap(find.byTooltip('Theme'));
+      // Tap settings button
+      await tester.tap(find.byTooltip('Settings'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Select Theme'), findsOneWidget);
-
-      // Tap outside to dismiss (tap the title)
-      await tester.tap(find.text('Sudoku'), warnIfMissed: false);
-      await tester.pumpAndSettle();
-
-      // The popup should be gone
-      expect(find.text('Blue'), findsNothing);
+      // Should navigate to Settings Page
+      expect(find.text('Settings Page'), findsOneWidget);
     });
 
     testWidgets('Test 3: Pause interaction', (tester) async {
@@ -506,6 +505,39 @@ void main() {
         true,
       );
       container.read(gameNotifierProvider.notifier).pauseGame();
+    });
+    testWidgets('Test 18: System back button toggles pause state', (tester) async {
+      tester.view.physicalSize = const Size(1080, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      final container = createTestContainer();
+
+      final board = createTestBoard();
+      container.read(gameNotifierProvider.notifier).initCustomGame(board);
+
+      await tester.pumpWidget(createWidgetUnderTest(container));
+      await tester.pumpAndSettle();
+
+      // State is initially running (not paused)
+      expect(container.read(gameNotifierProvider).isPaused, false);
+
+      // Simulate system back button
+      final dynamic widgetsBinding = WidgetsBinding.instance;
+      await widgetsBinding.handlePopRoute();
+      await tester.pumpAndSettle();
+
+      // Verify game is paused
+      expect(container.read(gameNotifierProvider).isPaused, true);
+      expect(find.text('Resume Game'), findsOneWidget);
+
+      // Simulate system back button again
+      await widgetsBinding.handlePopRoute();
+      await tester.pumpAndSettle();
+
+      // Verify game is resumed
+      expect(container.read(gameNotifierProvider).isPaused, false);
+      expect(find.text('Resume Game'), findsNothing);
     });
   });
 }
