@@ -81,10 +81,13 @@ Folder ini berisi seluruh *source code* (kode sumber) dari aplikasi MungSudoku. 
 - **Class/Widget `_ActionItem`**: Ikon beserta label (me, create, shop, settings) yang diletakkan berjejer di bagian bawah layar menggunakan dukungan `flutter_svg`.
 
 ### 📄 `lib/src/features/shop/presentation/shop_page.dart`
-- **Class/Widget `ShopPage`**: Fitur `ShopPage` menyediakan antarmuka toko fiktif (*mock*) yang diakses melalui ikon keranjang ("Shop") di menu utama.
-  - **Antarmuka**: Mengadopsi gaya visual *gamification* dari Main Menu, dengan latar warna primer dan daftar produk berbentuk kapsul dengan efek *drop shadow* bawah tebal (`_ProductCard`).
-  - **Produk Mock**: *Remove Ads*, *Skins / Themes*, *Hints*, *Fast Notes Pack*.
-  - **Interaksi**: Saat pengguna menekan salah satu produk, sebuah `SnackBar` akan muncul menginformasikan status simulasi pembelian.
+- **Class/Widget `ShopPage`**: Antarmuka toko fiktif (*mock*) dengan pendekatan desain SaaS pricing yang mengutamakan *glanceability* dan konversi.
+  - **2-Column Top Row** (`IntrinsicHeight` + `Row`): Kartu kompak "Daily Focus" (Gratis) dan "Pro Upgrade" (Rp 79.000) tampil berdampingan.
+  - **Scarcity Header**: Menampilkan kuota slot Founders tersisa ("1,452 / 2,000") dengan `LinearProgressIndicator` untuk mendorong urgensi.
+  - **3-Column Comparison Pricing Table** (`_PricingTable` → `Row` + `Expanded`): Tiga tier Investor (Silver, Gold, Diamond) tampil sejajar membagi lebar layar secara merata. Tidak ada horizontal scroll — semua kartu terlihat bersamaan.
+    - **Silver & Diamond**: Latar putih, tombol *Outlined* ("Pilih Paket").
+    - **Gold (tengah)**: Latar gelap (`#1A1A2E`), teks putih, badge "Best Value" kuning, tombol *Filled* berwarna amber — desain menonjol sebagai *sweet spot* konversi. Kartu Gold juga diposisikan sedikit lebih tinggi (`top: 0`) vs Silver/Diamond (`top: 12`) sebagai efek *elevation visual*.
+  - **Benefit list**: Setiap tier menggunakan `Icon(Icons.check, size: 11)` + teks padat (font 10pt) untuk kepadatan informasi maksimal dalam ruang sempit.
 
 ### 📄 `lib/src/features/profile/presentation/profile_page.dart`
 - **Class/Widget `ProfilePage`**: Halaman "Me" yang berfungsi sebagai *Mental Focus & Productivity Dashboard*. Menampilkan metrik produktivitas pemain (Games Played, Win Rate, Daily Focus Streak, Deep Work Sessions, Silent Productivity Time) dengan gaya visual minimalis dan *pill-shaped cards*.
